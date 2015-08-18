@@ -1,0 +1,2087 @@
+From loes.jansen at student.kuleuven.be  Mon Jul 24 15:32:53 2006
+From: loes.jansen at student.kuleuven.be (Loes Jansen)
+Date: Mon, 24 Jul 2006 15:32:53 +0200
+Subject: [Rtfirewire-devel] Problems with rtfirewire on mac
+Message-ID: <44C4CC05.4050508@student.kuleuven.be>
+
+Hello,
+
+I've tried to install rtfirewire on an ibook. To make this work, I had
+to make some adjustments on the code: e.g. uncomment the ppc options in
+the makefile. Everything is now compiling just fine and hostconfig works
+without any problems, but when I try to rtping, the computer freezes.
+Sometimes that even happens while insmod-ing the module bis1394. I can't
+see anything in dmesg or /var/log/messages, but I'd really like to make
+it work.
+
+I'm using a 2.6.14.7 kernel, patched with
+adeos-ipipe-2.6.14-ppc-1.3-05.patch and I am now running xenomai-2.2.0.
+
+Can you tell me where to start fixing this problem?
+
+-- 
+Thanks in advance,
+Loes Jansen
+
+
+From jan.kiszka at web.de  Mon Jul 24 16:28:18 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 24 Jul 2006 16:28:18 +0200
+Subject: [Rtfirewire-devel] Problems with rtfirewire on mac
+In-Reply-To: <44C4CC05.4050508@student.kuleuven.be>
+References: <44C4CC05.4050508@student.kuleuven.be>
+Message-ID: <44C4D902.9090608@web.de>
+
+Loes Jansen wrote:
+> Hello,
+> 
+> I've tried to install rtfirewire on an ibook. To make this work, I had
+> to make some adjustments on the code: e.g. uncomment the ppc options in
+> the makefile. Everything is now compiling just fine and hostconfig works
+> without any problems, but when I try to rtping, the computer freezes.
+> Sometimes that even happens while insmod-ing the module bis1394. I can't
+> see anything in dmesg or /var/log/messages, but I'd really like to make
+> it work.
+> 
+> I'm using a 2.6.14.7 kernel, patched with
+> adeos-ipipe-2.6.14-ppc-1.3-05.patch and I am now running xenomai-2.2.0.
+
+There is ipipe-1.3-06 now available as well. Don't know for sure, but it
+should fix the broken CONFIG_DEBUG_SPINLOCK support. So, if that switch
+happened to be on in your .config...
+
+BTW, how did you manage to build rt-firewire against Xenomai >= 2.1? I
+find no support for such thing in its build system. I guess you patched
+rt-firewire in this respect as well, don't you? Then you must have
+adapted the rtos_primitives.h as well to reflect recent RTDM. Could you
+post the patches? I would like to give it at least a compiler run here too.
+
+> 
+> Can you tell me where to start fixing this problem?
+> 
+
+Some general hints (though I still wonder how this can work at all):
+
+Start with testing Xenomai itself if this hasn't been done yet: latency
+test in combination with xeno_timerbench (latency -t 0..2). Then
+continue with switching on Xenomai's and RTDM's debug options. Those may
+detect forgotten lock releases in rtfirewire (maybe your hardward
+triggers different code paths or orders than on x86).
+
+To catch potential last words of your box (the oops): I guess you do not
+have a serial port on your ibook, do you? But netconsole may help you as
+well, see related documentation in the kernel source tree.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060724/0726421c/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 24 16:40:52 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 24 Jul 2006 16:40:52 +0200
+Subject: [Rtfirewire-devel] Fwd:  Problems with rtfirewire on mac
+In-Reply-To: <95210d7e0607240739gd39bd97rb924570ea43a28b4@mail.gmail.com>
+References: <44C4CC05.4050508@student.kuleuven.be> <44C4D902.9090608@web.de>
+	<95210d7e0607240739gd39bd97rb924570ea43a28b4@mail.gmail.com>
+Message-ID: <95210d7e0607240740l7b8493f5jfe92795676e7b2b@mail.gmail.com>
+
+On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Loes Jansen wrote:
+> > Hello,
+> >
+> > I've tried to install rtfirewire on an ibook. To make this work, I had
+> > to make some adjustments on the code: e.g. uncomment the ppc options in
+> > the makefile. Everything is now compiling just fine and hostconfig works
+> > without any problems, but when I try to rtping, the computer freezes.
+> > Sometimes that even happens while insmod-ing the module bis1394. I can't
+> > see anything in dmesg or /var/log/messages, but I'd really like to make
+> > it work.
+> >
+> > I'm using a 2.6.14.7 kernel, patched with
+> > adeos-ipipe-2.6.14-ppc-1.3-05.patch and I am now running xenomai-2.2.0.
+>
+> There is ipipe-1.3-06 now available as well. Don't know for sure, but it
+> should fix the broken CONFIG_DEBUG_SPINLOCK support. So, if that switch
+> happened to be on in your .config...
+>
+> BTW, how did you manage to build rt-firewire against Xenomai >= 2.1? I
+> find no support for such thing in its build system. I guess you patched
+> rt-firewire in this respect as well, don't you? Then you must have
+> adapted the rtos_primitives.h as well to reflect recent RTDM. Could you
+> post the patches? I would like to give it at least a compiler run here too.
+>
+I have made rtfirewire compile over xeno 2.1, (two more options were
+added to the configure tool: --with-linux and --with-rtext-config, and
+yes some small change in the code due to  recent RTDM:)). But it still
+only stays in my own svn repository at home. Tonight, I will have a
+rtping test over xeno2.1 and check in the svn build in berlios.
+
+Yuchen
+
+> >
+> > Can you tell me where to start fixing this problem?
+> >
+>
+> Some general hints (though I still wonder how this can work at all):
+>
+> Start with testing Xenomai itself if this hasn't been done yet: latency
+> test in combination with xeno_timerbench (latency -t 0..2). Then
+> continue with switching on Xenomai's and RTDM's debug options. Those may
+> detect forgotten lock releases in rtfirewire (maybe your hardward
+> triggers different code paths or orders than on x86).
+>
+> To catch potential last words of your box (the oops): I guess you do not
+> have a serial port on your ibook, do you? But netconsole may help you as
+> well, see related documentation in the kernel source tree.
+>
+> Jan
+>
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From piet.levrier at student.kuleuven.be  Mon Jul 24 16:55:41 2006
+From: piet.levrier at student.kuleuven.be (Piet Levrier)
+Date: Mon, 24 Jul 2006 16:55:41 +0200
+Subject: [Rtfirewire-devel] Fwd:  Problems with rtfirewire on mac
+In-Reply-To: <95210d7e0607240740l7b8493f5jfe92795676e7b2b@mail.gmail.com>
+References: <44C4CC05.4050508@student.kuleuven.be>
+	<44C4D902.9090608@web.de>	<95210d7e0607240739gd39bd97rb924570ea43a28b4@mail.gmail.com>
+	<95210d7e0607240740l7b8493f5jfe92795676e7b2b@mail.gmail.com>
+Message-ID: <44C4DF6D.2090706@student.kuleuven.be>
+
+
+
+Yuchen Zhang wrote:
+> On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>   
+>> Loes Jansen wrote:
+>>     
+>>> Hello,
+>>>
+>>> I've tried to install rtfirewire on an ibook. To make this work, I had
+>>> to make some adjustments on the code: e.g. uncomment the ppc options in
+>>> the makefile. Everything is now compiling just fine and hostconfig works
+>>> without any problems, but when I try to rtping, the computer freezes.
+>>> Sometimes that even happens while insmod-ing the module bis1394. I can't
+>>> see anything in dmesg or /var/log/messages, but I'd really like to make
+>>> it work.
+>>>
+>>> I'm using a 2.6.14.7 kernel, patched with
+>>> adeos-ipipe-2.6.14-ppc-1.3-05.patch and I am now running xenomai-2.2.0.
+>>>       
+>> There is ipipe-1.3-06 now available as well. Don't know for sure, but it
+>> should fix the broken CONFIG_DEBUG_SPINLOCK support. So, if that switch
+>> happened to be on in your .config...
+>>
+>>     
+
+Where exactly can we find this patch ipipe-1.3-06?
+
+>> BTW, how did you manage to build rt-firewire against Xenomai >= 2.1? I
+>> find no support for such thing in its build system. I guess you patched
+>> rt-firewire in this respect as well, don't you? Then you must have
+>> adapted the rtos_primitives.h as well to reflect recent RTDM. Could you
+>> post the patches? I would like to give it at least a compiler run here too.
+>>
+>>     
+> I have made rtfirewire compile over xeno 2.1, (two more options were
+> added to the configure tool: --with-linux and --with-rtext-config, and
+> yes some small change in the code due to  recent RTDM:)). But it still
+> only stays in my own svn repository at home. Tonight, I will have a
+> rtping test over xeno2.1 and check in the svn build in berlios.
+>
+> Yuchen
+>   
+
+Loes & I have compiled Yuchens' code of rtfirewire over xenomai 2.1 on 
+an x86 architecture and rtping gives no problems here.
+
+>>> Can you tell me where to start fixing this problem?
+>>>
+>>>       
+>> Some general hints (though I still wonder how this can work at all):
+>>
+>> Start with testing Xenomai itself if this hasn't been done yet: latency
+>> test in combination with xeno_timerbench (latency -t 0..2). Then
+>> continue with switching on Xenomai's and RTDM's debug options. Those may
+>> detect forgotten lock releases in rtfirewire (maybe your hardward
+>> triggers different code paths or orders than on x86).
+>>
+>>     
+The tests available in the testsuite of xenomai seem to work on the ibook.
+We'll switch on the debug options and try again.
+
+Piet
+
+>> To catch potential last words of your box (the oops): I guess you do not
+>> have a serial port on your ibook, do you? But netconsole may help you as
+>> well, see related documentation in the kernel source tree.
+>>
+>> Jan
+>>
+>>
+>>
+>> _______________________________________________
+>> Rtfirewire-devel mailing list
+>> Rtfirewire-devel at lists.berlios.de
+>> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>>
+>>
+>>
+>>
+>>     
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>   
+
+
+From jan.kiszka at web.de  Mon Jul 24 18:00:22 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 24 Jul 2006 18:00:22 +0200
+Subject: [Rtfirewire-devel] Fwd:  Problems with rtfirewire on mac
+In-Reply-To: <44C4DF6D.2090706@student.kuleuven.be>
+References: <44C4CC05.4050508@student.kuleuven.be>	<44C4D902.9090608@web.de>	<95210d7e0607240739gd39bd97rb924570ea43a28b4@mail.gmail.com>	<95210d7e0607240740l7b8493f5jfe92795676e7b2b@mail.gmail.com>
+	<44C4DF6D.2090706@student.kuleuven.be>
+Message-ID: <44C4EE96.5030702@web.de>
+
+Piet Levrier wrote:
+> 
+> Yuchen Zhang wrote:
+>> On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>>   
+>>> Loes Jansen wrote:
+>>>     
+>>>> Hello,
+>>>>
+>>>> I've tried to install rtfirewire on an ibook. To make this work, I had
+>>>> to make some adjustments on the code: e.g. uncomment the ppc options in
+>>>> the makefile. Everything is now compiling just fine and hostconfig works
+>>>> without any problems, but when I try to rtping, the computer freezes.
+>>>> Sometimes that even happens while insmod-ing the module bis1394. I can't
+>>>> see anything in dmesg or /var/log/messages, but I'd really like to make
+>>>> it work.
+>>>>
+>>>> I'm using a 2.6.14.7 kernel, patched with
+>>>> adeos-ipipe-2.6.14-ppc-1.3-05.patch and I am now running xenomai-2.2.0.
+>>>>       
+>>> There is ipipe-1.3-06 now available as well. Don't know for sure, but it
+>>> should fix the broken CONFIG_DEBUG_SPINLOCK support. So, if that switch
+>>> happened to be on in your .config...
+>>>
+>>>     
+> 
+> Where exactly can we find this patch ipipe-1.3-06?
+
+http://download.gna.org/adeos/patches/v2.6/ppc/ (or in Xenomai's SVN)
+
+> 
+>>> BTW, how did you manage to build rt-firewire against Xenomai >= 2.1? I
+>>> find no support for such thing in its build system. I guess you patched
+>>> rt-firewire in this respect as well, don't you? Then you must have
+>>> adapted the rtos_primitives.h as well to reflect recent RTDM. Could you
+>>> post the patches? I would like to give it at least a compiler run here too.
+>>>
+>>>     
+>> I have made rtfirewire compile over xeno 2.1, (two more options were
+>> added to the configure tool: --with-linux and --with-rtext-config, and
+>> yes some small change in the code due to  recent RTDM:)). But it still
+>> only stays in my own svn repository at home. Tonight, I will have a
+>> rtping test over xeno2.1 and check in the svn build in berlios.
+>>
+>> Yuchen
+>>   
+> 
+> Loes & I have compiled Yuchens' code of rtfirewire over xenomai 2.1 on 
+> an x86 architecture and rtping gives no problems here.
+
+Good sign so far. Maybe some endianess problem somewhere? Hmm, on the
+other hand it already crashes on insmod, not only on communication.
+
+> 
+>>>> Can you tell me where to start fixing this problem?
+>>>>
+>>>>       
+>>> Some general hints (though I still wonder how this can work at all):
+>>>
+>>> Start with testing Xenomai itself if this hasn't been done yet: latency
+>>> test in combination with xeno_timerbench (latency -t 0..2). Then
+>>> continue with switching on Xenomai's and RTDM's debug options. Those may
+>>> detect forgotten lock releases in rtfirewire (maybe your hardward
+>>> triggers different code paths or orders than on x86).
+>>>
+>>>     
+> The tests available in the testsuite of xenomai seem to work on the ibook.
+> We'll switch on the debug options and try again.
+>
+
+Ok.
+
+I was almost trying to suggest you to install kgdb for ipipe (kernel
+debugger) when I remembered that we only have x86 support so far. And it
+also requires a serial link. So, "prink debugging" will therefore be the
+way to go when the debug switches doesn't help. Another trick:
+ipipe_set_printk_sync(&rthal_domain) forces immediate printing instead
+of deferred one over Linux.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060724/fc7241d0/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 24 18:47:46 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 24 Jul 2006 18:47:46 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+	compiles over Xenomai 2.1
+Message-ID: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>
+
+Hi, all
+
+the current trunk revision (96) of RT-FireWire svn repository in
+berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+has to specify two options along the configure tool:
+
+--with-linux= the path to your real-time linux kernel
+
+--with-rtext-config=the path to the xeno-config in your box (e.g.
+/usr/xenomai/bin/xeno-config)
+
+So far, the rtping test has been runnig without problem. The lastest
+xenomai2.2 has NOT been tested yet.
+
+Best regards,
+Yuchen
+
+
+From jan.kiszka at web.de  Mon Jul 24 19:13:32 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 24 Jul 2006 19:13:32 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+ compiles over Xenomai 2.1
+In-Reply-To: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>
+Message-ID: <44C4FFBC.7040802@web.de>
+
+Yuchen Zhang wrote:
+> Hi, all
+> 
+> the current trunk revision (96) of RT-FireWire svn repository in
+> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+> has to specify two options along the configure tool:
+> 
+> --with-linux= the path to your real-time linux kernel
+> 
+> --with-rtext-config=the path to the xeno-config in your box (e.g.
+> /usr/xenomai/bin/xeno-config)
+> 
+> So far, the rtping test has been runnig without problem. The lastest
+> xenomai2.2 has NOT been tested yet.
+
+It also compiles fine against Xenomai trunk once you patched
+configure.ac (which I strongly recommend, Yuchen :)). There were no RTDM
+API changes between 2.1 and 2.2.
+
+Some gcc-4.1 warning at this chance:
+
+/usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+?ohci_remove1?:
+/usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3099: warning:
+enumeration value ?OHCI_INIT_HAVE_MEM_REGION? not handled in switch
+/usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+?ohci1394_init_iso_ctx?:
+/usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3533: warning:
+label ?OHCI_ISO_MULTICHANNEL_RECEIVE? defined but not used
+
+One restriction for now: MODULE_PARM got dropped on 2.6.17, so 2.6.16 is
+the limit for rt-firewire ATM.
+
+Yuchen, there are also changes in the way module symbols are handled in
+2.6.17, check RTnet rev. #995. Definitely not urging though.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060724/24fc35c4/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 24 22:45:42 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 24 Jul 2006 22:45:42 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+	compiles over Xenomai 2.1
+In-Reply-To: <44C4FFBC.7040802@web.de>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>
+	<44C4FFBC.7040802@web.de>
+Message-ID: <95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>
+
+On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > Hi, all
+> >
+> > the current trunk revision (96) of RT-FireWire svn repository in
+> > berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+> > has to specify two options along the configure tool:
+> >
+> > --with-linux= the path to your real-time linux kernel
+> >
+> > --with-rtext-config=the path to the xeno-config in your box (e.g.
+> > /usr/xenomai/bin/xeno-config)
+> >
+> > So far, the rtping test has been runnig without problem. The lastest
+> > xenomai2.2 has NOT been tested yet.
+>
+> It also compiles fine against Xenomai trunk once you patched
+> configure.ac (which I strongly recommend, Yuchen :)). There were no RTDM
+> API changes between 2.1 and 2.2.
+>
+Yes, some minor changes in the configure.ac should enable the compile
+over xeno2.2 and trunk, also over ppc platform. Checked in already,
+but not tested yet:)
+
+> Some gcc-4.1 warning at this chance:
+>
+> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+> ?ohci_remove1?:
+> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3099: warning:
+> enumeration value ?OHCI_INIT_HAVE_MEM_REGION? not handled in switch
+> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+> ?ohci1394_init_iso_ctx?:
+> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3533: warning:
+> label ?OHCI_ISO_MULTICHANNEL_RECEIVE? defined but not used
+>
+I also got these warnings, due to some legacy code from Linux driver,
+so far considered not harmful.
+
+> One restriction for now: MODULE_PARM got dropped on 2.6.17, so 2.6.16 is
+> the limit for rt-firewire ATM.
+>
+> Yuchen, there are also changes in the way module symbols are handled in
+> 2.6.17, check RTnet rev. #995. Definitely not urging though.
+>
+Thanks for informing this. I am still using 2.6.14, so not yet
+confronted with this problem. Will look into it in the future when
+this limitation starts bothering us more:)
+
+Yuchen
+
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From piet.levrier at student.kuleuven.be  Tue Jul 25 14:01:37 2006
+From: piet.levrier at student.kuleuven.be (Piet Levrier)
+Date: Tue, 25 Jul 2006 14:01:37 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+ compiles over Xenomai 2.1
+In-Reply-To: <95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>	<44C4FFBC.7040802@web.de>
+	<95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>
+Message-ID: <44C60821.2030201@student.kuleuven.be>
+
+
+
+Yuchen Zhang wrote:
+> On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>   
+>> Yuchen Zhang wrote:
+>>     
+>>> Hi, all
+>>>
+>>> the current trunk revision (96) of RT-FireWire svn repository in
+>>> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+>>> has to specify two options along the configure tool:
+>>>
+>>> --with-linux= the path to your real-time linux kernel
+>>>
+>>> --with-rtext-config=the path to the xeno-config in your box (e.g.
+>>> /usr/xenomai/bin/xeno-config)
+>>>
+>>> So far, the rtping test has been runnig without problem. The lastest
+>>> xenomai2.2 has NOT been tested yet.
+>>>       
+>> It also compiles fine against Xenomai trunk once you patched
+>> configure.ac (which I strongly recommend, Yuchen :)). There were no RTDM
+>> API changes between 2.1 and 2.2.
+>>
+>>     
+> Yes, some minor changes in the configure.ac should enable the compile
+> over xeno2.2 and trunk, also over ppc platform. Checked in already,
+> but not tested yet:)
+>   
+
+We've adapted configure.ac a little bit and it compiles fine over 
+xenomai2.2.  However,
+rtping results in the following error: "ioctl: Cannot allocate memory". 
+Any suggestions?
+
+piet
+
+>> Some gcc-4.1 warning at this chance:
+>>
+>> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+>> ?ohci_remove1?:
+>> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3099: warning:
+>> enumeration value ?OHCI_INIT_HAVE_MEM_REGION? not handled in switch
+>> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+>> ?ohci1394_init_iso_ctx?:
+>> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3533: warning:
+>> label ?OHCI_ISO_MULTICHANNEL_RECEIVE? defined but not used
+>>
+>>     
+> I also got these warnings, due to some legacy code from Linux driver,
+> so far considered not harmful.
+>
+>   
+>> One restriction for now: MODULE_PARM got dropped on 2.6.17, so 2.6.16 is
+>> the limit for rt-firewire ATM.
+>>
+>> Yuchen, there are also changes in the way module symbols are handled in
+>> 2.6.17, check RTnet rev. #995. Definitely not urging though.
+>>
+>>     
+> Thanks for informing this. I am still using 2.6.14, so not yet
+> confronted with this problem. Will look into it in the future when
+> this limitation starts bothering us more:)
+>
+> Yuchen
+>   
+
+
+
+From jan.kiszka at web.de  Tue Jul 25 14:40:35 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 14:40:35 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+ compiles over Xenomai 2.1
+In-Reply-To: <44C60821.2030201@student.kuleuven.be>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>	<44C4FFBC.7040802@web.de>	<95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>
+	<44C60821.2030201@student.kuleuven.be>
+Message-ID: <44C61143.7020308@web.de>
+
+Piet Levrier wrote:
+> 
+> Yuchen Zhang wrote:
+>> On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>>   
+>>> Yuchen Zhang wrote:
+>>>     
+>>>> Hi, all
+>>>>
+>>>> the current trunk revision (96) of RT-FireWire svn repository in
+>>>> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+>>>> has to specify two options along the configure tool:
+>>>>
+>>>> --with-linux= the path to your real-time linux kernel
+>>>>
+>>>> --with-rtext-config=the path to the xeno-config in your box (e.g.
+>>>> /usr/xenomai/bin/xeno-config)
+>>>>
+>>>> So far, the rtping test has been runnig without problem. The lastest
+>>>> xenomai2.2 has NOT been tested yet.
+>>>>       
+>>> It also compiles fine against Xenomai trunk once you patched
+>>> configure.ac (which I strongly recommend, Yuchen :)). There were no RTDM
+>>> API changes between 2.1 and 2.2.
+>>>
+>>>     
+>> Yes, some minor changes in the configure.ac should enable the compile
+>> over xeno2.2 and trunk, also over ppc platform. Checked in already,
+>> but not tested yet:)
+>>   
+> 
+> We've adapted configure.ac a little bit and it compiles fine over 
+> xenomai2.2.  However,
+
+Latest SVN builds without patching here.
+
+> rtping results in the following error: "ioctl: Cannot allocate memory". 
+> Any suggestions?
+
+Fishy. Maybe some memory corruption. Do you have these two in your .config:
+
+CONFIG_DEBUG_SLAB=y
+CONFIG_DEBUG_SLAB_LEAK=y
+
+Already helped me revealing leaks and corruption in other projects.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/91b89eeb/attachment.pgp>
+
+From piet.levrier at student.kuleuven.be  Tue Jul 25 15:23:16 2006
+From: piet.levrier at student.kuleuven.be (Piet Levrier)
+Date: Tue, 25 Jul 2006 15:23:16 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+ compiles over Xenomai 2.1
+In-Reply-To: <95210d7e0607250555y340136d3r79bf56b3f57f1fbf@mail.gmail.com>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>	
+	<44C4FFBC.7040802@web.de>	
+	<95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>	
+	<44C60821.2030201@student.kuleuven.be>	
+	<95210d7e0607250537y18f8903cg15018591b31c7e59@mail.gmail.com>	
+	<44C61246.3080500@student.kuleuven.be>
+	<95210d7e0607250555y340136d3r79bf56b3f57f1fbf@mail.gmail.com>
+Message-ID: <44C61B44.70205@student.kuleuven.be>
+
+
+
+Yuchen Zhang wrote:
+> On 7/25/06, Piet Levrier <piet.levrier at student.kuleuven.be> wrote:
+>>
+>>
+>> Yuchen Zhang wrote:
+>> > On 7/25/06, Piet Levrier <piet.levrier at student.kuleuven.be> wrote:
+>> >>
+>> >>
+>> >> Yuchen Zhang wrote:
+>> >> > On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>> >> >
+>> >> >> Yuchen Zhang wrote:
+>> >> >>
+>> >> >>> Hi, all
+>> >> >>>
+>> >> >>> the current trunk revision (96) of RT-FireWire svn repository in
+>> >> >>> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1,
+>> >> one
+>> >> >>> has to specify two options along the configure tool:
+>> >> >>>
+>> >> >>> --with-linux= the path to your real-time linux kernel
+>> >> >>>
+>> >> >>> --with-rtext-config=the path to the xeno-config in your box (e.g.
+>> >> >>> /usr/xenomai/bin/xeno-config)
+>> >> >>>
+>> >> >>> So far, the rtping test has been runnig without problem. The 
+>> lastest
+>> >> >>> xenomai2.2 has NOT been tested yet.
+>> >> >>>
+>> >> >> It also compiles fine against Xenomai trunk once you patched
+>> >> >> configure.ac (which I strongly recommend, Yuchen :)). There were
+>> >> no RTDM
+>> >> >> API changes between 2.1 and 2.2.
+>> >> >>
+>> >> >>
+>> >> > Yes, some minor changes in the configure.ac should enable the 
+>> compile
+>> >> > over xeno2.2 and trunk, also over ppc platform. Checked in already,
+>> >> > but not tested yet:)
+>> >> >
+>> >>
+>> >> We've adapted configure.ac a little bit and it compiles fine over
+>> >> xenomai2.2.  However,
+>> >> rtping results in the following error: "ioctl: Cannot allocate 
+>> memory".
+>> >> Any suggestions?
+>> >>
+>> >
+>> > Can you tell me what the dmesg said?
+>>
+>> ./rtping -h fwhost0 -d 0 -s 500 results solely in
+>> "Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with
+>> priority 0."
+>> and then
+>> "ioctl: Cannot allocate memory"
+>>
+>> dmesg says nothing.
+>>
+> Ok, try to unload all the rtfw modules, see if you got memory leakage?
+> I guess the error happens in bis_send_echo, when it cannot allocate
+> new packet. If yes, the possible cause is the internal memory leakage.
+>
+> Yuchen
+>
+When I unload all the rtfw modules (rtpkbuff, rt_serv, rtpc, 
+rt_ieee1394, rt_ohci1394 and bis1394), memory is released.
+After reloading the modules, rtping worked... but not for long. 
+Here's what I did after insmodding the modules:
+
+# ./hostconfig fwhost0
+
+fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+          Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+          Pending Packets:0
+          [NO FLAGS]  Max Packet Size: 2048
+          Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+          Iso xmit DMA ctx:8   Usage:ffffff00
+          Iso rcv DMA ctx:4   Usage:fffffff0
+          Isochronous BW:4915    Channels:fffffffeffffffff
+
+# ./hostconfig fwhost0 up
+
+# ./hostconfig fwhost0
+
+fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+          Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+          Pending Packets:0
+          UP RUNNING  Max Packet Size: 2048
+          Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+          Iso xmit DMA ctx:8   Usage:ffffff00
+          Iso rcv DMA ctx:4   Usage:fffffff0
+          Isochronous BW:4915    Channels:fffffffeffffffff
+
+---------------------------------------------------------->>>> So far so 
+good
+
+# ./rtping -h fwhost0 -d 0 -s 500
+Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+priority 0.
+500 bytes roundtriping fwhost0 and 0: time=65.5 us
+500 bytes roundtriping fwhost0 and 0: time=56.2 us
+500 bytes roundtriping fwhost0 and 0: time=59.8 us
+500 bytes roundtriping fwhost0 and 0: time=56.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.0 us
+500 bytes roundtriping fwhost0 and 0: time=66.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.8 us
+500 bytes roundtriping fwhost0 and 0: time=59.3 us
+500 bytes roundtriping fwhost0 and 0: time=59.5 us
+500 bytes roundtriping fwhost0 and 0: time=59.6 us
+500 bytes roundtriping fwhost0 and 0: time=57.9 us
+500 bytes roundtriping fwhost0 and 0: time=57.8 us
+500 bytes roundtriping fwhost0 and 0: time=58.4 us
+ioctl: Resource temporarily unavailable
+
+------------------------------------------------------->>>> retry...
+
+# ./rtping -h fwhost0 -d 0 -s 500
+Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+priority 0.
+ioctl: Cannot allocate memory
+
+# dmesg | tail
+[ 6070.296204] New ioctl RT-Firewire Core registered
+[ 6070.297826] RT-Firewire:Real-Time FireWire Stack Initialized!
+[ 6074.300420] OHCI driver for RT-FireWire project
+[ 6074.300462] PCI: Found IRQ 10 for device 0000:00:0a.0
+[ 6074.351377] RT-firewire: register fwhost0
+[ 6080.679353] New ioctl Bus Internal Service on FireWire registered
+[ 6136.192210] 
+/usr/src/RT-FireWire/build/stack/ieee1394_core.c[abort_timedouts]: 
+packet sent to node[65472] from fwhost0 timeouts!!!
+[ 6136.192224]
+[ 6142.495884] 
+/usr/src/RT-FireWire/build/stack/ieee1394_core.c[hpsb_free_packet]: 
+packet to fwhost0 still refered!
+[ 6142.495900]
+
+
+During rtping, no further memory was consumed.
+
+piet
+
+
+From jan.kiszka at web.de  Tue Jul 25 15:36:24 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 15:36:24 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+ compiles over Xenomai 2.1
+In-Reply-To: <44C61B44.70205@student.kuleuven.be>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>		<44C4FFBC.7040802@web.de>		<95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>		<44C60821.2030201@student.kuleuven.be>		<95210d7e0607250537y18f8903cg15018591b31c7e59@mail.gmail.com>		<44C61246.3080500@student.kuleuven.be>	<95210d7e0607250555y340136d3r79bf56b3f57f1fbf@mail.gmail.com>
+	<44C61B44.70205@student.kuleuven.be>
+Message-ID: <44C61E58.7080007@web.de>
+
+Piet Levrier wrote:
+> 
+> Yuchen Zhang wrote:
+>> On 7/25/06, Piet Levrier <piet.levrier at student.kuleuven.be> wrote:
+>>>
+>>> Yuchen Zhang wrote:
+>>>> On 7/25/06, Piet Levrier <piet.levrier at student.kuleuven.be> wrote:
+>>>>>
+>>>>> Yuchen Zhang wrote:
+>>>>>> On 7/24/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>>>>>>
+>>>>>>> Yuchen Zhang wrote:
+>>>>>>>
+>>>>>>>> Hi, all
+>>>>>>>>
+>>>>>>>> the current trunk revision (96) of RT-FireWire svn repository in
+>>>>>>>> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1,
+>>>>> one
+>>>>>>>> has to specify two options along the configure tool:
+>>>>>>>>
+>>>>>>>> --with-linux= the path to your real-time linux kernel
+>>>>>>>>
+>>>>>>>> --with-rtext-config=the path to the xeno-config in your box (e.g.
+>>>>>>>> /usr/xenomai/bin/xeno-config)
+>>>>>>>>
+>>>>>>>> So far, the rtping test has been runnig without problem. The 
+>>> lastest
+>>>>>>>> xenomai2.2 has NOT been tested yet.
+>>>>>>>>
+>>>>>>> It also compiles fine against Xenomai trunk once you patched
+>>>>>>> configure.ac (which I strongly recommend, Yuchen :)). There were
+>>>>> no RTDM
+>>>>>>> API changes between 2.1 and 2.2.
+>>>>>>>
+>>>>>>>
+>>>>>> Yes, some minor changes in the configure.ac should enable the 
+>>> compile
+>>>>>> over xeno2.2 and trunk, also over ppc platform. Checked in already,
+>>>>>> but not tested yet:)
+>>>>>>
+>>>>> We've adapted configure.ac a little bit and it compiles fine over
+>>>>> xenomai2.2.  However,
+>>>>> rtping results in the following error: "ioctl: Cannot allocate 
+>>> memory".
+>>>>> Any suggestions?
+>>>>>
+>>>> Can you tell me what the dmesg said?
+>>> ./rtping -h fwhost0 -d 0 -s 500 results solely in
+>>> "Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with
+>>> priority 0."
+>>> and then
+>>> "ioctl: Cannot allocate memory"
+>>>
+>>> dmesg says nothing.
+>>>
+>> Ok, try to unload all the rtfw modules, see if you got memory leakage?
+>> I guess the error happens in bis_send_echo, when it cannot allocate
+>> new packet. If yes, the possible cause is the internal memory leakage.
+>>
+>> Yuchen
+>>
+> When I unload all the rtfw modules (rtpkbuff, rt_serv, rtpc, 
+> rt_ieee1394, rt_ohci1394 and bis1394), memory is released.
+> After reloading the modules, rtping worked... but not for long. 
+> Here's what I did after insmodding the modules:
+> 
+> # ./hostconfig fwhost0
+> 
+> fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+>           Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+>           Pending Packets:0
+>           [NO FLAGS]  Max Packet Size: 2048
+>           Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+>           Iso xmit DMA ctx:8   Usage:ffffff00
+>           Iso rcv DMA ctx:4   Usage:fffffff0
+>           Isochronous BW:4915    Channels:fffffffeffffffff
+> 
+> # ./hostconfig fwhost0 up
+> 
+> # ./hostconfig fwhost0
+> 
+> fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+>           Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+>           Pending Packets:0
+>           UP RUNNING  Max Packet Size: 2048
+>           Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+>           Iso xmit DMA ctx:8   Usage:ffffff00
+>           Iso rcv DMA ctx:4   Usage:fffffff0
+>           Isochronous BW:4915    Channels:fffffffeffffffff
+> 
+> ---------------------------------------------------------->>>> So far so 
+> good
+> 
+> # ./rtping -h fwhost0 -d 0 -s 500
+> Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+> priority 0.
+> 500 bytes roundtriping fwhost0 and 0: time=65.5 us
+> 500 bytes roundtriping fwhost0 and 0: time=56.2 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=56.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.0 us
+> 500 bytes roundtriping fwhost0 and 0: time=66.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.3 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.5 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.6 us
+> 500 bytes roundtriping fwhost0 and 0: time=57.9 us
+> 500 bytes roundtriping fwhost0 and 0: time=57.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=58.4 us
+> ioctl: Resource temporarily unavailable
+> 
+> ------------------------------------------------------->>>> retry...
+> 
+> # ./rtping -h fwhost0 -d 0 -s 500
+> Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+> priority 0.
+> ioctl: Cannot allocate memory
+> 
+> # dmesg | tail
+> [ 6070.296204] New ioctl RT-Firewire Core registered
+> [ 6070.297826] RT-Firewire:Real-Time FireWire Stack Initialized!
+> [ 6074.300420] OHCI driver for RT-FireWire project
+> [ 6074.300462] PCI: Found IRQ 10 for device 0000:00:0a.0
+> [ 6074.351377] RT-firewire: register fwhost0
+> [ 6080.679353] New ioctl Bus Internal Service on FireWire registered
+> [ 6136.192210] 
+> /usr/src/RT-FireWire/build/stack/ieee1394_core.c[abort_timedouts]: 
+> packet sent to node[65472] from fwhost0 timeouts!!!
+> [ 6136.192224]
+> [ 6142.495884] 
+> /usr/src/RT-FireWire/build/stack/ieee1394_core.c[hpsb_free_packet]: 
+> packet to fwhost0 still refered!
+> [ 6142.495900]
+> 
+> 
+> During rtping, no further memory was consumed.
+
+Looks to me like the internal buffer management of rt-firewire fails to
+reclaim transmitted or received buffers here. But I'm now better backing
+out of this - this is something where Yuchen has far better insight. :)
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/e34ca308/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Jul 25 15:51:02 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 25 Jul 2006 15:51:02 +0200
+Subject: [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios
+	compiles over Xenomai 2.1
+In-Reply-To: <44C61B44.70205@student.kuleuven.be>
+References: <95210d7e0607240947q72952858l9d69a06c9f7a3aa7@mail.gmail.com>
+	<44C4FFBC.7040802@web.de>
+	<95210d7e0607241345p6c3c0fa4sb15a63e79d775637@mail.gmail.com>
+	<44C60821.2030201@student.kuleuven.be>
+	<95210d7e0607250537y18f8903cg15018591b31c7e59@mail.gmail.com>
+	<44C61246.3080500@student.kuleuven.be>
+	<95210d7e0607250555y340136d3r79bf56b3f57f1fbf@mail.gmail.com>
+	<44C61B44.70205@student.kuleuven.be>
+Message-ID: <95210d7e0607250651i14ce4cd8p980d6b63d1bcb874@mail.gmail.com>
+
+On 7/25/06, Piet Levrier <piet.levrier at student.kuleuven.be> wrote:
+
+> When I unload all the rtfw modules (rtpkbuff, rt_serv, rtpc,
+> rt_ieee1394, rt_ohci1394 and bis1394), memory is released.
+> After reloading the modules, rtping worked... but not for long.
+> Here's what I did after insmodding the modules:
+>
+> # ./hostconfig fwhost0
+>
+> fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+>           Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+>           Pending Packets:0
+>           [NO FLAGS]  Max Packet Size: 2048
+>           Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+>           Iso xmit DMA ctx:8   Usage:ffffff00
+>           Iso rcv DMA ctx:4   Usage:fffffff0
+>           Isochronous BW:4915    Channels:fffffffeffffffff
+>
+> # ./hostconfig fwhost0 up
+>
+> # ./hostconfig fwhost0
+>
+> fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+>           Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+>           Pending Packets:0
+>           UP RUNNING  Max Packet Size: 2048
+>           Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+>           Iso xmit DMA ctx:8   Usage:ffffff00
+>           Iso rcv DMA ctx:4   Usage:fffffff0
+>           Isochronous BW:4915    Channels:fffffffeffffffff
+>
+> ---------------------------------------------------------->>>> So far so
+> good
+>
+> # ./rtping -h fwhost0 -d 0 -s 500
+> Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with
+> priority 0.
+> 500 bytes roundtriping fwhost0 and 0: time=65.5 us
+> 500 bytes roundtriping fwhost0 and 0: time=56.2 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=56.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.0 us
+> 500 bytes roundtriping fwhost0 and 0: time=66.1 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.3 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.5 us
+> 500 bytes roundtriping fwhost0 and 0: time=59.6 us
+> 500 bytes roundtriping fwhost0 and 0: time=57.9 us
+> 500 bytes roundtriping fwhost0 and 0: time=57.8 us
+> 500 bytes roundtriping fwhost0 and 0: time=58.4 us
+> ioctl: Resource temporarily unavailable
+>
+> ------------------------------------------------------->>>> retry...
+>
+> # ./rtping -h fwhost0 -d 0 -s 500
+> Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with
+> priority 0.
+> ioctl: Cannot allocate memory
+>
+> # dmesg | tail
+> [ 6070.296204] New ioctl RT-Firewire Core registered
+> [ 6070.297826] RT-Firewire:Real-Time FireWire Stack Initialized!
+> [ 6074.300420] OHCI driver for RT-FireWire project
+> [ 6074.300462] PCI: Found IRQ 10 for device 0000:00:0a.0
+> [ 6074.351377] RT-firewire: register fwhost0
+> [ 6080.679353] New ioctl Bus Internal Service on FireWire registered
+> [ 6136.192210]
+> /usr/src/RT-FireWire/build/stack/ieee1394_core.c[abort_timedouts]:
+> packet sent to node[65472] from fwhost0 timeouts!!!
+> [ 6136.192224]
+> [ 6142.495884]
+> /usr/src/RT-FireWire/build/stack/ieee1394_core.c[hpsb_free_packet]:
+> packet to fwhost0 still refered!
+> [ 6142.495900]
+>
+>
+> During rtping, no further memory was consumed.
+>
+Ok, it seems you are doing loopback roundtrip. To be honest, I have
+seen this error before during my own testing. If you try with two
+nodes, it should be gone. I will try to reproduce this error later at
+home.
+
+Yuchen
+
+
+From jan.kiszka at web.de  Tue Jul 25 17:44:41 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 17:44:41 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+Message-ID: <44C63C69.8030205@web.de>
+
+This patch enables 2.6.17 support (also 2.6.16 when compiling with gcc-4.1).
+
+Jan
+
+PS: A simple svn diff revealed a lot of whitespace changes after touching the files.
+I guess some cleanup wrt trailing spaces or line feeds is required.
+
+
+ drivers/ohci/rt_ohci1394.c |    6 +++---
+ rtpkbuff/rtpkbuff.c        |    2 +-
+ stack/csr.c                |    2 +-
+ stack/hosts.c              |    2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+Index: rtpkbuff/rtpkbuff.c
+===================================================================
+--- rtpkbuff/rtpkbuff.c	(revision 97)
++++ rtpkbuff/rtpkbuff.c	(working copy)
+@@ -39,7 +39,7 @@
+ 	rtdm_printk("RTPKB:%s[%d]: " fmt "\n",  __FUNCTION__, __LINE__, ## args)
+ 
+ static unsigned int rtpkb_cache_size = DEFAULT_RTPKB_CACHE_SIZE;
+-MODULE_PARM(rtpkb_cache_size, "i");
++module_param(rtpkb_cache_size, uint, 0444);
+ MODULE_PARM_DESC(rtpkb_cache_size, "Number of cached rtpkbs for creating pools in real-time");
+ 
+ 
+Index: stack/hosts.c
+===================================================================
+--- stack/hosts.c	(revision 97)
++++ stack/hosts.c	(working copy)
+@@ -59,7 +59,7 @@ DECLARE_MUTEX(hpsb_hosts_lock);
+ 
+ /*! module parameter,Number of additional global realtime packet buffers per network adapter*/
+ unsigned int device_rtpkbs = DEFAULT_DEVICE_RTPKBS;
+-MODULE_PARM(device_rtpkbs, "i");
++module_param(device_rtpkbs, uint, 0444);
+ MODULE_PARM_DESC(device_rtpkbs, "Number of additional global realtime packet "
+                  "buffers per network adapter");
+ 
+Index: stack/csr.c
+===================================================================
+--- stack/csr.c	(revision 97)
++++ stack/csr.c	(working copy)
+@@ -46,7 +46,7 @@
+ /* Module Parameters */
+ /* this module parameter can be used to disable mapping of the FCP registers */
+ static int fcp = 1;
+-MODULE_PARM(fcp,"i");
++module_param(fcp, int, 0444);
+ MODULE_PARM_DESC(fcp, "Map FCP registers (default = 1, disable = 0).");
+ 
+ static struct csr1212_keyval *node_cap = NULL;
+Index: drivers/ohci/rt_ohci1394.c
+===================================================================
+--- drivers/ohci/rt_ohci1394.c	(revision 97)
++++ drivers/ohci/rt_ohci1394.c	(working copy)
+@@ -151,13 +151,13 @@ static char version[] __devinitdata =
+ 
+ /* Module Parameters */
+ static int cards = 2;
+-MODULE_PARM(cards, "i");
++module_param(cards, int, 0444);
+ MODULE_PARM_DESC(cards, "Number of cards to be steered by this driver (default  = 2).");
+ static int disable_irm = 0;
+-MODULE_PARM(disable_irm, "i");
++module_param(disable_irm, int, 0444);
+ MODULE_PARM_DESC(disable_irm, "Disable Isochronous Resource Manager Contending on local adapter (default = NO).");
+ static int phys_dma = 1;
+-MODULE_PARM(phys_dma, "i");
++module_param(phys_dma, int, 0444);
+ MODULE_PARM_DESC(phys_dma, "Enable dma for physical packets (default = 1).");
+ 
+ static unsigned int cards_found;
+
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/c49ada1e/attachment.pgp>
+
+From jan.kiszka at web.de  Tue Jul 25 17:44:48 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 17:44:48 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+Message-ID: <44C63C70.3030807@web.de>
+
+Hi,
+
+some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+
+BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+ printing eip:
+c012eca8
+...
+EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+
+That's due to registering the OHCI IRQ with a NULL driver name (I called
+cat /proc/xenomai/irq).
+
+
+The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+tried to restart this command:
+
+/usr/src/rt-firewire/build/stack/ieee1394_core.c[abort_timedouts]: packet sent to node[65472] from fwhost0 timeouts!!!
+
+/usr/src/rt-firewire/build/stack/ieee1394_core.c[hpsb_free_packet]: packet to fwhost0 still refered!
+
+BUG: unable to handle kernel paging request at virtual address 6b6b6b6f
+ printing eip:
+c011ee08
+*pde = 00000000
+Oops: 0002 [#2]
+Modules linked in: bis1394 rtpc rt_ohci1394 rt_ieee1394 rt_serv rtpkbuff 8139too e100
+CPU:    0
+EIP:    0060:[<c011ee08>]    Not tainted VLI
+EFLAGS: 00010246   (2.6.17.6 #8) 
+EIP is at prepare_to_wait+0x2e/0x5f
+eax: 6b6b6b6b   ebx: f7063e98   ecx: 00000200   edx: f7063ea4
+esi: f75050a8   edi: 00000001   ebp: f7063e68   esp: f7063e5c
+ds: 007b   es: 007b   ss: 0068
+Process rtping (pid: 946, threadinfo=f7062000 task=f7c2b070)
+Stack: f7505090 f7063f04 f7063e8c f7063eb8 f88d434d f7063e94 0000007d 00000000 
+       00000000 00000000 00000000 00000000 0804a260 f7062000 f7063ea4 00000000 
+       f7c2b070 c011ec9b f7063ea4 f7063ea4 ffffffe7 c02c0100 f7063ed8 f7063f10 
+Call Trace:
+ <c0102cc4> show_stack_log_lvl+0x86/0x91  <c0102e5c> show_registers+0x149/0x1b6
+ <c0103024> die+0x15b/0x277  <c010b1e9> do_page_fault+0x4ab/0x59d
+ <c010916c> __ipipe_handle_exception+0x61/0x91  <c0102784> error_code+0x54/0x70
+ <f88d434d> rtfw_rtpc_dispatch_call+0x165/0x278 [rtpc]  <f88d7113> bis_ioctl+0x6c/0x101 [bis1394]
+ <f88bfcb9> ieee1394_ioctl+0x87/0xbc [rt_ieee1394]  <c016bd46> do_ioctl+0x4e/0x5f
+ <c016bf59> vfs_ioctl+0x202/0x21c  <c016bfc0> sys_ioctl+0x4d/0x69
+ <c0275806> syscall_call+0x7/0xb 
+Code: 57 56 53 e8 b7 a3 fe ff 83 22 fe 89 d3 89 cf 89 c6 e8 6f cc 00 00 8d 53 0c 83 f8 01 19 c9 81 e1 00 02 00 00 39 53 0c 75 0d 8b 06 <89> 50 04 89 43 0c 89 72 04 89 16 83 7b 04 00 74 0b b8 00 e0 ff 
+EIP: [<c011ee08>] prepare_to_wait+0x2e/0x5f SS:ESP 0068:f7063e5c
+
+
+That pattern 6b6b6b6b indicates some release bug (CONFIG_DEBUG_SLAB):
+/usr/src/linux/mm/slab.c:#define POISON_FREE    0x6b    /* for use-after-free poisoning */ 
+
+Jan
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/91d7f78b/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Jul 25 19:24:50 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 25 Jul 2006 19:24:50 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <44C63C69.8030205@web.de>
+References: <44C63C69.8030205@web.de>
+Message-ID: <95210d7e0607251024g17f77607r8bbafb3b7b638f06@mail.gmail.com>
+
+So, after patching, does it still compile with Linux < 2.6.17, using gcc-4.0?
+
+Yuchen
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> This patch enables 2.6.17 support (also 2.6.16 when compiling with gcc-4.1).
+>
+> Jan
+>
+> PS: A simple svn diff revealed a lot of whitespace changes after touching the files.
+> I guess some cleanup wrt trailing spaces or line feeds is required.
+>
+>
+>  drivers/ohci/rt_ohci1394.c |    6 +++---
+>  rtpkbuff/rtpkbuff.c        |    2 +-
+>  stack/csr.c                |    2 +-
+>  stack/hosts.c              |    2 +-
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> Index: rtpkbuff/rtpkbuff.c
+> ===================================================================
+> --- rtpkbuff/rtpkbuff.c (revision 97)
+> +++ rtpkbuff/rtpkbuff.c (working copy)
+> @@ -39,7 +39,7 @@
+>         rtdm_printk("RTPKB:%s[%d]: " fmt "\n",  __FUNCTION__, __LINE__, ## args)
+>
+>  static unsigned int rtpkb_cache_size = DEFAULT_RTPKB_CACHE_SIZE;
+> -MODULE_PARM(rtpkb_cache_size, "i");
+> +module_param(rtpkb_cache_size, uint, 0444);
+>  MODULE_PARM_DESC(rtpkb_cache_size, "Number of cached rtpkbs for creating pools in real-time");
+>
+>
+> Index: stack/hosts.c
+> ===================================================================
+> --- stack/hosts.c       (revision 97)
+> +++ stack/hosts.c       (working copy)
+> @@ -59,7 +59,7 @@ DECLARE_MUTEX(hpsb_hosts_lock);
+>
+>  /*! module parameter,Number of additional global realtime packet buffers per network adapter*/
+>  unsigned int device_rtpkbs = DEFAULT_DEVICE_RTPKBS;
+> -MODULE_PARM(device_rtpkbs, "i");
+> +module_param(device_rtpkbs, uint, 0444);
+>  MODULE_PARM_DESC(device_rtpkbs, "Number of additional global realtime packet "
+>                   "buffers per network adapter");
+>
+> Index: stack/csr.c
+> ===================================================================
+> --- stack/csr.c (revision 97)
+> +++ stack/csr.c (working copy)
+> @@ -46,7 +46,7 @@
+>  /* Module Parameters */
+>  /* this module parameter can be used to disable mapping of the FCP registers */
+>  static int fcp = 1;
+> -MODULE_PARM(fcp,"i");
+> +module_param(fcp, int, 0444);
+>  MODULE_PARM_DESC(fcp, "Map FCP registers (default = 1, disable = 0).");
+>
+>  static struct csr1212_keyval *node_cap = NULL;
+> Index: drivers/ohci/rt_ohci1394.c
+> ===================================================================
+> --- drivers/ohci/rt_ohci1394.c  (revision 97)
+> +++ drivers/ohci/rt_ohci1394.c  (working copy)
+> @@ -151,13 +151,13 @@ static char version[] __devinitdata =
+>
+>  /* Module Parameters */
+>  static int cards = 2;
+> -MODULE_PARM(cards, "i");
+> +module_param(cards, int, 0444);
+>  MODULE_PARM_DESC(cards, "Number of cards to be steered by this driver (default  = 2).");
+>  static int disable_irm = 0;
+> -MODULE_PARM(disable_irm, "i");
+> +module_param(disable_irm, int, 0444);
+>  MODULE_PARM_DESC(disable_irm, "Disable Isochronous Resource Manager Contending on local adapter (default = NO).");
+>  static int phys_dma = 1;
+> -MODULE_PARM(phys_dma, "i");
+> +module_param(phys_dma, int, 0444);
+>  MODULE_PARM_DESC(phys_dma, "Enable dma for physical packets (default = 1).");
+>
+>  static unsigned int cards_found;
+>
+>
+>
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From yuchen623 at gmail.com  Tue Jul 25 19:29:35 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 25 Jul 2006 19:29:35 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <44C63C70.3030807@web.de>
+References: <44C63C70.3030807@web.de>
+Message-ID: <95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Hi,
+>
+> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+>
+> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+>  printing eip:
+> c012eca8
+> ...
+> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+>
+> That's due to registering the OHCI IRQ with a NULL driver name (I called
+> cat /proc/xenomai/irq).
+>
+So, this is new in 2.6.17 kernel, Is it?
+
+>
+> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+> tried to restart this command:
+>
+This bug happens when running loopback rtping. I will try to reproduce
+this bug here at home.
+
+Yuchen
+
+> /usr/src/rt-firewire/build/stack/ieee1394_core.c[abort_timedouts]: packet sent to node[65472] from fwhost0 timeouts!!!
+>
+> /usr/src/rt-firewire/build/stack/ieee1394_core.c[hpsb_free_packet]: packet to fwhost0 still refered!
+>
+> BUG: unable to handle kernel paging request at virtual address 6b6b6b6f
+>  printing eip:
+> c011ee08
+> *pde = 00000000
+> Oops: 0002 [#2]
+> Modules linked in: bis1394 rtpc rt_ohci1394 rt_ieee1394 rt_serv rtpkbuff 8139too e100
+> CPU:    0
+> EIP:    0060:[<c011ee08>]    Not tainted VLI
+> EFLAGS: 00010246   (2.6.17.6 #8)
+> EIP is at prepare_to_wait+0x2e/0x5f
+> eax: 6b6b6b6b   ebx: f7063e98   ecx: 00000200   edx: f7063ea4
+> esi: f75050a8   edi: 00000001   ebp: f7063e68   esp: f7063e5c
+> ds: 007b   es: 007b   ss: 0068
+> Process rtping (pid: 946, threadinfo=f7062000 task=f7c2b070)
+> Stack: f7505090 f7063f04 f7063e8c f7063eb8 f88d434d f7063e94 0000007d 00000000
+>        00000000 00000000 00000000 00000000 0804a260 f7062000 f7063ea4 00000000
+>        f7c2b070 c011ec9b f7063ea4 f7063ea4 ffffffe7 c02c0100 f7063ed8 f7063f10
+> Call Trace:
+>  <c0102cc4> show_stack_log_lvl+0x86/0x91  <c0102e5c> show_registers+0x149/0x1b6
+>  <c0103024> die+0x15b/0x277  <c010b1e9> do_page_fault+0x4ab/0x59d
+>  <c010916c> __ipipe_handle_exception+0x61/0x91  <c0102784> error_code+0x54/0x70
+>  <f88d434d> rtfw_rtpc_dispatch_call+0x165/0x278 [rtpc]  <f88d7113> bis_ioctl+0x6c/0x101 [bis1394]
+>  <f88bfcb9> ieee1394_ioctl+0x87/0xbc [rt_ieee1394]  <c016bd46> do_ioctl+0x4e/0x5f
+>  <c016bf59> vfs_ioctl+0x202/0x21c  <c016bfc0> sys_ioctl+0x4d/0x69
+>  <c0275806> syscall_call+0x7/0xb
+> Code: 57 56 53 e8 b7 a3 fe ff 83 22 fe 89 d3 89 cf 89 c6 e8 6f cc 00 00 8d 53 0c 83 f8 01 19 c9 81 e1 00 02 00 00 39 53 0c 75 0d 8b 06 <89> 50 04 89 43 0c 89 72 04 89 16 83 7b 04 00 74 0b b8 00 e0 ff
+> EIP: [<c011ee08>] prepare_to_wait+0x2e/0x5f SS:ESP 0068:f7063e5c
+>
+>
+> That pattern 6b6b6b6b indicates some release bug (CONFIG_DEBUG_SLAB):
+> /usr/src/linux/mm/slab.c:#define POISON_FREE    0x6b    /* for use-after-free poisoning */
+>
+> Jan
+>
+>
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From jan.kiszka at web.de  Tue Jul 25 19:32:47 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 19:32:47 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <95210d7e0607251024g17f77607r8bbafb3b7b638f06@mail.gmail.com>
+References: <44C63C69.8030205@web.de>
+	<95210d7e0607251024g17f77607r8bbafb3b7b638f06@mail.gmail.com>
+Message-ID: <44C655BF.8010204@web.de>
+
+Yuchen Zhang wrote:
+> So, after patching, does it still compile with Linux < 2.6.17, using gcc-4.0?
+> 
+
+At least down to 2.6.13 (I recently watched someone running latest RTnet
+over it, and RTnet includes such patches). I guess it was introduced
+with 2.5.something. And this even works on 2.4 kernels (was back-ported).
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/374f7b1f/attachment.pgp>
+
+From jan.kiszka at web.de  Tue Jul 25 19:35:01 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 19:35:01 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>
+References: <44C63C70.3030807@web.de>
+	<95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>
+Message-ID: <44C65645.7090702@web.de>
+
+Yuchen Zhang wrote:
+> On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>> Hi,
+>>
+>> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+>>
+>> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+>>  printing eip:
+>> c012eca8
+>> ...
+>> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+>>
+>> That's due to registering the OHCI IRQ with a NULL driver name (I called
+>> cat /proc/xenomai/irq).
+>>
+> So, this is new in 2.6.17 kernel, Is it?
+
+You mean Xenomai 2.1, don't you? :)
+(part of the IRQ subsystem restructuring in Xenomai and Adeos)
+
+> 
+>> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+>> tried to restart this command:
+>>
+> This bug happens when running loopback rtping. I will try to reproduce
+> this bug here at home.
+
+Ok. It's at least nicely reproducable.
+
+Jan
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/5e509d5c/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Jul 25 20:31:04 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 25 Jul 2006 20:31:04 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <44C65645.7090702@web.de>
+References: <44C63C70.3030807@web.de>
+	<95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>
+	<44C65645.7090702@web.de>
+Message-ID: <95210d7e0607251131y6a72659an593aef991eb75f8a@mail.gmail.com>
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> >> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+> >>
+> >> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+> >>  printing eip:
+> >> c012eca8
+> >> ...
+> >> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+> >>
+> >> That's due to registering the OHCI IRQ with a NULL driver name (I called
+> >> cat /proc/xenomai/irq).
+> >>
+> > So, this is new in 2.6.17 kernel, Is it?
+>
+> You mean Xenomai 2.1, don't you? :)
+> (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+>
+Ok, now I get it:) You mean this oops only happens when you call
+/proc/xenomai/irq. I will try to fix this.
+
+> >
+> >> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+> >> tried to restart this command:
+> >>
+> > This bug happens when running loopback rtping. I will try to reproduce
+> > this bug here at home.
+>
+> Ok. It's at least nicely reproducable.
+>
+I acutally have fixed this bug long time ago. But due to some
+configuration management mistake, the head revision was not containing
+this fix. It has been fixed now, Just check out the head rev and give
+another try:)
+
+Yuchen
+
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From jan.kiszka at web.de  Tue Jul 25 20:53:24 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 20:53:24 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <95210d7e0607251131y6a72659an593aef991eb75f8a@mail.gmail.com>
+References: <44C63C70.3030807@web.de>	<95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>	<44C65645.7090702@web.de>
+	<95210d7e0607251131y6a72659an593aef991eb75f8a@mail.gmail.com>
+Message-ID: <44C668A4.7060204@web.de>
+
+Yuchen Zhang wrote:
+> On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>>>> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+>>>>
+>>>> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+>>>>  printing eip:
+>>>> c012eca8
+>>>> ...
+>>>> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+>>>>
+>>>> That's due to registering the OHCI IRQ with a NULL driver name (I called
+>>>> cat /proc/xenomai/irq).
+>>>>
+>>> So, this is new in 2.6.17 kernel, Is it?
+>> You mean Xenomai 2.1, don't you? :)
+>> (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+>>
+> Ok, now I get it:) You mean this oops only happens when you call
+> /proc/xenomai/irq. I will try to fix this.
+> 
+>>>> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+>>>> tried to restart this command:
+>>>>
+>>> This bug happens when running loopback rtping. I will try to reproduce
+>>> this bug here at home.
+>> Ok. It's at least nicely reproducable.
+>>
+> I acutally have fixed this bug long time ago. But due to some
+> configuration management mistake, the head revision was not containing
+> this fix. It has been fixed now, Just check out the head rev and give
+> another try:)
+
+Yes, works now. It's only that I had to replace "-d 0" with "-d 1" in
+the rtping call. All other values give "Resource temporarily
+unavailable". I don't claim to understand yet what's going on. How does
+node numbering work? Was _that_ broken before?
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/f3e7a473/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Jul 25 21:02:22 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 25 Jul 2006 21:02:22 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <44C668A4.7060204@web.de>
+References: <44C63C70.3030807@web.de>
+	<95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>
+	<44C65645.7090702@web.de>
+	<95210d7e0607251131y6a72659an593aef991eb75f8a@mail.gmail.com>
+	<44C668A4.7060204@web.de>
+Message-ID: <95210d7e0607251202v32403826xd756e4036aa0f811@mail.gmail.com>
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> >>>> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+> >>>>
+> >>>> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+> >>>>  printing eip:
+> >>>> c012eca8
+> >>>> ...
+> >>>> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+> >>>>
+> >>>> That's due to registering the OHCI IRQ with a NULL driver name (I called
+> >>>> cat /proc/xenomai/irq).
+> >>>>
+> >>> So, this is new in 2.6.17 kernel, Is it?
+> >> You mean Xenomai 2.1, don't you? :)
+> >> (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+> >>
+> > Ok, now I get it:) You mean this oops only happens when you call
+> > /proc/xenomai/irq. I will try to fix this.
+> >
+> >>>> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+> >>>> tried to restart this command:
+> >>>>
+> >>> This bug happens when running loopback rtping. I will try to reproduce
+> >>> this bug here at home.
+> >> Ok. It's at least nicely reproducable.
+> >>
+> > I acutally have fixed this bug long time ago. But due to some
+> > configuration management mistake, the head revision was not containing
+> > this fix. It has been fixed now, Just check out the head rev and give
+> > another try:)
+>
+> Yes, works now. It's only that I had to replace "-d 0" with "-d 1" in
+> the rtping call. All other values give "Resource temporarily
+> unavailable". I don't claim to understand yet what's going on. How does
+> node numbering work? Was _that_ broken before?
+>
+How many cards do you have in your box? If you do hostconfig, you can
+see the node ID of each card. The node ID is the id of that card in
+the _whole_ FW network. So if the node ID is 1, it must be connected
+to at least another FW device/card.
+
+Yuchen
+
+
+From jan.kiszka at web.de  Tue Jul 25 21:05:46 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 25 Jul 2006 21:05:46 +0200
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <95210d7e0607251202v32403826xd756e4036aa0f811@mail.gmail.com>
+References: <44C63C70.3030807@web.de>	<95210d7e0607251029q43353eacr89058d6058dd1734@mail.gmail.com>	<44C65645.7090702@web.de>	<95210d7e0607251131y6a72659an593aef991eb75f8a@mail.gmail.com>	<44C668A4.7060204@web.de>
+	<95210d7e0607251202v32403826xd756e4036aa0f811@mail.gmail.com>
+Message-ID: <44C66B8A.8090000@web.de>
+
+Yuchen Zhang wrote:
+> On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>> Yuchen Zhang wrote:
+>>> On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>>>>>> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+>>>>>>
+>>>>>> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+>>>>>>  printing eip:
+>>>>>> c012eca8
+>>>>>> ...
+>>>>>> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+>>>>>>
+>>>>>> That's due to registering the OHCI IRQ with a NULL driver name (I called
+>>>>>> cat /proc/xenomai/irq).
+>>>>>>
+>>>>> So, this is new in 2.6.17 kernel, Is it?
+>>>> You mean Xenomai 2.1, don't you? :)
+>>>> (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+>>>>
+>>> Ok, now I get it:) You mean this oops only happens when you call
+>>> /proc/xenomai/irq. I will try to fix this.
+>>>
+>>>>>> The second one comes after "rtping -h fwhost0 -d 0 -s 500" reported a failure and I
+>>>>>> tried to restart this command:
+>>>>>>
+>>>>> This bug happens when running loopback rtping. I will try to reproduce
+>>>>> this bug here at home.
+>>>> Ok. It's at least nicely reproducable.
+>>>>
+>>> I acutally have fixed this bug long time ago. But due to some
+>>> configuration management mistake, the head revision was not containing
+>>> this fix. It has been fixed now, Just check out the head rev and give
+>>> another try:)
+>> Yes, works now. It's only that I had to replace "-d 0" with "-d 1" in
+>> the rtping call. All other values give "Resource temporarily
+>> unavailable". I don't claim to understand yet what's going on. How does
+>> node numbering work? Was _that_ broken before?
+>>
+> How many cards do you have in your box? If you do hostconfig, you can
+> see the node ID of each card. The node ID is the id of that card in
+> the _whole_ FW network. So if the node ID is 1, it must be connected
+> to at least another FW device/card.
+
+Oh, I see. I only have one card on that box, but a camera is currently
+attached and I guess it won the race for ID 0, right? Starting to make
+sense to me. :)
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/ad02bcc3/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 31 09:36:41 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Jul 2006 07:36:41 +0000
+Subject: [Rtfirewire-devel] Test results and bugs
+In-Reply-To: <44C63C70.3030807@web.de>
+References: <44C63C70.3030807@web.de>
+Message-ID: <95210d7e0607310036s7a37dc2as3f7dbecee0f4f96@mail.gmail.com>
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Hi,
+>
+> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+>
+> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+>  printing eip:
+> c012eca8
+> ...
+> EIP: [<c012eca8>] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+>
+> That's due to registering the OHCI IRQ with a NULL driver name (I called
+> cat /proc/xenomai/irq).
+>
+Have fixed in the head revision on SVN.
+
+Yuchen
+
+
+From yuchen623 at gmail.com  Mon Jul 31 09:40:33 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Jul 2006 07:40:33 +0000
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <44C63C69.8030205@web.de>
+References: <44C63C69.8030205@web.de>
+Message-ID: <95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>
+
+Patch applied, but not yet tested with compiling with 2.6.17 or better.
+
+Thanks,
+Yuchen
+
+On 7/25/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> This patch enables 2.6.17 support (also 2.6.16 when compiling with gcc-4.1).
+>
+> Jan
+>
+> PS: A simple svn diff revealed a lot of whitespace changes after touching the files.
+> I guess some cleanup wrt trailing spaces or line feeds is required.
+>
+>
+>  drivers/ohci/rt_ohci1394.c |    6 +++---
+>  rtpkbuff/rtpkbuff.c        |    2 +-
+>  stack/csr.c                |    2 +-
+>  stack/hosts.c              |    2 +-
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> Index: rtpkbuff/rtpkbuff.c
+> ===================================================================
+> --- rtpkbuff/rtpkbuff.c (revision 97)
+> +++ rtpkbuff/rtpkbuff.c (working copy)
+> @@ -39,7 +39,7 @@
+>         rtdm_printk("RTPKB:%s[%d]: " fmt "\n",  __FUNCTION__, __LINE__, ## args)
+>
+>  static unsigned int rtpkb_cache_size = DEFAULT_RTPKB_CACHE_SIZE;
+> -MODULE_PARM(rtpkb_cache_size, "i");
+> +module_param(rtpkb_cache_size, uint, 0444);
+>  MODULE_PARM_DESC(rtpkb_cache_size, "Number of cached rtpkbs for creating pools in real-time");
+>
+>
+> Index: stack/hosts.c
+> ===================================================================
+> --- stack/hosts.c       (revision 97)
+> +++ stack/hosts.c       (working copy)
+> @@ -59,7 +59,7 @@ DECLARE_MUTEX(hpsb_hosts_lock);
+>
+>  /*! module parameter,Number of additional global realtime packet buffers per network adapter*/
+>  unsigned int device_rtpkbs = DEFAULT_DEVICE_RTPKBS;
+> -MODULE_PARM(device_rtpkbs, "i");
+> +module_param(device_rtpkbs, uint, 0444);
+>  MODULE_PARM_DESC(device_rtpkbs, "Number of additional global realtime packet "
+>                   "buffers per network adapter");
+>
+> Index: stack/csr.c
+> ===================================================================
+> --- stack/csr.c (revision 97)
+> +++ stack/csr.c (working copy)
+> @@ -46,7 +46,7 @@
+>  /* Module Parameters */
+>  /* this module parameter can be used to disable mapping of the FCP registers */
+>  static int fcp = 1;
+> -MODULE_PARM(fcp,"i");
+> +module_param(fcp, int, 0444);
+>  MODULE_PARM_DESC(fcp, "Map FCP registers (default = 1, disable = 0).");
+>
+>  static struct csr1212_keyval *node_cap = NULL;
+> Index: drivers/ohci/rt_ohci1394.c
+> ===================================================================
+> --- drivers/ohci/rt_ohci1394.c  (revision 97)
+> +++ drivers/ohci/rt_ohci1394.c  (working copy)
+> @@ -151,13 +151,13 @@ static char version[] __devinitdata =
+>
+>  /* Module Parameters */
+>  static int cards = 2;
+> -MODULE_PARM(cards, "i");
+> +module_param(cards, int, 0444);
+>  MODULE_PARM_DESC(cards, "Number of cards to be steered by this driver (default  = 2).");
+>  static int disable_irm = 0;
+> -MODULE_PARM(disable_irm, "i");
+> +module_param(disable_irm, int, 0444);
+>  MODULE_PARM_DESC(disable_irm, "Disable Isochronous Resource Manager Contending on local adapter (default = NO).");
+>  static int phys_dma = 1;
+> -MODULE_PARM(phys_dma, "i");
+> +module_param(phys_dma, int, 0444);
+>  MODULE_PARM_DESC(phys_dma, "Enable dma for physical packets (default = 1).");
+>
+>  static unsigned int cards_found;
+>
+>
+>
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://bat.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+>
+>
+>
+
+
+From jan.kiszka at web.de  Mon Jul 31 10:25:24 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 31 Jul 2006 10:25:24 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>
+References: <44C63C69.8030205@web.de>
+	<95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>
+Message-ID: <44CDBE74.9030306@web.de>
+
+Yuchen Zhang wrote:
+> Patch applied, but not yet tested with compiling with 2.6.17 or better.
+> 
+
+The SVN seems to be broken. I'm getting this on update or checkout:
+
+svn: Reading one svndiff window read beyond the end of the representation
+
+Maybe "svnadmin recover" can help.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060731/09ed34bd/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 31 10:58:33 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Jul 2006 08:58:33 +0000
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <44CDBE74.9030306@web.de>
+References: <44C63C69.8030205@web.de>
+	<95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>
+	<44CDBE74.9030306@web.de>
+Message-ID: <95210d7e0607310158w604886cawc5c9ba2bb8347b53@mail.gmail.com>
+
+I tried with" svnadmin recover", but still got the problem when
+checking out. Dont know yet how to fix it.
+
+Yuchen
+
+On 7/31/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > Patch applied, but not yet tested with compiling with 2.6.17 or better.
+> >
+>
+> The SVN seems to be broken. I'm getting this on update or checkout:
+>
+> svn: Reading one svndiff window read beyond the end of the representation
+>
+> Maybe "svnadmin recover" can help.
+>
+> Jan
+>
+>
+>
+>
+
+
+From jan.kiszka at web.de  Mon Jul 31 11:22:38 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 31 Jul 2006 11:22:38 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <95210d7e0607310158w604886cawc5c9ba2bb8347b53@mail.gmail.com>
+References: <44C63C69.8030205@web.de>	
+	<95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>	
+	<44CDBE74.9030306@web.de>
+	<95210d7e0607310158w604886cawc5c9ba2bb8347b53@mail.gmail.com>
+Message-ID: <44CDCBDE.6000507@web.de>
+
+Yuchen Zhang wrote:
+> I tried with" svnadmin recover", but still got the problem when
+> checking out. Dont know yet how to fix it.
+
+At least checkout of rev. #98 still works. Something must have messed up
+the database later.
+
+I would suggest to grab a backup quickly (svnadmin dump, probably only
+up to #98), install it locally, and try to re-submit your patches to
+that copy. If this works, you could overwrite the existing repos with
+your fixed version. BTW, do you obtain updates of the repos regularly? I
+have to check now if we still do...
+
+There is a worrying number of bad signs from this project hoster. Given
+that we have quite a few important projects there, we are more and more
+discussing alternatives now. If this doesn't stabilises again within the
+next weeks (including a larger partition!), the first moving van will
+get hired. Destination: SourceForge or gna.org.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060731/4fa5f930/attachment.pgp>
+
+From yuchen623 at gmail.com  Mon Jul 31 12:03:22 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Jul 2006 10:03:22 +0000
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <44CDCBDE.6000507@web.de>
+References: <44C63C69.8030205@web.de>
+	<95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>
+	<44CDBE74.9030306@web.de>
+	<95210d7e0607310158w604886cawc5c9ba2bb8347b53@mail.gmail.com>
+	<44CDCBDE.6000507@web.de>
+Message-ID: <95210d7e0607310303r67b005d6k75aa1aa908321c72@mail.gmail.com>
+
+On 7/31/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > I tried with" svnadmin recover", but still got the problem when
+> > checking out. Dont know yet how to fix it.
+>
+> At least checkout of rev. #98 still works. Something must have messed up
+> the database later.
+>
+> I would suggest to grab a backup quickly (svnadmin dump, probably only
+> up to #98), install it locally, and try to re-submit your patches to
+> that copy. If this works, you could overwrite the existing repos with
+> your fixed version. BTW, do you obtain updates of the repos regularly? I
+> have to check now if we still do...
+>
+I managed to dump from rev 0 to rev 98 to a file on the berlios
+server, but I could not transfer the file to my local PC. It says:
+
+when with scp
+zhangyuchen at sheep:~> scp ./dumpfile zhang at 145.120.12.100:/home/zhang/
+-bash: /usr/bin/scp: Permission denied
+
+when trying with sftp
+zhangyuchen at sheep:~> sftp zhang at 145.120.12.100:/home/zhang/ ./dumpfile
+Connecting to 145.120.12.100...
+exec: /usr/bin/ssh: Permission denied
+
+I also called scp from my local PC, but also got strange error:
+zhang at spacebox:~/workspace$ scp\
+zhangyuchen at svn.berlios.de:/svnroot/repos/rtfirewire/dumpfile .
+zhangyuchen at svn.berlios.de's password:
+bash: line 1: /usr/bin/scp: Permission denied
+
+Did you manage to transfer any file from berlios server?
+
+Yuchen
+
+> There is a worrying number of bad signs from this project hoster. Given
+> that we have quite a few important projects there, we are more and more
+> discussing alternatives now. If this doesn't stabilises again within the
+> next weeks (including a larger partition!), the first moving van will
+> get hired. Destination: SourceForge or gna.org.
+>
+> Jan
+>
+>
+>
+>
+
+
+From jan.kiszka at web.de  Mon Jul 31 12:41:45 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 31 Jul 2006 12:41:45 +0200
+Subject: [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+In-Reply-To: <95210d7e0607310303r67b005d6k75aa1aa908321c72@mail.gmail.com>
+References: <44C63C69.8030205@web.de>	
+	<95210d7e0607310040wc5db6b6j6ffd3820392f158e@mail.gmail.com>	
+	<44CDBE74.9030306@web.de>	
+	<95210d7e0607310158w604886cawc5c9ba2bb8347b53@mail.gmail.com>	
+	<44CDCBDE.6000507@web.de>
+	<95210d7e0607310303r67b005d6k75aa1aa908321c72@mail.gmail.com>
+Message-ID: <44CDDE69.5050903@web.de>
+
+Yuchen Zhang wrote:
+> On 7/31/06, Jan Kiszka <jan.kiszka at web.de> wrote:
+>> Yuchen Zhang wrote:
+>> > I tried with" svnadmin recover", but still got the problem when
+>> > checking out. Dont know yet how to fix it.
+>>
+>> At least checkout of rev. #98 still works. Something must have messed up
+>> the database later.
+>>
+>> I would suggest to grab a backup quickly (svnadmin dump, probably only
+>> up to #98), install it locally, and try to re-submit your patches to
+>> that copy. If this works, you could overwrite the existing repos with
+>> your fixed version. BTW, do you obtain updates of the repos regularly? I
+>> have to check now if we still do...
+>>
+> I managed to dump from rev 0 to rev 98 to a file on the berlios
+> server, but I could not transfer the file to my local PC. It says:
+> 
+> when with scp
+> zhangyuchen at sheep:~> scp ./dumpfile zhang at 145.120.12.100:/home/zhang/
+> -bash: /usr/bin/scp: Permission denied
+> 
+> when trying with sftp
+> zhangyuchen at sheep:~> sftp zhang at 145.120.12.100:/home/zhang/ ./dumpfile
+> Connecting to 145.120.12.100...
+> exec: /usr/bin/ssh: Permission denied
+> 
+> I also called scp from my local PC, but also got strange error:
+> zhang at spacebox:~/workspace$ scp\
+> zhangyuchen at svn.berlios.de:/svnroot/repos/rtfirewire/dumpfile .
+> zhangyuchen at svn.berlios.de's password:
+> bash: line 1: /usr/bin/scp: Permission denied
+> 
+> Did you manage to transfer any file from berlios server?
+
+Try to log in via shell.berlios.de: same home dir AND scp access.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060731/e4d9e507/attachment.pgp>
+

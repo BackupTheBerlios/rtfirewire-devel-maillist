@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] porting rtfirewire from xenomai to rtai
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20porting%20rtfirewire%20from%20xenomai%20to%20rtai&In-Reply-To=%3C1148914481.447b0b317b463%40webmail.utwente.nl%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000042.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] porting rtfirewire from xenomai to rtai</H1>
+    <B>s0120871 at .SYNTAX-ERROR</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20porting%20rtfirewire%20from%20xenomai%20to%20rtai&In-Reply-To=%3C1148914481.447b0b317b463%40webmail.utwente.nl%3E"
+       TITLE="[Rtfirewire-devel] porting rtfirewire from xenomai to rtai">s0120871 at .SYNTAX-ERROR
+       </A><BR>
+    <I>Mon May 29 16:54:41 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000042.html">[Rtfirewire-devel] RTfirewire porting to RTAI
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello,
+
+As I mailed you earlier, I am currently working on the assingment to port your 
+RTfirewire code from Xenomai to RTAI. This is a practical assignment I am 
+doing for the embedded system design group at the Twente University.
+
+Now I have been browsing through the code to get some feeling for what's in it 
+and its structure. I noticed that I need to focus mainly on the modules 
+rt_serv and rtpkbuff. These seem to be the only ones that provide 'services' 
+to the other modules and use the 'rtos' procedures which are RT platform 
+specific. Is this correct?
+
+I also noticed that there is a nice 'translation header-file' 
+(rtos_primitives.h) which transforms the RT platform specific calls to a more 
+generic call-type which is used by the code. As a starting point for the 
+porting, I wanted to compare the Xenomai translation to the RTAI API and 
+change where needed.
+
+The thing that puzzles me a bit is that in the rtos_primitives.h it seems as 
+if there is already a RTAI translation made (the conditional compiler code #if 
+defined(CONFIG_RTAI_24) etc). Is it so that the translation to RTAI is already 
+accounted for? Or has it been prepared but never verified? 
+
+
+Thanks in advance for your reply,
+
+Best regards, Harm
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000042.html">[Rtfirewire-devel] RTfirewire porting to RTAI
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

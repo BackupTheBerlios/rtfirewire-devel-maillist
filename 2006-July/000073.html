@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C44CDDE69.5050903%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000072.html">
+   <LINK REL="Next"  HREF="000058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [PATCH] kernel 2.6.17 support</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C44CDDE69.5050903%40web.de%3E"
+       TITLE="[Rtfirewire-devel] [PATCH] kernel 2.6.17 support">jan.kiszka at web.de
+       </A><BR>
+    <I>Mon Jul 31 12:41:45 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000072.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+        <LI>Next message: <A HREF="000058.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Yuchen Zhang wrote:
+&gt;<i> On 7/31/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;&gt;<i> Yuchen Zhang wrote:
+</I>&gt;&gt;<i> &gt; I tried with&quot; svnadmin recover&quot;, but still got the problem when
+</I>&gt;&gt;<i> &gt; checking out. Dont know yet how to fix it.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> At least checkout of rev. #98 still works. Something must have messed up
+</I>&gt;&gt;<i> the database later.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> I would suggest to grab a backup quickly (svnadmin dump, probably only
+</I>&gt;&gt;<i> up to #98), install it locally, and try to re-submit your patches to
+</I>&gt;&gt;<i> that copy. If this works, you could overwrite the existing repos with
+</I>&gt;&gt;<i> your fixed version. BTW, do you obtain updates of the repos regularly? I
+</I>&gt;&gt;<i> have to check now if we still do...
+</I>&gt;&gt;<i>
+</I>&gt;<i> I managed to dump from rev 0 to rev 98 to a file on the berlios
+</I>&gt;<i> server, but I could not transfer the file to my local PC. It says:
+</I>&gt;<i> 
+</I>&gt;<i> when with scp
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; scp ./dumpfile <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/
+</I>&gt;<i> -bash: /usr/bin/scp: Permission denied
+</I>&gt;<i> 
+</I>&gt;<i> when trying with sftp
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; sftp <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/ ./dumpfile
+</I>&gt;<i> Connecting to 145.120.12.100...
+</I>&gt;<i> exec: /usr/bin/ssh: Permission denied
+</I>&gt;<i> 
+</I>&gt;<i> I also called scp from my local PC, but also got strange error:
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at spacebox</A>:~/workspace$ scp\
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>:/svnroot/repos/rtfirewire/dumpfile .
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>'s password:
+</I>&gt;<i> bash: line 1: /usr/bin/scp: Permission denied
+</I>&gt;<i> 
+</I>&gt;<i> Did you manage to transfer any file from berlios server?
+</I>
+Try to log in via shell.berlios.de: same home dir AND scp access.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060731/e4d9e507/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060731/e4d9e507/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000072.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+	<LI>Next message: <A HREF="000058.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

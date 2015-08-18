@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607310303r67b005d6k75aa1aa908321c72%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000071.html">
+   <LINK REL="Next"  HREF="000073.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [PATCH] kernel 2.6.17 support</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607310303r67b005d6k75aa1aa908321c72%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] [PATCH] kernel 2.6.17 support">yuchen623 at gmail.com
+       </A><BR>
+    <I>Mon Jul 31 12:03:22 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000071.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+        <LI>Next message: <A HREF="000073.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 7/31/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> Yuchen Zhang wrote:
+</I>&gt;<i> &gt; I tried with&quot; svnadmin recover&quot;, but still got the problem when
+</I>&gt;<i> &gt; checking out. Dont know yet how to fix it.
+</I>&gt;<i>
+</I>&gt;<i> At least checkout of rev. #98 still works. Something must have messed up
+</I>&gt;<i> the database later.
+</I>&gt;<i>
+</I>&gt;<i> I would suggest to grab a backup quickly (svnadmin dump, probably only
+</I>&gt;<i> up to #98), install it locally, and try to re-submit your patches to
+</I>&gt;<i> that copy. If this works, you could overwrite the existing repos with
+</I>&gt;<i> your fixed version. BTW, do you obtain updates of the repos regularly? I
+</I>&gt;<i> have to check now if we still do...
+</I>&gt;<i>
+</I>I managed to dump from rev 0 to rev 98 to a file on the berlios
+server, but I could not transfer the file to my local PC. It says:
+
+when with scp
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; scp ./dumpfile <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/
+-bash: /usr/bin/scp: Permission denied
+
+when trying with sftp
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; sftp <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/ ./dumpfile
+Connecting to 145.120.12.100...
+exec: /usr/bin/ssh: Permission denied
+
+I also called scp from my local PC, but also got strange error:
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at spacebox</A>:~/workspace$ scp\
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>:/svnroot/repos/rtfirewire/dumpfile .
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>'s password:
+bash: line 1: /usr/bin/scp: Permission denied
+
+Did you manage to transfer any file from berlios server?
+
+Yuchen
+
+&gt;<i> There is a worrying number of bad signs from this project hoster. Given
+</I>&gt;<i> that we have quite a few important projects there, we are more and more
+</I>&gt;<i> discussing alternatives now. If this doesn't stabilises again within the
+</I>&gt;<i> next weeks (including a larger partition!), the first moving van will
+</I>&gt;<i> get hired. Destination: SourceForge or gna.org.
+</I>&gt;<i>
+</I>&gt;<i> Jan
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000071.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+	<LI>Next message: <A HREF="000073.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

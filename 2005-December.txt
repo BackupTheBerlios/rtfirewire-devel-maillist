@@ -1,0 +1,3351 @@
+From yuchen623 at gmail.com  Thu Dec  1 23:16:17 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Thu, 1 Dec 2005 23:16:17 +0100
+Subject: [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+In-Reply-To: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com>
+References: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com>
+Message-ID: <95210d7e0512011416w23185dd4w640e0e203776dc35@mail.gmail.com>
+
+Dear Faruque,
+
+
+> Thanks a lot for your warm reply. I'm very glad to join with rt-firewire
+> team.
+> we hope to make the rt firewire user friendly and useful soon.
+
+
+I am just going to annouse the 0.1 release of rt-fw. After that, I would
+like to discuss about the short-term developement in the rt-fw mailing list.
+Basically, it would be the user-interface, like raw1394, and complete the
+packet captureing.
+
+[ CAUTION: please don't be hurry to reply or even read completely to
+> this mail now! coz' its' a very long story  :) ]
+>
+> Well, i assume u have some time to read this mail, so let's have a
+> look to address a generic user Mr. X's wish to talk with the firewire
+> card C's 1st port's resident Mr. R (An OHCI compliant ieee1394 generic
+> node ).
+>
+> Case-1: PHY/Async Quadlet Read
+> --------------------------------------------------
+> User X :  Hey Mr. R, Can you give me your NodeNumber ( first 6 bit
+> from your OHCI NodeID Register located at Offset E8h) ?
+> Node R: I got your request .please wait
+> Node R: Here's the  quadlet, please check it.
+> User X: Ok, Thanks.
+
+
+the csr module is taking care of the access to all the base registers. See
+the csr.c file. Basically, the csr module is no more than a module in the
+application layer: registered to take care of a certain range of address (in
+the 48-bit 1394 address).
+
+Case-2: PHY/Async Write
+> ------------------------------------
+> User X: Hey R, can you write this busNumber to your busNumber Register
+> (6-15 bit of NodeID Register) ?
+> Node R: I got your request .please wait
+> Node R: I complete your request, here's what i already wrote.
+> User X: Ok, Thanks.
+
+the same, csr is taking care of this.
+
+
+Both cases are more or less similar (pls fix me if i am wrong). So as
+> the rt-firewire developer how we can staisfy the demands ?
+
+
+there is a  non real-time command tool called 1394commander developed on
+Linux 1394 subsystem, exactly for the same purpose, i.e. accessing the base
+registers. But, it is based on raw1394. On current implementation of rt-fw,
+we either have to make a kernel module specifically to deal with the access
+to base registers, so on the user side, we only need to give some IOCTL
+command via, say /dev/rt-firewrie, OR we make rt_raw1394 to allow fully
+access to the whole address space from user space, which of course includes
+the base registers.
+
+As per my imagination the path of request/response flow is like this:
+>
+> User  X
+> 1----> rt-fw-client (User Space app)
+> 2----> rt-fw-server (process) or (rt_raw1394 and bis module using
+> /dev/rt-firewire interfacing with rtdm)
+> 3---> rtdm ( upon posix/native skin of xeno_nucleus with xeno_hal)
+> 4----> rt_ohci1394 and rt_ieee1394 (using xenomai rtos api modules
+> rtpc, rt_serv, rtpkbuff )
+> 5----> (hardware) ieee1394 Card C's 1st Port :
+> Node R.
+
+
+Basically, you are right.
+
+For now, I'm very much curious how you sent async/iso packets to
+> client and measure the time statistics  (as mentioned in your MSc
+> Report) from user space ?
+
+
+For asyn packets, I measured the roundtrip latency just using the rtping.
+For iso packets, I used another program to measure the data arrival interval
+drift on the packet receiving side, since the iso transmission is only
+1-way. This is a bit tricky.
+
+
+1. with the current codes, is there any way to write some user space
+> app to talk with /dev/rt-firewire for the above purpose? As I checked
+> the source files i got a few ioctl() calling options are available,
+> like IOC_RTFW_* PING, ISO_START, ISO_SHUTDOWN and some other BUS
+> MANAGEMENT options(ohci_devctl) in rt_ohci1394 and some other old
+> ioctl() options in ieee1394-ioctl.h file. Specifically how can I write
+> a user space app to send/recv some requests to/from the running
+> rt-firewire driver?
+
+
+As you can also conclude from what I said above, it is currently not
+implemented to let user-space program get full direct access to the 1394
+address space. In the non real-time Linux 1394 world, this access is (again)
+fully based on raw1394. Currently, we only can use eth1394 to get access to
+FireWire like to Ethernet, but the access range is only limited to the space
+registered by the eth1394 driver.
+
+2. Could you please suggest some good references for learning about
+> how to write code of user space app to interact with  running kernel
+> device driver ? I've already studied LDD, LKM Prog. Guide and
+> Beginning Linux Prog.(from wrox) etc. But I'm in a complete dark
+> position to interact with the rt-fw drivers except rtping / hostconfig
+> (though i managed to read the 2kB OHCI registers by writing user space
+> code using mmap call)
+
+
+Em......the best one in my mind is Linux Device Driver 3rd edition, which
+probably you have read:)
+
+3. BTW, is the  bis module support to add a new node ? if I attach a
+> ieee1394 Camera how can I add this node and do a rtping to it?
+
+
+Nope. Bis module can only talk to another PC-based 1394 node, which must
+have loaded bis module also.
+
+I hope to go through the Xenomai and RTDM soon and then i would like
+> to uncover Linux raw1394,the existing black box, to get something like
+> that in rt_* domain.
+> what you think?
+
+
+For me, it is good:). If I may ask, are you going to work on this like for
+your MSc project? Do you have some real lab stuff to do some testing? I am
+not giving you any pressure, but I am just curious to know:)
+
+Again I would like to give thanks for reading all my boring talks.
+
+
+Haha, I like this kind of discussion very much. You are always welcome to
+ask questions, even some really boring one:)
+
+Wishing you happiness 4 all the time
+
+
+Thanks, the same 2 you.
+
+
+Yuchen
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/16b987a6/attachment.html>
+
+From yuchen623 at gmail.com  Thu Dec  1 23:47:49 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Thu, 1 Dec 2005 23:47:49 +0100
+Subject: [Rtfirewire-devel] [RT-FireWire][Announce]0.1 release of RT-FireWire
+Message-ID: <95210d7e0512011447h7b7d9aa9tc7e0502b8f5137fa@mail.gmail.com>
+
+Dear all,
+probably some of you have already heared about the RT-FireWire project. Now,
+I would like to announce the 0.1 release of the work. You can download the
+package via
+http://home.student.utwente.nl/y.zhang-4/download.htm. (BTW, for the
+homepage of RT-FireWire, you can just type rtfirewire.berlios.de, which will
+be automatically redirected)
+
+Key features:
+o   Compiles with Xenomai 2.0 and Linux 2.6.12+
+o   Real-Time packet transmission (asynchronous and isochronous)
+o   Real-Time Memory management
+o   Device management via /dev/rt-firewire
+o   Support RTnet via Real-Time Ethernet emulation over FireWire.
+
+Some other remarks:
+o   in current implementation, quite a part of the work is adopted from the
+Linux1394 system, which is designed for general purpose usage.
+o   for those who are interested in the technical issues, it is recommended
+to read these 2 papers. http://home.student.utwente.nl/y.zhang-4/doc.htm
+
+As a start-up OS project, we badly need more developing force, so please
+just drop me a mail if you are interested to join the work, or just curious
+to know more about the internals. And of course, it is recommended to
+register to the mailing list.
+http://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+
+Best regards,
+Yuchen Zhang
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/1f858b9f/attachment.html>
+
+From jan.kiszka at web.de  Thu Dec  1 23:50:30 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Thu, 01 Dec 2005 23:50:30 +0100
+Subject: [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy
+ a generic user's wish!
+In-Reply-To: <95210d7e0512011416w23185dd4w640e0e203776dc35@mail.gmail.com>
+References: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com> <95210d7e0512011416w23185dd4w640e0e203776dc35@mail.gmail.com>
+Message-ID: <438F7E36.9090805@web.de>
+
+Hi all,
+
+good chance to post my first mail to this list. :)
+
+Yuchen Zhang wrote:
+> Dear Faruque,
+> 
+>>Thanks a lot for your warm reply. I'm very glad to join with rt-firewire
+>>team.
+>>we hope to make the rt firewire user friendly and useful soon.
+
+Nice to hear that there is another contributor for this important project!
+
+> 
+> I am just going to annouse the 0.1 release of rt-fw. After that, I would
+> like to discuss about the short-term developement in the rt-fw mailing list.
+> Basically, it would be the user-interface, like raw1394, and complete the
+> packet captureing.
+> 
+
+What about Xenomai 2.1 support? Already planned for the near future? I'm
+asking as I recently reworked RTnet's build system for the new build
+model (in-kernel) of upcoming 2.1. But the eth1396 driver would not work
+yet, of course.
+
+At this chance, I also re-enabled kernel 2.4 support for RTnet. Xenomai
+works for x86 and PPC also over the "old" kernel now, and RTnet compiles
+against 2.4.31-adeos again (no clue if it runs as well, I didn't test
+it). I don't know how much of your code depends on 2.6 kernel features,
+but maybe it's worth checking how much work the build system would
+require for this. But: low priority, 2.4 support foremost targets
+low-end and existing systems where FireWire is not that often found.
+
+For all changes that where required, see RTnet SVN for details - or ask
+me. Also, feel free to bother me with any RTDM questions and quirks when
+defining and implementing raw1394 for that layer.
+
+Good luck for your future work!
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/313f0c1a/attachment.pgp>
+
+From writefaruq at gmail.com  Fri Dec  2 04:17:03 2005
+From: writefaruq at gmail.com (Md. Omar Faruque Sarker)
+Date: Fri, 2 Dec 2005 12:17:03 +0900
+Subject: [Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+Message-ID: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+
+Dear list,
+
+Congratulations!
+The first release of rt-fw 0.1 on my Ubuntu 5.10 box (Intel P-III
+128MB RAM) works fine with some minor adjustments.
+
+1. I inserted xeno_native.ko module before inserting xeno_rtdm.ko
+otherwise I got:
+insmod: error inserting rt_serv.ko -1 Unknown Sysbol in Module
+
+2.  I passed the "lapic" parameter to grub boot loader on booting my
+box. otherwise
+I got :
+insmod: error inserting xeno_hal.ko -1 No Such Device
+
+May be the problem is related to Xenomai.
+
+3. I also inserted rt_sim1394.ko module and do a ping to sim_host0
+
+I've done this test at my room as I forgot to bring my firewire card
+from lab. So there is noway to do a <rtping> according to doc! So
+could you mention it in the doc, so that poor people can do the
+experiment without really buying a firewire card :))
+
+Here my rtping wtt was 71.2 us and avg rtt is 30 us and  with real
+firewire card I got avg rtt 7 us (wtt 14 us)
+
+Thanks,
+
+Faruque
+
+--
+M. Omar Faruque Sarker
+MS Student,
+HCI and Robotics
+University of Science and Technology (UST)
+Seoul, Korea (South)
+Ph: +82-02-958-5759 (Lab) +82-02-958-6532(R)
+
+
+From jan.kiszka at web.de  Fri Dec  2 08:58:55 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Fri, 02 Dec 2005 08:58:55 +0100
+Subject: [Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 +
+ Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+In-Reply-To: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+References: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+Message-ID: <438FFEBF.1060703@web.de>
+
+Md. Omar Faruque Sarker wrote:
+> Dear list,
+> 
+> Congratulations!
+> The first release of rt-fw 0.1 on my Ubuntu 5.10 box (Intel P-III
+> 128MB RAM) works fine with some minor adjustments.
+> 
+> 1. I inserted xeno_native.ko module before inserting xeno_rtdm.ko
+> otherwise I got:
+> insmod: error inserting rt_serv.ko -1 Unknown Sysbol in Module
+
+Which symbol? Take a look at what the kernel console/logfile tells you.
+I guess some xeno_native symbol was forgotten during the RTDM port.
+
+> 
+> 2.  I passed the "lapic" parameter to grub boot loader on booting my
+> box. otherwise
+> I got :
+> insmod: error inserting xeno_hal.ko -1 No Such Device
+> 
+> May be the problem is related to Xenomai.
+
+Xenomai requires the APIC switched on when the kernel was compiled with
+local APIC or SMP feature because it activates APIC-only code in this
+case. It's simply not that flexible as the kernel in this regard which
+can always fall back to APIC-less mode.
+
+> 
+> 3. I also inserted rt_sim1394.ko module and do a ping to sim_host0
+> 
+> I've done this test at my room as I forgot to bring my firewire card
+> from lab. So there is noway to do a <rtping> according to doc! So
+> could you mention it in the doc, so that poor people can do the
+> experiment without really buying a firewire card :))
+> 
+> Here my rtping wtt was 71.2 us and avg rtt is 30 us and  with real
+> firewire card I got avg rtt 7 us (wtt 14 us)
+
+I guess your sim1394 test measures a lot Xenomai scheduling latencies
+;). BTW, I'm not up-to-date: is this rt_sim1394 already part of
+rt-firewire or yet on the way into the repos? Would be interesting to
+have such thing for my typically firewire-less tests of RTnet - would
+allow to check eth1394 over such a loopback...
+
+> 
+> Thanks,
+> 
+> Faruque
+> 
+> --
+> M. Omar Faruque Sarker
+> MS Student,
+> HCI and Robotics
+
+Robotics? What kind of robotics? Mechatronic, high-level algorithms,
+...? So you are planning to use RT-FireWire in a robotics project?
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051202/5f6ca746/attachment.pgp>
+
+From yuchen623 at gmail.com  Fri Dec  2 10:29:03 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 2 Dec 2005 10:29:03 +0100
+Subject: [Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+In-Reply-To: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+References: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+Message-ID: <95210d7e0512020129v35e7b4i46490fe1885e40c1@mail.gmail.com>
+
+Dear Faruque,
+
+> Congratulations!
+Thanks!
+
+> The first release of rt-fw 0.1 on my Ubuntu 5.10 box (Intel P-III
+> 128MB RAM) works fine with some minor adjustments.
+>
+> 1. I inserted xeno_native.ko module before inserting xeno_rtdm.ko
+> otherwise I got:
+> insmod: error inserting rt_serv.ko -1 Unknown Sysbol in Module
+>
+> 2.  I passed the "lapic" parameter to grub boot loader on booting my
+> box. otherwise
+> I got :
+> insmod: error inserting xeno_hal.ko -1 No Such Device
+>
+> May be the problem is related to Xenomai.
+>
+> 3. I also inserted rt_sim1394.ko module and do a ping to sim_host0
+>
+I didnt put this module into the released package, because it may be
+NOT bug-free. I wrote this module also because I wanted to do test on
+my FireWire card-less laptop. But currently, only asynchronous
+transaction simulation is supported. The isochronous simulation will
+be much more complicated.
+
+> I've done this test at my room as I forgot to bring my firewire card
+> from lab. So there is noway to do a <rtping> according to doc! So
+> could you mention it in the doc, so that poor people can do the
+> experiment without really buying a firewire card :))
+>
+Ok, it seems I should add this module to the released package for the
+sake of "poor" people:) I will make another announcement then.
+
+> Here my rtping wtt was 71.2 us and avg rtt is 30 us and  with real
+> firewire card I got avg rtt 7 us (wtt 14 us)
+>
+Em....I think something wrong here. Do you mean avg 30 us (wtt 71.2
+us) is with REAL card, and avg 7us (wtt 14us) is with sim1394? Then
+they look quite ok.
+
+
+Yuchen
+
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From writefaruq at gmail.com  Fri Dec  2 13:14:59 2005
+From: writefaruq at gmail.com (Md. Omar Faruque Sarker)
+Date: Fri, 2 Dec 2005 21:14:59 +0900
+Subject: [Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+Message-ID: <fc9dd8650512020414u3637b2abp8de7e654570244fd@mail.gmail.com>
+
+Hi Jan,
+
+Best Greetings!
+Nice to write you 4 the first time.
+
+Referring to my RT-FW-0.1 installation process,  If I try to insert
+rt_serv.ko without loading xeno_native.ko it misses "rt_timer_start"
+symbol.
+
+I also compiled the RTnet on the same PC but at first I failed to
+compile rt_eth1394 because of rt-fw header file missing. then I copied
+all rt-fw include/*.h into RTnet's drivers/eth1394/ folder. then it
+compiled without error. Is there anything unlinked?
+
+Could you please add some generic hints about the  TDMA settings in
+rtnet.conf. In most cases I expect PnP settings or some easy
+instruction from the developer. coz at first setup I feel to be a lazy
+user to read all your readme doc :)
+
+If I have two linux box (one RT and another NRT)  connected directly
+(NIC 2 NIC)then what  should be my typical TDMA settings? Hopefully
+after a big test I may be able to report the rtnet's result also.
+
+Now have a brief about my study (as I saw some "??" in your reply)
+
+Well, I've just enrolled myself in this MS course last September'05. 
+My BSc was in Mechanical Engineering. So right now, no high-level
+algorithms at all! You're exactly right about my plan to use RT-FW in
+Robotics Project.
+
+Currently I'm associated with Intelligent Robotics Research Center at
+Korea Institute of Science and Technology(KIST, not KAIST). Sounds
+very amazing! Haha, I'm a foreign student (they call us "Alien") and
+upto now a good observer!
+
+Actually from my undergraduate I'm using Linux (Since Red Hat 6.x) and
+also did some job as Sys Admin. So I love the freedom and power of
+computing in Linux. And now trying to discover RT domain. It's already
+a lot I have told you, isn't it :)
+
+
+
+
+M. Omar Faruque Sarker
+MS Student,
+HCI and Robotics
+University of Science and Technology (UST)
+Seoul, Korea (South)
+Ph: +82-02-958-5759 (Lab) +82-02-958-6532(R)
+
+
+From jan.kiszka at web.de  Fri Dec  2 13:31:47 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Fri, 02 Dec 2005 13:31:47 +0100
+Subject: [Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+In-Reply-To: <fc9dd8650512020414u3637b2abp8de7e654570244fd@mail.gmail.com>
+References: <fc9dd8650512020414u3637b2abp8de7e654570244fd@mail.gmail.com>
+Message-ID: <43903EB3.4070103@web.de>
+
+Md. Omar Faruque Sarker wrote:
+> Hi Jan,
+> 
+> Best Greetings!
+> Nice to write you 4 the first time.
+> 
+> Referring to my RT-FW-0.1 installation process,  If I try to insert
+> rt_serv.ko without loading xeno_native.ko it misses "rt_timer_start"
+> symbol.
+
+I see. We have a similar issue in RTnet, but I worked around this in the
+new, lean RTOS abstraction layer of RTnet:
+
+http://www.rts.uni-hannover.de/rtnet/lxr/source/stack/include/rtnet_sys_xenomai.h
+
+I hope that we can overcome this issue one day when we move the system
+timer control away from the user API to some central control point in
+Xenomai (module parameter of xeno_native or common sysfs entry for all
+skins).
+
+> 
+> I also compiled the RTnet on the same PC but at first I failed to
+> compile rt_eth1394 because of rt-fw header file missing. then I copied
+> all rt-fw include/*.h into RTnet's drivers/eth1394/ folder. then it
+> compiled without error. Is there anything unlinked?
+
+Which RTnet version? RTnet should detect the right RT-FireWire path
+during configure and fail there when anything is broken - not later.
+
+> 
+> Could you please add some generic hints about the  TDMA settings in
+> rtnet.conf. In most cases I expect PnP settings or some easy
+> instruction from the developer. coz at first setup I feel to be a lazy
+> user to read all your readme doc :)
+
+Just read item 3 of "How to test it?" in the README:
+
+3. Check <PREFIX>/etc/rtnet.conf and adapt at least the following
+   parameters: RT_DRIVER, IPADDR, TDMA_MODE, TDMA_SLAVES.
+
+Comments are in the rtnet.conf.
+
+> 
+> If I have two linux box (one RT and another NRT)  connected directly
+> (NIC 2 NIC)then what  should be my typical TDMA settings? Hopefully
+> after a big test I may be able to report the rtnet's result also.
+
+Use the "simple" TDMA mode, i.e. the one pre-configured.
+
+> 
+> Now have a brief about my study (as I saw some "??" in your reply)
+> 
+> Well, I've just enrolled myself in this MS course last September'05. 
+> My BSc was in Mechanical Engineering. So right now, no high-level
+> algorithms at all! You're exactly right about my plan to use RT-FW in
+> Robotics Project.
+
+...for real-time vision or real-time control/data communication?
+
+> 
+> Currently I'm associated with Intelligent Robotics Research Center at
+> Korea Institute of Science and Technology(KIST, not KAIST). Sounds
+> very amazing! Haha, I'm a foreign student (they call us "Alien") and
+> upto now a good observer!
+> 
+> Actually from my undergraduate I'm using Linux (Since Red Hat 6.x) and
+> also did some job as Sys Admin. So I love the freedom and power of
+> computing in Linux. And now trying to discover RT domain. It's already
+> a lot I have told you, isn't it :)
+> 
+
+Greetings,
+Jan
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051202/f74f23bd/attachment.pgp>
+
+From yuchen623 at gmail.com  Fri Dec  2 13:54:25 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 2 Dec 2005 13:54:25 +0100
+Subject: [Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+In-Reply-To: <43903EB3.4070103@web.de>
+References: <fc9dd8650512020414u3637b2abp8de7e654570244fd@mail.gmail.com>
+	 <43903EB3.4070103@web.de>
+Message-ID: <95210d7e0512020454u15b8403au3f2aa38c084ca0b1@mail.gmail.com>
+
+> >
+> > I also compiled the RTnet on the same PC but at first I failed to
+> > compile rt_eth1394 because of rt-fw header file missing. then I copied
+> > all rt-fw include/*.h into RTnet's drivers/eth1394/ folder. then it
+> > compiled without error. Is there anything unlinked?
+>
+Did you specify rtfw installation path in the menuconfiguration?
+
+Regards,
+Yuchen
+
+
+From writefaruq at gmail.com  Fri Dec  2 15:04:37 2005
+From: writefaruq at gmail.com (Md. Omar Faruque Sarker)
+Date: Fri, 2 Dec 2005 23:04:37 +0900
+Subject: [Rtfirewire-devel] About CSR Module and User Space Access
+Message-ID: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+
+Dear Yuchen,
+
+Thanks 4 info about CSR module. But may be I'm still lagging behind
+from your hints. As I'm new to this type of job please fix me.
+
+I've tried  to compile the csr module by replacing obj-m line in
+Makefile of build/stack folder with this:
+
+obj-m +=csr.o
+
+and it compiles with some warning and after that when i tried to
+insert it and got error about missing symbol about
+"high_level_fcp_request" again I tried to build module highlevel.ko
+and similarly got error from insmod for the missing of the following
+symbols:
+
+ioctl_handlers
+hpsb_hosts_lock
+hpsb_hosts
+hpsb_update_config_rom_image
+
+I just did this without knowing inner details. As I need to show some
+demo of RT-FW   at my lab so I need a roadmap for sending read/write
+request to any ieee1394 capbale node.
+so please fix me about my planned steps to write a simple user space
+app using csr.ko:
+
+1. loading all current rt-fw modules including this csr.ko (after fixing) ??
+2. define struct csr_control and hpsb_host, hpsb_packet ...??
+3. call  add_host() read_maps() read_regs() etc to fill up the struct members ??
+4.  then use some packet sending functions ???
+5. Read the CSR registers for status ??
+6. And Where to find the content of the returned packet??
+
+Anyway I hope to study ieee1394commander tool  soon and also off
+course I must make some (one stop painless) HOWTOs and Docs on RT-FW
+for new users :)
+
+At this moment I'm remembering my past experience on 1999 when I saw
+no helpful Linux book was written in my native language. I was crazy
+enough to wrote a book for  beginning Linux and indeed it was a best
+seller at that time!
+
+Currently I got less time to document anything rather testing new
+things all the time!
+
+My lab is working for both RT Control and Vision and Now I'm involved
+in control part and hope to work on RT-FW for a long time. I've 2-3
+PCs with ieee1394 cards and CCD Cameras and   soon I hope to get some
+ieee1394 enable DSPs. Actually I don't know much about DSPs. Then what
+other lab stuff may be  required in future?
+
+Anyway I look forward to seeing better days with rt- fw based control.
+
+Thanks and best regards,
+
+
+Faruque
+
+
+--
+M. Omar Faruque Sarker
+MS Student,
+HCI and Robotics
+University of Science and Technology (UST)
+Seoul, Korea (South)
+Ph: +82-02-958-5759 (Lab) +82-02-958-6532(R)
+
+
+From yuchen623 at gmail.com  Sun Dec  4 18:36:27 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Sun, 4 Dec 2005 18:36:27 +0100
+Subject: [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+In-Reply-To: <438F7E36.9090805@web.de>
+References: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com>
+	 <95210d7e0512011416w23185dd4w640e0e203776dc35@mail.gmail.com>
+	 <438F7E36.9090805@web.de>
+Message-ID: <95210d7e0512040936v18d167a0xc46d49fa5af793f1@mail.gmail.com>
+
+Hi Jan,
+
+> > I am just going to annouse the 0.1 release of rt-fw. After that, I would
+> > like to discuss about the short-term developement in the rt-fw mailing list.
+> > Basically, it would be the user-interface, like raw1394, and complete the
+> > packet captureing.
+> >
+>
+> What about Xenomai 2.1 support? Already planned for the near future? I'm
+> asking as I recently reworked RTnet's build system for the new build
+> model (in-kernel) of upcoming 2.1. But the eth1396 driver would not work
+> yet, of course.
+>
+Why eth1394 does not compile? What is the problem? Or first, I should
+ask what you changed on the original RTnet code? Especially what
+changes went to the drivers?
+
+> At this chance, I also re-enabled kernel 2.4 support for RTnet. Xenomai
+> works for x86 and PPC also over the "old" kernel now, and RTnet compiles
+> against 2.4.31-adeos again (no clue if it runs as well, I didn't test
+> it). I don't know how much of your code depends on 2.6 kernel features,
+> but maybe it's worth checking how much work the build system would
+> require for this. But: low priority, 2.4 support foremost targets
+> low-end and existing systems where FireWire is not that often found.
+>
+This could be scheduled for next release of rtfw. Basically, we should
+let potential fw users in the community to try current rt-fw first,
+then see if there is a voice for 2.4 support.  Anyway, upgrade always
+has higher priority than backgrade:)
+
+> For all changes that where required, see RTnet SVN for details - or ask
+> me. Also, feel free to bother me with any RTDM questions and quirks when
+> defining and implementing raw1394 for that layer.
+>
+I guess Faruque will bother you more often:)
+
+> Good luck for your future work!
+Thanks!
+
+
+Yuchen
+
+
+From jan.kiszka at web.de  Sun Dec  4 19:03:15 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Sun, 04 Dec 2005 19:03:15 +0100
+Subject: [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy
+ a generic user's wish!
+In-Reply-To: <95210d7e0512040936v18d167a0xc46d49fa5af793f1@mail.gmail.com>
+References: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com>	 <95210d7e0512011416w23185dd4w640e0e203776dc35@mail.gmail.com>	 <438F7E36.9090805@web.de> <95210d7e0512040936v18d167a0xc46d49fa5af793f1@mail.gmail.com>
+Message-ID: <43932F63.7020704@web.de>
+
+Yuchen Zhang wrote:
+> Hi Jan,
+> 
+> 
+>>>I am just going to annouse the 0.1 release of rt-fw. After that, I would
+>>>like to discuss about the short-term developement in the rt-fw mailing list.
+>>>Basically, it would be the user-interface, like raw1394, and complete the
+>>>packet captureing.
+>>>
+>>
+>>What about Xenomai 2.1 support? Already planned for the near future? I'm
+>>asking as I recently reworked RTnet's build system for the new build
+>>model (in-kernel) of upcoming 2.1. But the eth1396 driver would not work
+>>yet, of course.
+>>
+> 
+> Why eth1394 does not compile? What is the problem? Or first, I should
+> ask what you changed on the original RTnet code? Especially what
+> changes went to the drivers?
+
+To make RTnet compile against 2.1, I only had to work on the build
+system, no code changes. The core is issue is that Xeno 2.1 no longer
+has some xeno-config for the kernel build. You directly have to build
+against the Xeno-extended kernel - and derive all required information
+from that tree beforehand. So, you also have to ask the user again for
+the linux path while this was previously derivable from the Xeno
+installation.
+
+If you do not build any userspace tools against Xeno libs, you no longer
+need to query the installation dir on the other hand. RTnet only asks
+for it now when you switch on the examples, i.e. also userspace Xenomai
+programs.
+
+> 
+> 
+>>At this chance, I also re-enabled kernel 2.4 support for RTnet. Xenomai
+>>works for x86 and PPC also over the "old" kernel now, and RTnet compiles
+>>against 2.4.31-adeos again (no clue if it runs as well, I didn't test
+>>it). I don't know how much of your code depends on 2.6 kernel features,
+>>but maybe it's worth checking how much work the build system would
+>>require for this. But: low priority, 2.4 support foremost targets
+>>low-end and existing systems where FireWire is not that often found.
+>>
+> 
+> This could be scheduled for next release of rtfw. Basically, we should
+> let potential fw users in the community to try current rt-fw first,
+> then see if there is a voice for 2.4 support.  Anyway, upgrade always
+> has higher priority than backgrade:)
+> 
+
+As I said: low prio. RTnet was more or less prepared for this due to its
+history (we were 2.4 only until autumn 2004). I haven't checked your
+files, but maybe RT-FireWire would need both work on every makefile and
+potential changes to the source code (where the kernel API is different).
+
+But let's see first how more 2.4 users will re-assemble around Xenomai.
+At least the low-end PPC community seems to be strongly interested.
+
+> 
+>>For all changes that where required, see RTnet SVN for details - or ask
+>>me. Also, feel free to bother me with any RTDM questions and quirks when
+>>defining and implementing raw1394 for that layer.
+>>
+> 
+> I guess Faruque will bother you more often:)
+> 
+> 
+>>Good luck for your future work!
+> 
+> Thanks!
+> 
+> 
+> Yuchen
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051204/336fc258/attachment.pgp>
+
+From yuchen623 at gmail.com  Sun Dec  4 22:14:24 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Sun, 4 Dec 2005 22:14:24 +0100
+Subject: [Rtfirewire-devel] Re: About CSR Module and User Space Access
+In-Reply-To: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+Message-ID: <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+
+Dear Faruque,
+
+> I've tried  to compile the csr module by replacing obj-m line in
+> Makefile of build/stack folder with this:
+>
+> obj-m +=csr.o
+>
+> and it compiles with some warning and after that when i tried to
+> insert it and got error about missing symbol about
+> "high_level_fcp_request" again I tried to build module highlevel.ko
+> and similarly got error from insmod for the missing of the following
+> symbols:
+>
+> ioctl_handlers
+> hpsb_hosts_lock
+> hpsb_hosts
+> hpsb_update_config_rom_image
+>
+Em...I dont get the point why you wanna make csr and highlevel as
+separate modules.
+Anyway, since all these files are using some symbols from other files,
+if you wanna load them separately, you have to make sure other files
+are loaded before, which will prevent the missing symbol problem as
+you have seen.
+
+> I just did this without knowing inner details. As I need to show some
+> demo of RT-FW   at my lab so I need a roadmap for sending read/write
+> request to any ieee1394 capbale node.
+> so please fix me about my planned steps to write a simple user space
+> app using csr.ko:
+>
+> 1. loading all current rt-fw modules including this csr.ko (after fixing) ??
+> 2. define struct csr_control and hpsb_host, hpsb_packet ...??
+> 3. call  add_host() read_maps() read_regs() etc to fill up the struct members ??
+> 4.  then use some packet sending functions ???
+> 5. Read the CSR registers for status ??
+> 6. And Where to find the content of the returned packet??
+>
+To write a user space function to talk to rt-fw module (without
+eth1394), you need to define a communication mechanism between kernel
+and user space. If you look into the libraw1394 (user-space library to
+access Linux raw1394), you can find: the communication is driven by
+user-side, which polls the kernel side for any newly coming message,
+either transaction message or other bus events (like bus reset). But I
+believe we do have quite some other options (mailbox, fifo, etc),
+which are more realtime, provided by Xenomai (also RTAI).
+
+Anyway, if you wanna write some user-space program on rt-fw, the
+current rt-fw cannot directly support that unless you use eth1394,
+which means your program will be no different from socket programming.
+
+BUT, the pressure to port raw1394 to rt-fw is obviously there, so we
+need to take some action anyway. I guess you are also interested, so
+let's start the work and keep on the discussion.
+
+> Anyway I hope to study ieee1394commander tool  soon and also off
+> course I must make some (one stop painless) HOWTOs and Docs on RT-FW
+> for new users :)
+>
+it will be very nice if you can put these HOWTOs in the rtfw repos.
+BTW, do you have account in berlios? If not, just create one and tell
+me, so I can add you to the team to allow you write access to the
+repos.
+
+> At this moment I'm remembering my past experience on 1999 when I saw
+> no helpful Linux book was written in my native language. I was crazy
+> enough to wrote a book for  beginning Linux and indeed it was a best
+> seller at that time!
+>
+> Currently I got less time to document anything rather testing new
+> things all the time!
+>
+> My lab is working for both RT Control and Vision and Now I'm involved
+> in control part and hope to work on RT-FW for a long time.
+That's really great!
+
+I've 2-3
+> PCs with ieee1394 cards and CCD Cameras and   soon I hope to get some
+> ieee1394 enable DSPs. Actually I don't know much about DSPs. Then what
+> other lab stuff may be  required in future?
+>
+Em...do you already know which kind of DSP boards you will get? Just
+drop me a weblink so I can also find them:) if/when you know. For
+other stuff, I dont know, should depends on what you will do.
+
+> Anyway I look forward to seeing better days with rt- fw based control.
+>
+Surely you will and keep in touch!
+
+Best regards,
+Yuchen
+
+
+From jan.kiszka at web.de  Sun Dec  4 23:27:18 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Sun, 04 Dec 2005 23:27:18 +0100
+Subject: [Rtfirewire-devel] Re: About CSR Module and User Space Access
+In-Reply-To: <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com> <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+Message-ID: <43936D46.40307@web.de>
+
+Yuchen Zhang wrote:
+> 
+> To write a user space function to talk to rt-fw module (without
+> eth1394), you need to define a communication mechanism between kernel
+> and user space. If you look into the libraw1394 (user-space library to
+> access Linux raw1394), you can find: the communication is driven by
+> user-side, which polls the kernel side for any newly coming message,
+> either transaction message or other bus events (like bus reset). But I
+> believe we do have quite some other options (mailbox, fifo, etc),
+> which are more realtime, provided by Xenomai (also RTAI).
+
+I would rather vote for a direct call mechanism (need not be
+polling-based, though) like RTDM provides - both for userspace and
+kernelspace users. Any intermediate buffering through mailboxes etc. may
+easily degrade performance.
+
+BTW: Yuchen, we still need to think about that common rtskb format to
+avoid the additonal copy step in eth1394...
+
+> 
+> Anyway, if you wanna write some user-space program on rt-fw, the
+> current rt-fw cannot directly support that unless you use eth1394,
+> which means your program will be no different from socket programming.
+> 
+> BUT, the pressure to port raw1394 to rt-fw is obviously there, so we
+> need to take some action anyway. I guess you are also interested, so
+> let's start the work and keep on the discussion.
+> 
+
+What about starting by analysing and summarising the existing
+functionalities of standard raw1394? Then one can discuss what
+interfaces are required for the real-time world and what mechanisms to
+provide them are best.
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051204/bf319e0d/attachment.pgp>
+
+From writefaruq at gmail.com  Mon Dec  5 15:40:16 2005
+From: writefaruq at gmail.com (M. Omar Faruque Sarker)
+Date: Mon, 5 Dec 2005 23:40:16 +0900
+Subject: [Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+Message-ID: <fc9dd8650512050640xd1bf364ib34b7f6f92203e2@mail.gmail.com>
+
+Hi all,
+
+Today during my extensive test on RT-FW-0.1 in the above mentioned PC
+with Linux 2.6.13 (with ipipe patch) I found an error which made my
+machine  non-responding.
+
+Just after successful loading of Xenomai modules I inserted rt-fw
+rtpkbuff and rt_serv and then got this:
+
+[ Xenomai: suspending kernel thread  f72de810('irq_brk') at 0xf8d47a7
+after exception 0.
+ ata: command 0x35 timed out stat 0x50 host stat 0x24 ]
+
+then if i insert other modules like rt_ohci1394 the system becomes
+completely unresponsive and noway but hard reboot ;(
+
+I disable HT from BIOS but no change.
+
+
+
+Thanks
+
+Faruq
+
+
+From yuchen623 at gmail.com  Mon Dec  5 20:56:46 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 5 Dec 2005 20:56:46 +0100
+Subject: [Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+In-Reply-To: <fc9dd8650512050640xd1bf364ib34b7f6f92203e2@mail.gmail.com>
+References: <fc9dd8650512050640xd1bf364ib34b7f6f92203e2@mail.gmail.com>
+Message-ID: <95210d7e0512051156q1873de12w5ceaba99eddffcd2@mail.gmail.com>
+
+On 12/5/05, M. Omar Faruque Sarker <writefaruq at gmail.com> wrote:
+> Hi all,
+>
+> Today during my extensive test on RT-FW-0.1 in the above mentioned PC
+> with Linux 2.6.13 (with ipipe patch) I found an error which made my
+> machine  non-responding.
+>
+I havent tried RT-FW with ipipe patched kernel. So the problem could
+be RT-FW somehow is not compatible with ipipe patch.
+
+> Just after successful loading of Xenomai modules I inserted rt-fw
+> rtpkbuff and rt_serv and then got this:
+>
+> [ Xenomai: suspending kernel thread  f72de810('irq_brk') at 0xf8d47a7
+> after exception 0.
+>  ata: command 0x35 timed out stat 0x50 host stat 0x24 ]
+>
+The problem is only in rt_serv module. irq_brk is the irq broker
+thread. For the time being, I dont know what exception 0 means, but
+that could be a very important clue.
+
+> then if i insert other modules like rt_ohci1394 the system becomes
+> completely unresponsive and noway but hard reboot ;(
+>
+> I disable HT from BIOS but no change.
+>
+>
+Anyway, I would likely to make this error happen on my box.
+
+Yuchen
+
+
+From yuchen623 at gmail.com  Mon Dec  5 21:20:42 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 5 Dec 2005 21:20:42 +0100
+Subject: [Rtfirewire-devel] Re: About CSR Module and User Space Access
+In-Reply-To: <43936D46.40307@web.de>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+	 <43936D46.40307@web.de>
+Message-ID: <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+
+Jan,
+
+> BTW: Yuchen, we still need to think about that common rtskb format to
+> avoid the additonal copy step in eth1394...
+>
+The solution currently in my mind is to also use rtpkbuff module in
+RTnet, which will be exactly the same for RTnet and RT-FW. The
+rtpkbuff modules takes care of the general memory management, so all
+the current rtskb functions will be using the primitives from rtpkbuff
+module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+the same naming for all rtskb functions. See below how currently rtpkb
+is defined:
+
+struct rtpkb {
+       /*meta stuff for general memory management*/
+         ......
+
+        char		specific_stuff[256]; /*rtskb specific stuff goes here*/
+};
+
+Would like to know your opinion:)
+
+Yuchen
+
+
+From yuchen623 at gmail.com  Mon Dec  5 22:00:26 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 5 Dec 2005 22:00:26 +0100
+Subject: [Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+In-Reply-To: <438FFEBF.1060703@web.de>
+References: <fc9dd8650512011917pf3f04bq4d176eef7d21ec17@mail.gmail.com>
+	 <438FFEBF.1060703@web.de>
+Message-ID: <95210d7e0512051300i76cda5b4gc050e31928611dcb@mail.gmail.com>
+
+On 12/2/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+
+> I guess your sim1394 test measures a lot Xenomai scheduling latencies
+> ;). BTW, I'm not up-to-date: is this rt_sim1394 already part of
+> rt-firewire or yet on the way into the repos? Would be interesting to
+> have such thing for my typically firewire-less tests of RTnet - would
+> allow to check eth1394 over such a loopback...
+
+Currently rt_sim1394 still doesnot support eth1394, due to the fact
+that isochronous simulation is not implemented yet. Isochronous
+transaction is needed for "Ethernet" broadcast, which is essential for
+ARP, etc.
+
+Yuchen
+
+
+From jan.kiszka at web.de  Tue Dec  6 22:37:37 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 06 Dec 2005 22:37:37 +0100
+Subject: [Rtfirewire-devel] Common rt-buffers (was: About CSR Module and User Space Access)
+In-Reply-To: <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>	 <43936D46.40307@web.de> <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+Message-ID: <439604A1.60507@web.de>
+
+Yuchen Zhang wrote:
+> Jan,
+> 
+> 
+>>BTW: Yuchen, we still need to think about that common rtskb format to
+>>avoid the additonal copy step in eth1394...
+>>
+> 
+> The solution currently in my mind is to also use rtpkbuff module in
+> RTnet, which will be exactly the same for RTnet and RT-FW. The
+> rtpkbuff modules takes care of the general memory management, so all
+> the current rtskb functions will be using the primitives from rtpkbuff
+> module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+> the same naming for all rtskb functions. See below how currently rtpkb
+> is defined:
+> 
+> struct rtpkb {
+>        /*meta stuff for general memory management*/
+>          ......
+> 
+>         char		specific_stuff[256]; /*rtskb specific stuff goes here*/
+> };
+> 
+> Would like to know your opinion:)
+
+I checked the situation in more details again. This is how I see at ATM:
+
+ o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+   fragment, starting with a buffer head, followed by a payload buffer.
+   RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+   4k. But RTnet may require more in case we ever start using jumbo
+   frames for gigabit Ethernet (i.e. >8k).
+
+ o In order to make buffer fully exchangeable between RT-FireWire and
+   RTnet, both subsystems must agree on
+
+    1. a common rt-buffer size
+    2. a minimum buffer head size to let every user put some private
+       data into the header as well
+    3. the same kernel slab pool to take additional buffers from
+
+   The third item actually enforces the first one - but may
+   unfortunately do this in the wrong direction, i.e. provide too small
+   buffers for one instance.
+   Requirement 3 could be avoided by using kmalloc instead of
+   kmem_cache_alloc for each individual buffer, but this may easily
+   increase the overhead due to not optimally sized memory fragments.
+
+ o As we should not simply set the worst-case size as default for all,
+   some flexibility at least during compile time is required regarding
+   the size parameters (1. and 2.). More precisely, that subsystem which
+   is closer to the physical media dictates the rt-packet size.
+
+
+Now let's think about some approaches to fulfill these requirements in a
+generic, maybe also extensible way:
+
+ o The rt-buffer pooling mechanism is a generic feature probably suited
+   for more scenarios than RTnet and RT-FireWire. I'm currently playing
+   with the idea to move the functionality into the RTDM layer. The core
+   features would be:
+
+    - Providing non-real-time allocation for rt-buffers from -what I
+      would call it- parent pools. Buffers from parent pools can be
+      organised in local real-time pools by the drivers and, in case
+      they come from the same parent pool, freely exchanged.
+
+    - Parent pools need to be identified by a unique name. The first
+      user which accesses a parent pool under a yet unregistered name
+      will create that pool with rt-buffer size that it provides with
+      the request.
+
+    - Any additional user of an existing parent pool specifying a
+      different rt-buffer size will receive an error. Thus we make sure
+      that all users cleanly agree on the same size beforehand. By
+      "size", I also mean the minimum header size, i.e. actually two
+      parameters.
+
+    - Moreover, one can discuss which features from RT-FireWire's rtpk
+      and RTnet's rtskb implementation should make it into RTDM. I
+      haven't thought about this yet.
+
+ o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+   would first have to establish some mechanism to agree on rt-buffer
+   sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+   RT-FireWire and its buffers are (currently) smaller, it will simply
+   grab RT-FireWire's parameters from some exported header during
+   compile time. Then RTnet can call RTDM to either join or create the
+   fitting parent pool.
+
+ o Due to the significant overhead of using 4k buffers for standard
+   Ethernet and the possibility that RTnet may support jumbo frames in
+   the future, a scheme for using different parent pools, thus rt-buffer
+   sizes for different network devices has to be established in RTnet
+   later on. But this requires some refactoring and API extensions and
+   is nothing for a quick shot.
+
+So far my ideas. Comments are welcome, questions as well. I hope the
+actual implementation is not half as long as this posting. ;)
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051206/1384642c/attachment.pgp>
+
+From yuchen623 at gmail.com  Wed Dec  7 01:39:40 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Wed, 7 Dec 2005 01:39:40 +0100
+Subject: [Rtfirewire-devel] Re: Common rt-buffers (was: About CSR Module and User Space Access)
+In-Reply-To: <439604A1.60507@web.de>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+	 <43936D46.40307@web.de>
+	 <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+	 <439604A1.60507@web.de>
+Message-ID: <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+
+On 12/6/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > Jan,
+> >
+> >
+> >>BTW: Yuchen, we still need to think about that common rtskb format to
+> >>avoid the additonal copy step in eth1394...
+> >>
+> >
+> > The solution currently in my mind is to also use rtpkbuff module in
+> > RTnet, which will be exactly the same for RTnet and RT-FW. The
+> > rtpkbuff modules takes care of the general memory management, so all
+> > the current rtskb functions will be using the primitives from rtpkbuff
+> > module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+> > the same naming for all rtskb functions. See below how currently rtpkb
+> > is defined:
+> >
+> > struct rtpkb {
+> >        /*meta stuff for general memory management*/
+> >          ......
+> >
+> >         char          specific_stuff[256]; /*rtskb specific stuff goes here*/
+> > };
+> >
+> > Would like to know your opinion:)
+>
+> I checked the situation in more details again. This is how I see at ATM:
+>
+>  o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+>    fragment, starting with a buffer head, followed by a payload buffer.
+>    RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+>    4k. But RTnet may require more in case we ever start using jumbo
+>    frames for gigabit Ethernet (i.e. >8k).
+>
+>  o In order to make buffer fully exchangeable between RT-FireWire and
+>    RTnet, both subsystems must agree on
+>
+>     1. a common rt-buffer size
+>     2. a minimum buffer head size to let every user put some private
+>        data into the header as well
+>     3. the same kernel slab pool to take additional buffers from
+>
+What I understand about the buffer header is: it is composed of the
+meta stuff, which is used both for general memory management (like
+payload size, the pool where the buffer belongs to, etc) and for
+application-specific management (like the Ethernet frame headers), and
+the pointer to the payload memory. A rt-buffer struct pointer can be
+safely casted to an pointer to application-specific buffer struct, and
+vice versa.
+
+>    The third item actually enforces the first one - but may
+>    unfortunately do this in the wrong direction, i.e. provide too small
+>    buffers for one instance.
+>    Requirement 3 could be avoided by using kmalloc instead of
+>    kmem_cache_alloc for each individual buffer, but this may easily
+>    increase the overhead due to not optimally sized memory fragments.
+>
+Yes, I agree.
+
+>  o As we should not simply set the worst-case size as default for all,
+>    some flexibility at least during compile time is required regarding
+>    the size parameters (1. and 2.). More precisely, that subsystem which
+>    is closer to the physical media dictates the rt-packet size.
+>
+I also agree that the size of buffer should be flexible. It could be
+an argument that is specified to the pool allocating API in the
+general memory management(say RTDM).
+
+>
+> Now let's think about some approaches to fulfill these requirements in a
+> generic, maybe also extensible way:
+>
+>  o The rt-buffer pooling mechanism is a generic feature probably suited
+>    for more scenarios than RTnet and RT-FireWire. I'm currently playing
+>    with the idea to move the functionality into the RTDM layer. The core
+>    features would be:
+>
+Good idea. In RT-FireWire, the general memory management has been
+separated from application-specific buffer management: we have rtpkb
+(for general) and hpsb_packet (for FireWire protocol). But, to move
+the functionality to a base layer, like RTDM, seems more reasonable.
+
+>     - Providing non-real-time allocation for rt-buffers from -what I
+>       would call it- parent pools. Buffers from parent pools can be
+>       organised in local real-time pools by the drivers and, in case
+>       they come from the same parent pool, freely exchanged.
+>
+>     - Parent pools need to be identified by a unique name. The first
+>       user which accesses a parent pool under a yet unregistered name
+>       will create that pool with rt-buffer size that it provides with
+>       the request.
+>
+>     - Any additional user of an existing parent pool specifying a
+>       different rt-buffer size will receive an error. Thus we make sure
+>       that all users cleanly agree on the same size beforehand. By
+>       "size", I also mean the minimum header size, i.e. actually two
+>       parameters.
+>
+
+Above 3 seem fine to  me.
+>     - Moreover, one can discuss which features from RT-FireWire's rtpk
+>       and RTnet's rtskb implementation should make it into RTDM. I
+>       haven't thought about this yet.
+>
+
+rtpkb has some functions that rtskb does not have. We can take a look
+into these details later.
+
+>  o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+>    would first have to establish some mechanism to agree on rt-buffer
+>    sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+>    RT-FireWire and its buffers are (currently) smaller, it will simply
+>    grab RT-FireWire's parameters from some exported header during
+>    compile time. Then RTnet can call RTDM to either join or create the
+>    fitting parent pool.
+>
+The pool allocating API of RTDM can be called either when the pool (of
+which the name is specified as argument) has been allocated or not. If
+allocated, the API simply returns the existing pointer to the pool.
+
+>  o Due to the significant overhead of using 4k buffers for standard
+>    Ethernet and the possibility that RTnet may support jumbo frames in
+>    the future, a scheme for using different parent pools, thus rt-buffer
+>    sizes for different network devices has to be established in RTnet
+>    later on. But this requires some refactoring and API extensions and
+>    is nothing for a quick shot.
+>
+Ok, again, the buffer size can be set as argument. But for now, I
+think we only need to focus on the service-provider part, i.e. RTDM.
+
+Now, I have some further idea: what if we also bind the packet
+capturing service with the memory management. That is if a real-time
+application needs real-time memory allocation, it can also ask for
+capturing of all those allocated memory (packets). We can use some
+user-space tools to analyze the captured memory. The captured memory
+can be delivered via fake Ethernet interface, so tools like Ethereal
+can be used (only need to extend it based on the application).
+
+The capturng of a packet can be done when that packet memory is freed,
+where the capturing operation is transparent to the application. Well,
+the application must claim somewhere  before the packet is freed that
+it should be captured, e.g. right after it is allocated.
+
+Concerning the packet capturing idea, we can explore more, if it is
+agreed to be interesting and effort-worth.
+
+Comments wanted, questions welcome:)
+
+Yuchen
+
+
+From jan.kiszka at web.de  Wed Dec  7 23:52:50 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Wed, 07 Dec 2005 23:52:50 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com> <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com> <43936D46.40307@web.de> <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com> <439604A1.60507@web.de> <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+Message-ID: <439767C2.2070004@web.de>
+
+Yuchen Zhang wrote:
+> On 12/6/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> 
+>>Yuchen Zhang wrote:
+>>
+>>>Jan,
+>>>
+>>>
+>>>
+>>>>BTW: Yuchen, we still need to think about that common rtskb format to
+>>>>avoid the additonal copy step in eth1394...
+>>>>
+>>>
+>>>The solution currently in my mind is to also use rtpkbuff module in
+>>>RTnet, which will be exactly the same for RTnet and RT-FW. The
+>>>rtpkbuff modules takes care of the general memory management, so all
+>>>the current rtskb functions will be using the primitives from rtpkbuff
+>>>module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+>>>the same naming for all rtskb functions. See below how currently rtpkb
+>>>is defined:
+>>>
+>>>struct rtpkb {
+>>>       /*meta stuff for general memory management*/
+>>>         ......
+>>>
+>>>        char          specific_stuff[256]; /*rtskb specific stuff goes here*/
+>>>};
+>>>
+>>>Would like to know your opinion:)
+>>
+>>I checked the situation in more details again. This is how I see at ATM:
+>>
+>> o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+>>   fragment, starting with a buffer head, followed by a payload buffer.
+>>   RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+>>   4k. But RTnet may require more in case we ever start using jumbo
+>>   frames for gigabit Ethernet (i.e. >8k).
+>>
+>> o In order to make buffer fully exchangeable between RT-FireWire and
+>>   RTnet, both subsystems must agree on
+>>
+>>    1. a common rt-buffer size
+>>    2. a minimum buffer head size to let every user put some private
+>>       data into the header as well
+>>    3. the same kernel slab pool to take additional buffers from
+>>
+> 
+> What I understand about the buffer header is: it is composed of the
+> meta stuff, which is used both for general memory management (like
+> payload size, the pool where the buffer belongs to, etc) and for
+> application-specific management (like the Ethernet frame headers), and
+> the pointer to the payload memory. A rt-buffer struct pointer can be
+> safely casted to an pointer to application-specific buffer struct, and
+> vice versa.
+> 
+> 
+>>   The third item actually enforces the first one - but may
+>>   unfortunately do this in the wrong direction, i.e. provide too small
+>>   buffers for one instance.
+>>   Requirement 3 could be avoided by using kmalloc instead of
+>>   kmem_cache_alloc for each individual buffer, but this may easily
+>>   increase the overhead due to not optimally sized memory fragments.
+>>
+> 
+> Yes, I agree.
+> 
+> 
+>> o As we should not simply set the worst-case size as default for all,
+>>   some flexibility at least during compile time is required regarding
+>>   the size parameters (1. and 2.). More precisely, that subsystem which
+>>   is closer to the physical media dictates the rt-packet size.
+>>
+> 
+> I also agree that the size of buffer should be flexible. It could be
+> an argument that is specified to the pool allocating API in the
+> general memory management(say RTDM).
+> 
+> 
+>>Now let's think about some approaches to fulfill these requirements in a
+>>generic, maybe also extensible way:
+>>
+>> o The rt-buffer pooling mechanism is a generic feature probably suited
+>>   for more scenarios than RTnet and RT-FireWire. I'm currently playing
+>>   with the idea to move the functionality into the RTDM layer. The core
+>>   features would be:
+>>
+> 
+> Good idea. In RT-FireWire, the general memory management has been
+> separated from application-specific buffer management: we have rtpkb
+> (for general) and hpsb_packet (for FireWire protocol). But, to move
+> the functionality to a base layer, like RTDM, seems more reasonable.
+> 
+> 
+>>    - Providing non-real-time allocation for rt-buffers from -what I
+>>      would call it- parent pools. Buffers from parent pools can be
+>>      organised in local real-time pools by the drivers and, in case
+>>      they come from the same parent pool, freely exchanged.
+>>
+>>    - Parent pools need to be identified by a unique name. The first
+>>      user which accesses a parent pool under a yet unregistered name
+>>      will create that pool with rt-buffer size that it provides with
+>>      the request.
+>>
+>>    - Any additional user of an existing parent pool specifying a
+>>      different rt-buffer size will receive an error. Thus we make sure
+>>      that all users cleanly agree on the same size beforehand. By
+>>      "size", I also mean the minimum header size, i.e. actually two
+>>      parameters.
+>>
+> 
+> 
+> Above 3 seem fine to  me.
+> 
+>>    - Moreover, one can discuss which features from RT-FireWire's rtpk
+>>      and RTnet's rtskb implementation should make it into RTDM. I
+>>      haven't thought about this yet.
+>>
+> 
+> 
+> rtpkb has some functions that rtskb does not have. We can take a look
+> into these details later.
+> 
+> 
+>> o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+>>   would first have to establish some mechanism to agree on rt-buffer
+>>   sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+>>   RT-FireWire and its buffers are (currently) smaller, it will simply
+>>   grab RT-FireWire's parameters from some exported header during
+>>   compile time. Then RTnet can call RTDM to either join or create the
+>>   fitting parent pool.
+>>
+> 
+> The pool allocating API of RTDM can be called either when the pool (of
+> which the name is specified as argument) has been allocated or not. If
+> allocated, the API simply returns the existing pointer to the pool.
+> 
+> 
+>> o Due to the significant overhead of using 4k buffers for standard
+>>   Ethernet and the possibility that RTnet may support jumbo frames in
+>>   the future, a scheme for using different parent pools, thus rt-buffer
+>>   sizes for different network devices has to be established in RTnet
+>>   later on. But this requires some refactoring and API extensions and
+>>   is nothing for a quick shot.
+>>
+> 
+> Ok, again, the buffer size can be set as argument. But for now, I
+> think we only need to focus on the service-provider part, i.e. RTDM.
+
+Hey, convincing you of my idea was really easy. ;)
+
+> 
+> Now, I have some further idea: what if we also bind the packet
+> capturing service with the memory management. That is if a real-time
+> application needs real-time memory allocation, it can also ask for
+> capturing of all those allocated memory (packets). We can use some
+> user-space tools to analyze the captured memory. The captured memory
+> can be delivered via fake Ethernet interface, so tools like Ethereal
+> can be used (only need to extend it based on the application).
+> 
+> The capturng of a packet can be done when that packet memory is freed,
+> where the capturing operation is transparent to the application. Well,
+> the application must claim somewhere  before the packet is freed that
+> it should be captured, e.g. right after it is allocated.
+> 
+> Concerning the packet capturing idea, we can explore more, if it is
+> agreed to be interesting and effort-worth.
+
+Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+useful.
+
+At least for RTnet, capturing is a debugging feature you don't what
+compiled in for production systems. It adds overhead to some critical
+paths that may hurt on low-end boxes.
+
+The question to me is then what functionality of the capturing subsystem
+could be moved to RTDM while still keeping the control of using it or
+not (without runtime costs) at the configuration level of the driver
+using it. I would like to be able to switch capturing off during "make
+menuconfig" of RTnet, but maybe switching it on for RT-FireWire at the
+same time.
+
+But maybe I'm too sceptical. I haven't look at both code bases with your
+idea in mind yet. What packet field, what functions would you move to RTDM?
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 256 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051207/ad4b1321/attachment.pgp>
+
+From yuchen623 at gmail.com  Thu Dec  8 20:27:48 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Thu, 8 Dec 2005 20:27:48 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <439767C2.2070004@web.de>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+	 <43936D46.40307@web.de>
+	 <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+	 <439604A1.60507@web.de>
+	 <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+	 <439767C2.2070004@web.de>
+Message-ID: <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com>
+
+On 12/7/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+> > On 12/6/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> >
+> >>Yuchen Zhang wrote:
+> >>
+> >>>Jan,
+> >>>
+> >>>
+> >>>
+> >>>>BTW: Yuchen, we still need to think about that common rtskb format to
+> >>>>avoid the additonal copy step in eth1394...
+> >>>>
+> >>>
+> >>>The solution currently in my mind is to also use rtpkbuff module in
+> >>>RTnet, which will be exactly the same for RTnet and RT-FW. The
+> >>>rtpkbuff modules takes care of the general memory management, so all
+> >>>the current rtskb functions will be using the primitives from rtpkbuff
+> >>>module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+> >>>the same naming for all rtskb functions. See below how currently rtpkb
+> >>>is defined:
+> >>>
+> >>>struct rtpkb {
+> >>>       /*meta stuff for general memory management*/
+> >>>         ......
+> >>>
+> >>>        char          specific_stuff[256]; /*rtskb specific stuff goes here*/
+> >>>};
+> >>>
+> >>>Would like to know your opinion:)
+> >>
+> >>I checked the situation in more details again. This is how I see at ATM:
+> >>
+> >> o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+> >>   fragment, starting with a buffer head, followed by a payload buffer.
+> >>   RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+> >>   4k. But RTnet may require more in case we ever start using jumbo
+> >>   frames for gigabit Ethernet (i.e. >8k).
+> >>
+> >> o In order to make buffer fully exchangeable between RT-FireWire and
+> >>   RTnet, both subsystems must agree on
+> >>
+> >>    1. a common rt-buffer size
+> >>    2. a minimum buffer head size to let every user put some private
+> >>       data into the header as well
+> >>    3. the same kernel slab pool to take additional buffers from
+> >>
+> >
+> > What I understand about the buffer header is: it is composed of the
+> > meta stuff, which is used both for general memory management (like
+> > payload size, the pool where the buffer belongs to, etc) and for
+> > application-specific management (like the Ethernet frame headers), and
+> > the pointer to the payload memory. A rt-buffer struct pointer can be
+> > safely casted to an pointer to application-specific buffer struct, and
+> > vice versa.
+> >
+> >
+> >>   The third item actually enforces the first one - but may
+> >>   unfortunately do this in the wrong direction, i.e. provide too small
+> >>   buffers for one instance.
+> >>   Requirement 3 could be avoided by using kmalloc instead of
+> >>   kmem_cache_alloc for each individual buffer, but this may easily
+> >>   increase the overhead due to not optimally sized memory fragments.
+> >>
+> >
+> > Yes, I agree.
+> >
+> >
+> >> o As we should not simply set the worst-case size as default for all,
+> >>   some flexibility at least during compile time is required regarding
+> >>   the size parameters (1. and 2.). More precisely, that subsystem which
+> >>   is closer to the physical media dictates the rt-packet size.
+> >>
+> >
+> > I also agree that the size of buffer should be flexible. It could be
+> > an argument that is specified to the pool allocating API in the
+> > general memory management(say RTDM).
+> >
+> >
+> >>Now let's think about some approaches to fulfill these requirements in a
+> >>generic, maybe also extensible way:
+> >>
+> >> o The rt-buffer pooling mechanism is a generic feature probably suited
+> >>   for more scenarios than RTnet and RT-FireWire. I'm currently playing
+> >>   with the idea to move the functionality into the RTDM layer. The core
+> >>   features would be:
+> >>
+> >
+> > Good idea. In RT-FireWire, the general memory management has been
+> > separated from application-specific buffer management: we have rtpkb
+> > (for general) and hpsb_packet (for FireWire protocol). But, to move
+> > the functionality to a base layer, like RTDM, seems more reasonable.
+> >
+> >
+> >>    - Providing non-real-time allocation for rt-buffers from -what I
+> >>      would call it- parent pools. Buffers from parent pools can be
+> >>      organised in local real-time pools by the drivers and, in case
+> >>      they come from the same parent pool, freely exchanged.
+> >>
+> >>    - Parent pools need to be identified by a unique name. The first
+> >>      user which accesses a parent pool under a yet unregistered name
+> >>      will create that pool with rt-buffer size that it provides with
+> >>      the request.
+> >>
+> >>    - Any additional user of an existing parent pool specifying a
+> >>      different rt-buffer size will receive an error. Thus we make sure
+> >>      that all users cleanly agree on the same size beforehand. By
+> >>      "size", I also mean the minimum header size, i.e. actually two
+> >>      parameters.
+> >>
+> >
+> >
+> > Above 3 seem fine to  me.
+> >
+> >>    - Moreover, one can discuss which features from RT-FireWire's rtpk
+> >>      and RTnet's rtskb implementation should make it into RTDM. I
+> >>      haven't thought about this yet.
+> >>
+> >
+> >
+> > rtpkb has some functions that rtskb does not have. We can take a look
+> > into these details later.
+> >
+> >
+> >> o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+> >>   would first have to establish some mechanism to agree on rt-buffer
+> >>   sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+> >>   RT-FireWire and its buffers are (currently) smaller, it will simply
+> >>   grab RT-FireWire's parameters from some exported header during
+> >>   compile time. Then RTnet can call RTDM to either join or create the
+> >>   fitting parent pool.
+> >>
+> >
+> > The pool allocating API of RTDM can be called either when the pool (of
+> > which the name is specified as argument) has been allocated or not. If
+> > allocated, the API simply returns the existing pointer to the pool.
+> >
+> >
+> >> o Due to the significant overhead of using 4k buffers for standard
+> >>   Ethernet and the possibility that RTnet may support jumbo frames in
+> >>   the future, a scheme for using different parent pools, thus rt-buffer
+> >>   sizes for different network devices has to be established in RTnet
+> >>   later on. But this requires some refactoring and API extensions and
+> >>   is nothing for a quick shot.
+> >>
+> >
+> > Ok, again, the buffer size can be set as argument. But for now, I
+> > think we only need to focus on the service-provider part, i.e. RTDM.
+>
+> Hey, convincing you of my idea was really easy. ;)
+>
+This is because my own idea was already more or less similiar to
+yours, i.e. to move memory management to a base layer, like RTDM. BUT,
+I dont think my idea is exactly the same as what you said, see below:
+1. I think the buffer size should be an argument to API of allocating
+parent pools, i.e. the kernel_slab_pool.
+
+2. I think  We DONT need to have different APIs for creating and
+joining parent pool. The name of the pool is given in the creating API
+anyway, but in case a pool of same name already exists, the pointer to
+the existing pool is returned. BUT this is transparent to
+applications.
+
+> >
+> > Now, I have some further idea: what if we also bind the packet
+> > capturing service with the memory management. That is if a real-time
+> > application needs real-time memory allocation, it can also ask for
+> > capturing of all those allocated memory (packets). We can use some
+> > user-space tools to analyze the captured memory. The captured memory
+> > can be delivered via fake Ethernet interface, so tools like Ethereal
+> > can be used (only need to extend it based on the application).
+> >
+> > The capturng of a packet can be done when that packet memory is freed,
+> > where the capturing operation is transparent to the application. Well,
+> > the application must claim somewhere  before the packet is freed that
+> > it should be captured, e.g. right after it is allocated.
+> >
+> > Concerning the packet capturing idea, we can explore more, if it is
+> > agreed to be interesting and effort-worth.
+>
+> Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+> useful.
+>
+Ok, now time for real debating:)
+Let's first sketch the main frame code to support this service.
+
+struct Cap_struct {
+         struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+captured packet to user-space*/
+         struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+compensate application memory come from*/
+        int buffer_size;  /* the size of buffer that can be captured here */
+}
+
+struct rt-buffer{
+          .....
+          struct Cap_struct *aCap;
+}
+
+/*function to create a Cap_struct*/
+struct Cap_struct *create_cap( int size, //  the buffer size
+                                             struct kernel_slab_pool
+*parent_pool,
+                                              char *name) // the name
+of fake ethernet dev, should be
+                                                               
+//specific about application
+{
+       if(*name already exists){
+               return (address of existing Cap_struct)
+       }
+      .............
+}
+
+/*function to remove a Cap_struct*/
+void remove_cap(struct Cap_struct *aCap_struct)
+
+/*function to capture a buffer*/
+struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+buffer_size, struct cap_struct *aCap)
+{
+     if(aCap->buffer_size != buffer_size)
+                   //print error msg and return
+     else{
+          //allocate a compesating buffer from the cap pool
+          // exchange buffers
+          //deliver the captured buffer to fake ethernet dev
+          //return the address of compensating buffer
+         return &comp_buffer;
+     }
+}
+
+/*function to free a rt buffer*/
+void free_rtbuffer(struct rt-buffer *abuffer){
+    if(abuffer->aCap){ //pointer NOT null, so we should capture this one
+         abuffer = cap_rtbuffer(abuffer, sizeof(abuffer), abuffer->aCap);
+    }
+    //free abuffer
+    ......
+}
+
+> At least for RTnet, capturing is a debugging feature you don't what
+> compiled in for production systems. It adds overhead to some critical
+> paths that may hurt on low-end boxes.
+>
+I dont think the overhead is noticable. When the base module (say
+RTDM) has capturing option enabled, the only overhead that happens to
+applications that do NOT need capturing   is, in the free_rtbuffer
+function, the extra checking of a rt-buffer's cap_struct pointer.
+
+> The question to me is then what functionality of the capturing subsystem
+> could be moved to RTDM while still keeping the control of using it or
+> not (without runtime costs) at the configuration level of the driver
+> using it. I would like to be able to switch capturing off during "make
+> menuconfig" of RTnet, but maybe switching it on for RT-FireWire at the
+> same time.
+>
+The capturing I am proposing is conceptually different from the
+capturing in RTnet (what I understood). It is fully oriented to
+applications, while RTnet's capturing is more or less per networking
+interface. That means in this new capturing service, buffer capturing
+can happen /anywhere/, even something totally away from network
+transaction. This is especially useful when we develop multiple
+applications over /one/ FireWire interface: we may only want to
+capture buffers used by one high-level application. Besides FireWire
+and Ethernet, other applications based on RTDM, like socketCAN, can
+also benefit from this service, as long as they need some analysis
+over the used memory to gain some insight to the system behavior.
+
+BTW, are you going to work on these soon, at least the memory
+management part? How can I contribute? My idea is to make RTDM
+temporarily a separate module that can be compiled over xenomai, and
+put it either on RTnet svn or RT-FireWire svn.
+
+Regards,
+Yuchen
+
+
+From writefaruq at gmail.com  Thu Dec  8 23:29:54 2005
+From: writefaruq at gmail.com (M. Omar Faruque Sarker)
+Date: Fri, 9 Dec 2005 07:29:54 +0900
+Subject: [Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+Message-ID: <fc9dd8650512081429ya6803cam58a1f33ef8f0f92@mail.gmail.com>
+
+Dear list,
+
+please consider this to answer using less jargon. I'm still in Users'
+side, not in Developers'  yet :)
+
+1. After loading Xenomai+RT-FW+ RTnet + rt_eth1394 modules I found the
+firewire card as "rteth1" using rtifconfig (also assigned an IP to
+it). Now,  If I attach a camera or any other ieee1394 capable 
+firewire node in that card's any port, in that case how   can I
+communicate with that node  under RTnet ? Does that node also have the
+same  IP?
+If yes, then if I use rt_dev_socket calls from user space code then
+what would be the parameters like AF_PACKET, SOCK_DGRAM etc. ? (I'm
+looking on RTnet's raw-packets.c and other example files)
+
+2. From rt_eth1394 module, as per my understanding, I saw if  2 PC
+have rt_eth1394 loaded then they can communicate (without any user
+interaction!). But If I want to send packet to a node that don't have
+rt_eth1394 module (in the same bus/ FW card's any port)  then I need
+to change the module. Could you please give me some hints?
+
+As I've checked the classic/ non-RT  ieee1394 driver's  eth1394 files
+and found some functions have been exported to user space to use by
+applications. In this case is it possible to do the same?
+
+3. For the sake of simplicity, can we start adopting raw1394's async
+part first and do iso later. you may ask me to do something by
+pointing out the major tasks in a specific manner.
+
+I'm again would like give you thanks and  appreciate for your attention.
+As you know that, to make something so-called user friendly it's
+sometimes obvious to face some unfriendly talks :)
+
+
+Best Regards,
+
+Faruque
+
+
+From yuchen623 at gmail.com  Fri Dec  9 00:09:23 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 9 Dec 2005 00:09:23 +0100
+Subject: [Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+In-Reply-To: <fc9dd8650512081429ya6803cam58a1f33ef8f0f92@mail.gmail.com>
+References: <fc9dd8650512081429ya6803cam58a1f33ef8f0f92@mail.gmail.com>
+Message-ID: <95210d7e0512081509u154736c9kc3b5a18d7522239d@mail.gmail.com>
+
+On 12/8/05, M. Omar Faruque Sarker <writefaruq at gmail.com> wrote:
+> Dear list,
+>
+> please consider this to answer using less jargon. I'm still in Users'
+> side, not in Developers'  yet :)
+>
+> 1. After loading Xenomai+RT-FW+ RTnet + rt_eth1394 modules I found the
+> firewire card as "rteth1" using rtifconfig (also assigned an IP to
+> it). Now,  If I attach a camera or any other ieee1394 capable
+> firewire node in that card's any port, in that case how   can I
+> communicate with that node  under RTnet ? Does that node also have the
+> same  IP?
+
+With another ieee1394 capable PC, you can build a fake Ethernet
+connection between 2 PCs, both holding different IP. But you /cannot/
+use rt_eth1394 to communicate with a 1394 camera. The communication
+over rt_eth1394 only happens via asynchronous transaction. As I know,
+1394 camera only supports isochronous streaming on one or more
+channels, which means your PC has to listen to that isochronous
+channel in order to receive the video signal. Unfortunately, the
+real-time video module in RT-FW has not yet been implemented / ported
+from Linux.
+
+> If yes, then if I use rt_dev_socket calls from user space code then
+> what would be the parameters like AF_PACKET, SOCK_DGRAM etc. ? (I'm
+> looking on RTnet's raw-packets.c and other example files)
+>
+> 2. From rt_eth1394 module, as per my understanding, I saw if  2 PC
+> have rt_eth1394 loaded then they can communicate (without any user
+> interaction!). But If I want to send packet to a node that don't have
+> rt_eth1394 module (in the same bus/ FW card's any port)  then I need
+> to change the module. Could you please give me some hints?
+>
+NO, in principle it is not suggested.
+Let's see how high-level applications over FireWire work first.
+
+A high-level application, being rt_eth1394 or others, claims to
+reserve a certain range of the low-level 48-bit address space on the
+local node. Later on, all the communication of that applicatoin only
+happen in that range of address. In RT-FW, the address range of a
+certain applicaion is fixed on all nodes, and that is used to
+construct the FW frame header in the lower FireWire protocol stack. 
+That means if you customize your own application which occupies the
+same address range (or at least with some overlap) with rt_eth1394's,
+you can use rt_eth1394 on one node to send packets to the customized
+application on another node. But, I dont see the point of doing this.
+Maybe you can explain to me more about your intention?
+
+> As I've checked the classic/ non-RT  ieee1394 driver's  eth1394 files
+> and found some functions have been exported to user space to use by
+> applications. In this case is it possible to do the same?
+>
+Which functions do you mean? Could you point them out explicitly here?
+
+> 3. For the sake of simplicity, can we start adopting raw1394's async
+> part first and do iso later. you may ask me to do something by
+> pointing out the major tasks in a specific manner.
+>
+Yes. I am going to sketch the code frame of rt_raw1394 module.
+Hopefully within 2-3 days, we can start dicussion here and see how to
+allcoate the task:)
+
+> I'm again would like give you thanks and  appreciate for your attention.
+> As you know that, to make something so-called user friendly it's
+> sometimes obvious to face some unfriendly talks :)
+>
+The final destination of us is to make RT-FW competitive and user friendly.
+
+Btw, a good book for learning FireWire: <<FireWire System
+Architecture, 2nd Edition>> by Anderson.D.
+
+Keep in touch.
+
+Yuchen
+
+
+From yuchen623 at gmail.com  Fri Dec  9 00:31:10 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 9 Dec 2005 00:31:10 +0100
+Subject: [Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+In-Reply-To: <95210d7e0512051156q1873de12w5ceaba99eddffcd2@mail.gmail.com>
+References: <fc9dd8650512050640xd1bf364ib34b7f6f92203e2@mail.gmail.com>
+	 <95210d7e0512051156q1873de12w5ceaba99eddffcd2@mail.gmail.com>
+Message-ID: <95210d7e0512081531q4ffc28cxb74458778fcfbca6@mail.gmail.com>
+
+Just tested with 2.6.13-ipipe, Xenomai 2.0 and RT-FW 0.1. BUT no problem at all!
+
+Probably you should re-compile everything, including Linux kernel,
+modules, and xenomai, and try again. If you still have the problem,
+feel free to tell me.
+
+Yuchen
+
+On 12/5/05, Yuchen Zhang <yuchen623 at gmail.com> wrote:
+> On 12/5/05, M. Omar Faruque Sarker <writefaruq at gmail.com> wrote:
+> > Hi all,
+> >
+> > Today during my extensive test on RT-FW-0.1 in the above mentioned PC
+> > with Linux 2.6.13 (with ipipe patch) I found an error which made my
+> > machine  non-responding.
+> >
+> I havent tried RT-FW with ipipe patched kernel. So the problem could
+> be RT-FW somehow is not compatible with ipipe patch.
+>
+> > Just after successful loading of Xenomai modules I inserted rt-fw
+> > rtpkbuff and rt_serv and then got this:
+> >
+> > [ Xenomai: suspending kernel thread  f72de810('irq_brk') at 0xf8d47a7
+> > after exception 0.
+> >  ata: command 0x35 timed out stat 0x50 host stat 0x24 ]
+> >
+> The problem is only in rt_serv module. irq_brk is the irq broker
+> thread. For the time being, I dont know what exception 0 means, but
+> that could be a very important clue.
+>
+> > then if i insert other modules like rt_ohci1394 the system becomes
+> > completely unresponsive and noway but hard reboot ;(
+> >
+> > I disable HT from BIOS but no change.
+> >
+> >
+> Anyway, I would likely to make this error happen on my box.
+>
+> Yuchen
+>
+
+
+From yuchen623 at gmail.com  Fri Dec  9 10:04:14 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 9 Dec 2005 10:04:14 +0100
+Subject: [Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+In-Reply-To: <95210d7e0512081509u154736c9kc3b5a18d7522239d@mail.gmail.com>
+References: <fc9dd8650512081429ya6803cam58a1f33ef8f0f92@mail.gmail.com>
+	 <95210d7e0512081509u154736c9kc3b5a18d7522239d@mail.gmail.com>
+Message-ID: <95210d7e0512090104n2aac9892m62826580b5fb95be@mail.gmail.com>
+
+On 12/9/05, Yuchen Zhang <yuchen623 at gmail.com> wrote:
+> On 12/8/05, M. Omar Faruque Sarker <writefaruq at gmail.com> wrote:
+> > Dear list,
+> >
+> > please consider this to answer using less jargon. I'm still in Users'
+> > side, not in Developers'  yet :)
+> >
+> > 1. After loading Xenomai+RT-FW+ RTnet + rt_eth1394 modules I found the
+> > firewire card as "rteth1" using rtifconfig (also assigned an IP to
+> > it). Now,  If I attach a camera or any other ieee1394 capable
+> > firewire node in that card's any port, in that case how   can I
+> > communicate with that node  under RTnet ? Does that node also have the
+> > same  IP?
+>
+> With another ieee1394 capable PC, you can build a fake Ethernet
+> connection between 2 PCs, both holding different IP. But you /cannot/
+> use rt_eth1394 to communicate with a 1394 camera. The communication
+> over rt_eth1394 only happens via asynchronous transaction. As I know,
+> 1394 camera only supports isochronous streaming on one or more
+> channels, which means your PC has to listen to that isochronous
+> channel in order to receive the video signal. Unfortunately, the
+> real-time video module in RT-FW has not yet been implemented / ported
+> from Linux.
+>
+> > If yes, then if I use rt_dev_socket calls from user space code then
+> > what would be the parameters like AF_PACKET, SOCK_DGRAM etc. ? (I'm
+> > looking on RTnet's raw-packets.c and other example files)
+> >
+> > 2. From rt_eth1394 module, as per my understanding, I saw if  2 PC
+> > have rt_eth1394 loaded then they can communicate (without any user
+> > interaction!). But If I want to send packet to a node that don't have
+> > rt_eth1394 module (in the same bus/ FW card's any port)  then I need
+> > to change the module. Could you please give me some hints?
+> >
+> NO, in principle it is not suggested.
+> Let's see how high-level applications over FireWire work first.
+>
+> A high-level application, being rt_eth1394 or others, claims to
+> reserve a certain range of the low-level 48-bit address space on the
+> local node.
+
+One remark: here we only talk about asynchronous transaction-based
+application, like rt_eth1394. If you use isochronous transaction, like
+video streaming, then what I said here does not apply. But then:
+
+the application claims to reserve a certain channel for sending or
+receiving or both. In FireWire bus, there is isochronous resource
+management that is handled by a node called isochronous manager (All
+PC-based 1394 nodes are capable of this job). Any node who wants to
+reserve a new channel (and bandwidth) or give up a channel should
+(according to 1394spec) send a message to iso manager to let him
+update the new channel usage. In case of reserving a channel or
+bandwidth, the iso manager may say /NO/ if that channel has been
+occupied by someone. The communication with iso manager is actually
+read, write or lock operation on the two CSR registers of iso manager
+node: the iso channel register and bus bandwidth register.
+
+Go back to RT-FW, the communication with iso manager is not implicitly
+done by the protocol stack. That is if a new application will be
+developed to use the iso transaction on FireWire, it must itself agree
+on the initial procedure and try to communicate with the iso manager.
+For the iso manager, see the output of hostconfig: the one with extra
+bus channel and bandwidth display is the iso manager.
+
+Hope this piece of text can help. But if somehow you got confused,
+dont hesitate to tell me:)
+
+Later on, all the communication of that applicatoin only
+> happen in that range of address. In RT-FW, the address range of a
+> certain applicaion is fixed on all nodes, and that is used to
+> construct the FW frame header in the lower FireWire protocol stack.
+> That means if you customize your own application which occupies the
+> same address range (or at least with some overlap) with rt_eth1394's,
+> you can use rt_eth1394 on one node to send packets to the customized
+> application on another node. But, I dont see the point of doing this.
+> Maybe you can explain to me more about your intention?
+>
+> > As I've checked the classic/ non-RT  ieee1394 driver's  eth1394 files
+> > and found some functions have been exported to user space to use by
+> > applications. In this case is it possible to do the same?
+> >
+> Which functions do you mean? Could you point them out explicitly here?
+>
+> > 3. For the sake of simplicity, can we start adopting raw1394's async
+> > part first and do iso later. you may ask me to do something by
+> > pointing out the major tasks in a specific manner.
+> >
+> Yes. I am going to sketch the code frame of rt_raw1394 module.
+> Hopefully within 2-3 days, we can start dicussion here and see how to
+> allcoate the task:)
+>
+> > I'm again would like give you thanks and  appreciate for your attention.
+> > As you know that, to make something so-called user friendly it's
+> > sometimes obvious to face some unfriendly talks :)
+> >
+> The final destination of us is to make RT-FW competitive and user friendly.
+>
+> Btw, a good book for learning FireWire: <<FireWire System
+> Architecture, 2nd Edition>> by Anderson.D.
+>
+> Keep in touch.
+>
+> Yuchen
+>
+
+
+From jan.kiszka at web.de  Fri Dec  9 21:41:28 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Fri, 09 Dec 2005 21:41:28 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>	 <43936D46.40307@web.de>	 <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>	 <439604A1.60507@web.de>	 <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>	 <439767C2.2070004@web.de> <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com>
+Message-ID: <4399EBF8.8030406@web.de>
+
+Yuchen Zhang wrote:
+> [...]
+> This is because my own idea was already more or less similiar to
+> yours, i.e. to move memory management to a base layer, like RTDM. BUT,
+> I dont think my idea is exactly the same as what you said, see below:
+> 1. I think the buffer size should be an argument to API of allocating
+> parent pools, i.e. the kernel_slab_pool.
+
+Did I expressed this differently? Yes, this makes sense most (more
+precisely: buffer size and minimum header size).
+
+> 
+> 2. I think  We DONT need to have different APIs for creating and
+> joining parent pool. The name of the pool is given in the creating API
+> anyway, but in case a pool of same name already exists, the pointer to
+> the existing pool is returned. BUT this is transparent to
+> applications.
+
+Also what I meant. You call some rtdm_prntpool_create(name, buf_size,
+min_head_size) or so, and that pool gets either created or the existing
+one is returned.
+
+> 
+> 
+>>>Now, I have some further idea: what if we also bind the packet
+>>>capturing service with the memory management. That is if a real-time
+>>>application needs real-time memory allocation, it can also ask for
+>>>capturing of all those allocated memory (packets). We can use some
+>>>user-space tools to analyze the captured memory. The captured memory
+>>>can be delivered via fake Ethernet interface, so tools like Ethereal
+>>>can be used (only need to extend it based on the application).
+>>>
+>>>The capturng of a packet can be done when that packet memory is freed,
+>>>where the capturing operation is transparent to the application. Well,
+>>>the application must claim somewhere  before the packet is freed that
+>>>it should be captured, e.g. right after it is allocated.
+>>>
+>>>Concerning the packet capturing idea, we can explore more, if it is
+>>>agreed to be interesting and effort-worth.
+>>
+>>Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+>>useful.
+>>
+> 
+> Ok, now time for real debating:)
+> Let's first sketch the main frame code to support this service.
+> 
+> struct Cap_struct {
+>          struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+> captured packet to user-space*/
+>          struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+> compensate application memory come from*/
+>         int buffer_size;  /* the size of buffer that can be captured here */
+> }
+
+So, that structure describes a capturing instance, conceptually
+something like rtcap service of RTnet?
+
+> 
+> struct rt-buffer{
+>           .....
+>           struct Cap_struct *aCap;
+> }
+> 
+
+And this link is needed as there can be multiple capturers, right? But
+what about the additional fields required by rtcap to save the initial
+buffer layout, the compensation buffer, timestamp, and other stuff? Note
+that rtcap does deferred capturing. Does your service in RT-FireWire
+work the same way?
+
+> /*function to create a Cap_struct*/
+> struct Cap_struct *create_cap( int size, //  the buffer size
+>                                              struct kernel_slab_pool
+> *parent_pool,
+>                                               char *name) // the name
+> of fake ethernet dev, should be
+>                                                                
+> //specific about application
+> {
+>        if(*name already exists){
+>                return (address of existing Cap_struct)
+>        }
+>       .............
+> }
+> 
+> /*function to remove a Cap_struct*/
+> void remove_cap(struct Cap_struct *aCap_struct)
+> 
+
+Ok, this makes sense.
+
+> /*function to capture a buffer*/
+> struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+> buffer_size, struct cap_struct *aCap)
+> {
+>      if(aCap->buffer_size != buffer_size)
+>                    //print error msg and return
+>      else{
+>           //allocate a compesating buffer from the cap pool
+>           // exchange buffers
+>           //deliver the captured buffer to fake ethernet dev
+
+I hope you do NOT deliver immediately, just pend the delivery for Linux
+to get in the CPU again.
+
+>           //return the address of compensating buffer
+>          return &comp_buffer;
+>      }
+> }
+
+What's the caller supposed to do with that returned buffer?
+
+> 
+> /*function to free a rt buffer*/
+> void free_rtbuffer(struct rt-buffer *abuffer){
+>     if(abuffer->aCap){ //pointer NOT null, so we should capture this one
+>          abuffer = cap_rtbuffer(abuffer, sizeof(abuffer), abuffer->aCap);
+
+Is this the only use case for cap_rtbuffer? How do you mark the actual
+capturing date? Only on buffer release? Or did you leave out this aspect
+in the draft?
+
+>     }
+>     //free abuffer
+>     ......
+> }
+> 
+> 
+>>At least for RTnet, capturing is a debugging feature you don't what
+>>compiled in for production systems. It adds overhead to some critical
+>>paths that may hurt on low-end boxes.
+>>
+> 
+> I dont think the overhead is noticable. When the base module (say
+> RTDM) has capturing option enabled, the only overhead that happens to
+> applications that do NOT need capturing   is, in the free_rtbuffer
+> function, the extra checking of a rt-buffer's cap_struct pointer.
+
+Well, the current kfree_rtskb in RTnet has to do more. It iterates over
+all rtskbs in a (possible) chain and checks for each if it is a captured
+one. Anyway, this needless overhead in the capturing-compiled-in-but-
+not-used case can be avoided with a simple check before entering any
+loop. So, you are likely right, the overhead is acceptable - and could
+still be reduced when we add a CONFIG_switch to RTDM.
+
+Apropos chains: does RT-FireWire's rtpk support them? If we drag
+capturing into the core service layer, this is required.
+
+> 
+> 
+>>The question to me is then what functionality of the capturing subsystem
+>>could be moved to RTDM while still keeping the control of using it or
+>>not (without runtime costs) at the configuration level of the driver
+>>using it. I would like to be able to switch capturing off during "make
+>>menuconfig" of RTnet, but maybe switching it on for RT-FireWire at the
+>>same time.
+>>
+> 
+> The capturing I am proposing is conceptually different from the
+> capturing in RTnet (what I understood). It is fully oriented to
+> applications, while RTnet's capturing is more or less per networking
+> interface. That means in this new capturing service, buffer capturing
+> can happen /anywhere/, even something totally away from network
+> transaction. This is especially useful when we develop multiple
+> applications over /one/ FireWire interface: we may only want to
+> capture buffers used by one high-level application. Besides FireWire
+
+I may not know my own code well enough, but I don't see a reason why
+setting the capturing mark in RTnet should not be movable, also away
+from the general places where it is right now.
+
+> and Ethernet, other applications based on RTDM, like socketCAN, can
+> also benefit from this service, as long as they need some analysis
+> over the used memory to gain some insight to the system behavior.
+
+I had Socket-CAN in mind as well first, but Sebastian's implementation
+is smartly not using discrete CAN-packet buffers. Rather, there are ring
+buffers per receiving socket. This is more efficient than throwing
+around 8 bytes data + some bytes head per CAN frame in individual
+packets. CAN packets are too small to justify the maintenance costs of
+skb-like approaches - that's at least my strong believe (but we should
+soon be able to do some benchmarks on this as well - there is a Linux
+skb-based variant on the way).
+
+Anyway, one may consider if "external" users of the rt-packet capturing
+services make sense as well. But that's more kind of a second or third step.
+
+> 
+> BTW, are you going to work on these soon, at least the memory
+> management part? How can I contribute? My idea is to make RTDM
+
+My plan was to burden much of the development on you, as my time is more
+than just limited. ;)
+
+Well, I have no fixed schedule, but I guess things will move quickly as
+soon as we have some API and data structures.
+
+> temporarily a separate module that can be compiled over xenomai, and
+> put it either on RTnet svn or RT-FireWire svn.
+
+I wouldn't drag the whole RTDM module back in RTnet again (that's too
+platform dependent anyway). I would suggest to develop the required
+services as an optional subsystem first inside RT-FireWire and RTnet. As
+soon as this API is stable for each individual project, we could than
+merge it into a private Xenomai tree, test the cooperation between RTnet
+and RT-FireWire, and then start submitting patches against Xenomai first
+and RTAI later.
+
+And, with the RTDM-packet subsystem still in both projects available, we
+could continue to provide support for older RTDM cores without that
+feature. Detecting the RTDM API revision is easy and could be used to
+decide if the internal rt-packet code should be build.
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 256 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051209/600f7c40/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Dec 13 01:06:17 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 13 Dec 2005 01:06:17 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <4399EBF8.8030406@web.de>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+	 <43936D46.40307@web.de>
+	 <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+	 <439604A1.60507@web.de>
+	 <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+	 <439767C2.2070004@web.de>
+	 <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com>
+	 <4399EBF8.8030406@web.de>
+Message-ID: <95210d7e0512121606j4dc6676kfd25c5cbeddea7fa@mail.gmail.com>
+
+On 12/9/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> Yuchen Zhang wrote:
+
+> >>>Now, I have some further idea: what if we also bind the packet
+> >>>capturing service with the memory management. That is if a real-time
+> >>>application needs real-time memory allocation, it can also ask for
+> >>>capturing of all those allocated memory (packets). We can use some
+> >>>user-space tools to analyze the captured memory. The captured memory
+> >>>can be delivered via fake Ethernet interface, so tools like Ethereal
+> >>>can be used (only need to extend it based on the application).
+> >>>
+> >>>The capturng of a packet can be done when that packet memory is freed,
+> >>>where the capturing operation is transparent to the application. Well,
+> >>>the application must claim somewhere  before the packet is freed that
+> >>>it should be captured, e.g. right after it is allocated.
+> >>>
+> >>>Concerning the packet capturing idea, we can explore more, if it is
+> >>>agreed to be interesting and effort-worth.
+> >>
+> >>Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+> >>useful.
+> >>
+> >
+> > Ok, now time for real debating:)
+> > Let's first sketch the main frame code to support this service.
+> >
+> > struct Cap_struct {
+> >          struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+> > captured packet to user-space*/
+> >          struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+> > compensate application memory come from*/
+> >         int buffer_size;  /* the size of buffer that can be captured here */
+> > }
+>
+> So, that structure describes a capturing instance, conceptually
+> something like rtcap service of RTnet?
+>
+Here the difference is, compared with rtcap in RTnet, every single
+Capturer has its own buffer pool and interface-to-userspace (the fake
+Ethernet). The latter can be seen the same in RTnet, as you have tap
+dev for each rtdev.
+
+But all in all, the new Capturing is oriented to application instead
+of network interface:
+when rtcap module in RTnet is loaded, it changes the xmit_hook&rx_hook
+of a certain rtdev  with informing the applications, i.e. the
+capturing service is fully transparent to applications. (Fix me, if I
+am wrong:)) The new Capturing is new mainly because it lets
+applications take over the control of capturing.
+
+> >
+> > struct rt-buffer{
+> >           .....
+> >           struct Cap_struct *aCap;
+> > }
+> >
+>
+> And this link is needed as there can be multiple capturers, right? But
+> what about the additional fields required by rtcap to save the initial
+> buffer layout, the compensation buffer, timestamp, and other stuff? Note
+> that rtcap does deferred capturing. Does your service in RT-FireWire
+> work the same way?
+>
+My idea was also deferred capturing, but somehow it was not clearly expressed:)
+And yes, the timestamp will be in rt-buffer struct also. For
+compensation buffer, my initial idea was to only capture the rt-buffer
+when it is being freed. In that case, we dont need the compesation
+buffer pointer in rt-buffer struct, since the compensation buffer will
+be immediately given to the application buffer pool, i.e. buffer
+exchange between application and capturer. That's also why the
+cap_rtbuffer function should return the pointer to compensation
+buffer. BUT now, I would rather choose to let application decide when
+to capture the packet: stamping the time, assigning the compensation
+packet and putting into the queue of captured packet. That is more
+similiar to rtcap in RTnet.
+
+So the rt-buffer struct will be
+struct rt-buffer{
+       ..........
+       struct Cap_struct *aCap;
+       struct rt-buffer *comp_buf;
+}
+
+
+> > /*function to create a Cap_struct*/
+> > struct Cap_struct *create_cap( int size, //  the buffer size
+> >                                              struct kernel_slab_pool
+> > *parent_pool,
+> >                                               char *name) // the name
+> > of fake ethernet dev, should be
+> >
+> > //specific about application
+> > {
+> >        if(*name already exists){
+> >                return (address of existing Cap_struct)
+> >        }
+> >       .............
+> > }
+> >
+> > /*function to remove a Cap_struct*/
+> > void remove_cap(struct Cap_struct *aCap_struct)
+> >
+>
+> Ok, this makes sense.
+>
+> > /*function to capture a buffer*/
+> > struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+> > buffer_size, struct cap_struct *aCap)
+> > {
+> >      if(aCap->buffer_size != buffer_size)
+> >                    //print error msg and return
+> >      else{
+> >           //allocate a compesating buffer from the cap pool
+> >           // exchange buffers
+> >           //deliver the captured buffer to fake ethernet dev
+>
+> I hope you do NOT deliver immediately, just pend the delivery for Linux
+> to get in the CPU again.
+>
+I thought this would not be real-time killing, since the main work is
+done in the signal handler invoked via netif_rx, but I just realized
+it also should include one time dynamic memory allocation, so now it
+will be wrapped in a Linux signal handler. Again like in RTnet.
+
+> >           //return the address of compensating buffer
+> >          return &comp_buffer;
+> >      }
+> > }
+>
+> What's the caller supposed to do with that returned buffer?
+>
+
+The changed cap_rtbuffer is like:
+
+void cap_rtbuffer(struct rt-buffer *abuffer, int
+buffer_size, struct cap_struct *aCap)
+> > {
+> >      if(aCap->buffer_size != buffer_size)
+> >                    //print error msg and return
+> >      else{
+> >           //allocate a compesating buffer from the cap pool
+> >           // exchange buffers
+> >           //deliver the captured buffer to fake ethernet dev
+>
+> I hope you do NOT deliver immediately, just pend the delivery for Linux
+> to get in the CPU again.
+>
+I thought this would not be real-time killing, since the main work is
+done in the signal handler invoked via netif_rx, but I just realized
+it also should include one time dynamic memory allocation, so now it
+will be wrapped in a Linux signal handler. Again like in RTnet.
+
+> >           //return the address of compensating buffer
+> >          return &comp_buffer;
+> >      }
+> > }
+>
+
+
+> >
+> > /*function to free a rt buffer*/
+> > void free_rtbuffer(struct rt-buffer *abuffer){
+> >     if(abuffer->aCap){ //pointer NOT null, so we should capture this one
+> >          abuffer = cap_rtbuffer(abuffer, sizeof(abuffer), abuffer->aCap);
+>
+> Is this the only use case for cap_rtbuffer? How do you mark the actual
+> capturing date? Only on buffer release? Or did you leave out this aspect
+> in the draft?
+>
+
+
+> >     }
+> >     //free abuffer
+> >     ......
+> > }
+> >
+> >
+> >>At least for RTnet, capturing is a debugging feature you don't what
+> >>compiled in for production systems. It adds overhead to some critical
+> >>paths that may hurt on low-end boxes.
+> >>
+> >
+> > I dont think the overhead is noticable. When the base module (say
+> > RTDM) has capturing option enabled, the only overhead that happens to
+> > applications that do NOT need capturing   is, in the free_rtbuffer
+> > function, the extra checking of a rt-buffer's cap_struct pointer.
+>
+> Well, the current kfree_rtskb in RTnet has to do more. It iterates over
+> all rtskbs in a (possible) chain and checks for each if it is a captured
+> one. Anyway, this needless overhead in the capturing-compiled-in-but-
+> not-used case can be avoided with a simple check before entering any
+> loop. So, you are likely right, the overhead is acceptable - and could
+> still be reduced when we add a CONFIG_switch to RTDM.
+>
+> Apropos chains: does RT-FireWire's rtpk support them? If we drag
+> capturing into the core service layer, this is required.
+>
+> >
+> >
+> >>The question to me is then what functionality of the capturing subsystem
+> >>could be moved to RTDM while still keeping the control of using it or
+> >>not (without runtime costs) at the configuration level of the driver
+> >>using it. I would like to be able to switch capturing off during "make
+> >>menuconfig" of RTnet, but maybe switching it on for RT-FireWire at the
+> >>same time.
+> >>
+> >
+> > The capturing I am proposing is conceptually different from the
+> > capturing in RTnet (what I understood). It is fully oriented to
+> > applications, while RTnet's capturing is more or less per networking
+> > interface. That means in this new capturing service, buffer capturing
+> > can happen /anywhere/, even something totally away from network
+> > transaction. This is especially useful when we develop multiple
+> > applications over /one/ FireWire interface: we may only want to
+> > capture buffers used by one high-level application. Besides FireWire
+>
+> I may not know my own code well enough, but I don't see a reason why
+> setting the capturing mark in RTnet should not be movable, also away
+> from the general places where it is right now.
+>
+> > and Ethernet, other applications based on RTDM, like socketCAN, can
+> > also benefit from this service, as long as they need some analysis
+> > over the used memory to gain some insight to the system behavior.
+>
+> I had Socket-CAN in mind as well first, but Sebastian's implementation
+> is smartly not using discrete CAN-packet buffers. Rather, there are ring
+> buffers per receiving socket. This is more efficient than throwing
+> around 8 bytes data + some bytes head per CAN frame in individual
+> packets. CAN packets are too small to justify the maintenance costs of
+> skb-like approaches - that's at least my strong believe (but we should
+> soon be able to do some benchmarks on this as well - there is a Linux
+> skb-based variant on the way).
+>
+> Anyway, one may consider if "external" users of the rt-packet capturing
+> services make sense as well. But that's more kind of a second or third step.
+>
+> >
+> > BTW, are you going to work on these soon, at least the memory
+> > management part? How can I contribute? My idea is to make RTDM
+>
+> My plan was to burden much of the development on you, as my time is more
+> than just limited. ;)
+>
+> Well, I have no fixed schedule, but I guess things will move quickly as
+> soon as we have some API and data structures.
+>
+> > temporarily a separate module that can be compiled over xenomai, and
+> > put it either on RTnet svn or RT-FireWire svn.
+>
+> I wouldn't drag the whole RTDM module back in RTnet again (that's too
+> platform dependent anyway). I would suggest to develop the required
+> services as an optional subsystem first inside RT-FireWire and RTnet. As
+> soon as this API is stable for each individual project, we could than
+> merge it into a private Xenomai tree, test the cooperation between RTnet
+> and RT-FireWire, and then start submitting patches against Xenomai first
+> and RTAI later.
+>
+> And, with the RTDM-packet subsystem still in both projects available, we
+> could continue to provide support for older RTDM cores without that
+> feature. Detecting the RTDM API revision is easy and could be used to
+> decide if the internal rt-packet code should be build.
+>
+> Jan
+>
+>
+>
+
+
+From yuchen623 at gmail.com  Tue Dec 13 01:22:00 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 13 Dec 2005 01:22:00 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <95210d7e0512121606j4dc6676kfd25c5cbeddea7fa@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com>
+	 <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com>
+	 <43936D46.40307@web.de>
+	 <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com>
+	 <439604A1.60507@web.de>
+	 <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com>
+	 <439767C2.2070004@web.de>
+	 <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com>
+	 <4399EBF8.8030406@web.de>
+	 <95210d7e0512121606j4dc6676kfd25c5cbeddea7fa@mail.gmail.com>
+Message-ID: <95210d7e0512121622m750766e4ie953ff1c2a441d5e@mail.gmail.com>
+
+Sorry, I sent the last mail by mistake, it has not been finished. So
+the story continues here:)
+
+The changed cap_rtbuffer is like:
+
+  void cap_rtbuffer(struct rt-buffer *abuffer, int
+  buffer_size, struct cap_struct *aCap)
+ {
+          if(aCap->buffer_size != buffer_size)
+                   //print error msg and return
+          else{
+                   //allocate a compensating buffer from the cap pool
+                  if(failed)
+                        //out of memory failure and return
+                  //assign comp buffer to abuffer
+                 // stamp the time
+                 //put the buffer to the queue as captured packet
+         }
+}
+
+
+> > >>At least for RTnet, capturing is a debugging feature you don't what
+> > >>compiled in for production systems. It adds overhead to some critical
+> > >>paths that may hurt on low-end boxes.
+> > >>
+> > >
+> > > I dont think the overhead is noticable. When the base module (say
+> > > RTDM) has capturing option enabled, the only overhead that happens to
+> > > applications that do NOT need capturing   is, in the free_rtbuffer
+> > > function, the extra checking of a rt-buffer's cap_struct pointer.
+> >
+> > Well, the current kfree_rtskb in RTnet has to do more. It iterates over
+> > all rtskbs in a (possible) chain and checks for each if it is a captured
+> > one. Anyway, this needless overhead in the capturing-compiled-in-but-
+> > not-used case can be avoided with a simple check before entering any
+> > loop. So, you are likely right, the overhead is acceptable - and could
+> > still be reduced when we add a CONFIG_switch to RTDM.
+> >
+> > Apropos chains: does RT-FireWire's rtpk support them? If we drag
+> > capturing into the core service layer, this is required.
+> >
+Yes, chaining will be supported also. Not yet in current RT-FireWire's
+rtpkb module, but will be a new feature.
+
+> > >
+> > >
+> > >>The question to me is then what functionality of the capturing subsystem
+> > >>could be moved to RTDM while still keeping the control of using it or
+> > >>not (without runtime costs) at the configuration level of the driver
+> > >>using it. I would like to be able to switch capturing off during "make
+> > >>menuconfig" of RTnet, but maybe switching it on for RT-FireWire at the
+> > >>same time.
+> > >>
+> > >
+> > > The capturing I am proposing is conceptually different from the
+> > > capturing in RTnet (what I understood). It is fully oriented to
+> > > applications, while RTnet's capturing is more or less per networking
+> > > interface. That means in this new capturing service, buffer capturing
+> > > can happen /anywhere/, even something totally away from network
+> > > transaction. This is especially useful when we develop multiple
+> > > applications over /one/ FireWire interface: we may only want to
+> > > capture buffers used by one high-level application. Besides FireWire
+> >
+> > I may not know my own code well enough, but I don't see a reason why
+> > setting the capturing mark in RTnet should not be movable, also away
+> > from the general places where it is right now.
+> >
+Em...I would like to know more about this: how to move the capturing
+mark in RTnet from where it is now? Now, I see it only happens when
+packets is transmitted or received.
+
+
+> > > and Ethernet, other applications based on RTDM, like socketCAN, can
+> > > also benefit from this service, as long as they need some analysis
+> > > over the used memory to gain some insight to the system behavior.
+> >
+> > I had Socket-CAN in mind as well first, but Sebastian's implementation
+> > is smartly not using discrete CAN-packet buffers. Rather, there are ring
+> > buffers per receiving socket. This is more efficient than throwing
+> > around 8 bytes data + some bytes head per CAN frame in individual
+> > packets. CAN packets are too small to justify the maintenance costs of
+> > skb-like approaches - that's at least my strong believe (but we should
+> > soon be able to do some benchmarks on this as well - there is a Linux
+> > skb-based variant on the way).
+> >
+> > Anyway, one may consider if "external" users of the rt-packet capturing
+> > services make sense as well. But that's more kind of a second or third step.
+> >
+> > >
+> > > BTW, are you going to work on these soon, at least the memory
+> > > management part? How can I contribute? My idea is to make RTDM
+> >
+> > My plan was to burden much of the development on you, as my time is more
+> > than just limited. ;)
+> >
+> > Well, I have no fixed schedule, but I guess things will move quickly as
+> > soon as we have some API and data structures.
+> >
+> > > temporarily a separate module that can be compiled over xenomai, and
+> > > put it either on RTnet svn or RT-FireWire svn.
+> >
+> > I wouldn't drag the whole RTDM module back in RTnet again (that's too
+> > platform dependent anyway). I would suggest to develop the required
+> > services as an optional subsystem first inside RT-FireWire and RTnet. As
+> > soon as this API is stable for each individual project, we could than
+> > merge it into a private Xenomai tree, test the cooperation between RTnet
+> > and RT-FireWire, and then start submitting patches against Xenomai first
+> > and RTAI later.
+> >
+> > And, with the RTDM-packet subsystem still in both projects available, we
+> > could continue to provide support for older RTDM cores without that
+> > feature. Detecting the RTDM API revision is easy and could be used to
+> > decide if the internal rt-packet code should be build.
+> >
+I just created a new branch in RTFW svn. Now only copied the files
+from RTFW's rtpkbuff module, but can be compiled separately. A
+starting point.
+
+Yuchen
+
+
+From writefaruq at gmail.com  Wed Dec 14 19:38:21 2005
+From: writefaruq at gmail.com (M. Omar Faruque Sarker)
+Date: Thu, 15 Dec 2005 03:38:21 +0900
+Subject: [Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+Message-ID: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+
+Dear Yuchen,
+
+It's very nice that in spite of your busy schedule you replied me. I
+never mind if it's fast or late, coz, i'm  enjoying very much to
+discover and uncover  this new field and also I'm prepared to go a
+long way :)
+
+As a part of my discovery, I've tried to make a layered structure of
+RT-FW current modules using modinfo. I found something like this
+(please fix me if I'm wrong):
+
+
+                      bis1394                     *User App* (talks
+with /dev/rt_raw1394)
+                          |                               |
+                 --------------                       |
+                 |                |                      |
+                 |          [rt_ohci1394]     *RT_RAW1394*
+                 |                |                      |
+                 |                |     ----------------
+                 |                |     |
+                 |             [rt_ieee1394]
+                 |                      |
+                 |        ------------------------
+             (rtpc)   |                             |
+                 |       |                             |
+             (rt_serv)                            |
+                 |                                    |
+              ----------                           |
+              |           |                          |
+<xeno_rtdm> <xeno_native>    |
+         |                 |                      |
+<<xeno_nucleus>>                 (rt_pkbuff)
+             |                                        |
+             |           ------------------------
+             |          |
+ <<<xeno_hal>>>
+
+Please Note:
+a) My art may not be so good, Anyway I noticed that modinfo is saying
+that rt_ohci1394 is dependent on ieee1394 (Non-RT)! is this mistake or
+anything else?
+
+  b) In the libraw1394 document
+(http://www.linux1394.org/doc/overview.php) it is said that ohci1394
+is lower level driver with respect to ieee1394, but modinfo says that
+ohci1394 is dependent on ieee1394. what is your explanation regarding
+RT-FW?
+
+c) I placed our desired *RT_RAW1394* above  rt_ieee1394.  I think, raw
+module can directly talk with rt_ieee1394 and also will use exported
+symbols/functions from rt_ieee1394 . Is this ok?
+
+d) Is this case do we need a user library like  libraw1394 or
+alternately, /dev/rt_raw1394 (with some IOCTLs) is sufficient for now?
+
+I'm actually thinking for "at least async capable" rt_raw interface.
+Could you please start discussion about that and also indicate what
+kind of RT capability we have to put inside that rt_raw1394  module?
+
+Soon I hope to repeat RT-FW testing on P-IV Intel motherboard with
+ipipe patch + a minimum change in Kernel and Xenomai Configuration. 
+BTW, one person asked me the pronunciation of "Xenomai". Is this
+"jeno-mayee" or "eno-mai" or ... :)
+
+Have a nice  time !
+
+Best Reagrds,
+
+Faruque
+
+
+
+
+
+--
+
+
+From jan.kiszka at web.de  Thu Dec 15 09:31:17 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Thu, 15 Dec 2005 09:31:17 +0100
+Subject: [Rtfirewire-devel] RT-FW inter module dependencies and (future)
+ position of RT_RAW1394 in the dependency tree
+In-Reply-To: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+References: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+Message-ID: <43A129D5.9020205@web.de>
+
+M. Omar Faruque Sarker wrote:
+> ...
+> BTW, one person asked me the pronunciation of "Xenomai". Is this
+> "jeno-mayee" or "eno-mai" or ... :)
+> 
+
+Here in Germany with our "hard" pronunciation ;) I prefer "'ksenoo-mai",
+emphasising the first syllable. But I also heard and liked a similar
+pronunciation as Xen, the virtualisation software: "'senoo-mai". Mmh,
+maybe something worth a non-technical thread on the Xenomai mailing
+list... :)
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051215/990ee10d/attachment.pgp>
+
+From yuchen623 at gmail.com  Thu Dec 15 21:30:23 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Thu, 15 Dec 2005 21:30:23 +0100
+Subject: [Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+In-Reply-To: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+References: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+Message-ID: <95210d7e0512151230ub19a1d8o14cfc9917ea72bcc@mail.gmail.com>
+
+Hi, Faruque,
+
+> It's very nice that in spite of your busy schedule you replied me. I
+> never mind if it's fast or late, coz, i'm  enjoying very much to
+> discover and uncover  this new field and also I'm prepared to go a
+> long way :)
+>
+Good. I believe we are gonna make something soon, probably after the
+xmas and new year holiday.
+
+> As a part of my discovery, I've tried to make a layered structure of
+> RT-FW current modules using modinfo. I found something like this
+> (please fix me if I'm wrong):
+>
+>
+>                       bis1394                     *User App* (talks
+> with /dev/rt_raw1394)
+>                           |                               |
+>                  --------------                       |
+>                  |                |                      |
+>                  |          [rt_ohci1394]     *RT_RAW1394*
+>                  |                |                      |
+>                  |                |     ----------------
+>                  |                |     |
+>                  |             [rt_ieee1394]
+>                  |                      |
+>                  |        ------------------------
+>              (rtpc)   |                             |
+>                  |       |                             |
+>              (rt_serv)                            |
+>                  |                                    |
+>               ----------                           |
+>               |           |                          |
+> <xeno_rtdm> <xeno_native>    |
+>          |                 |                      |
+> <<xeno_nucleus>>                 (rt_pkbuff)
+>              |                                        |
+>              |           ------------------------
+>              |          |
+>  <<<xeno_hal>>>
+>
+> Please Note:
+> a) My art may not be so good, Anyway I noticed that modinfo is saying
+> that rt_ohci1394 is dependent on ieee1394 (Non-RT)! is this mistake or
+> anything else?
+>
+Nice graph:) Well, I am not familiar with the tool, but I think it may
+not be smart enough to find modules in the right place. There should
+be a system default setting where it finds all  the modules. Besides,
+it is possible that ieee1394 and rt_ieee1394 share the same names for
+symbols, since I have not check that the names of all symbols were
+changed. That is because I suppose the NRT FW modules should NOT be
+loaded when the RT-FW modules are in memory. But if you find it is
+needed to make both NRT and RT FW modules loaded in the same time,
+please tell me.
+
+>   b) In the libraw1394 document
+> (http://www.linux1394.org/doc/overview.php) it is said that ohci1394
+> is lower level driver with respect to ieee1394, but modinfo says that
+> ohci1394 is dependent on ieee1394. what is your explanation regarding
+> RT-FW?
+>
+Indeed, like the order of loading RT-FW modules, you have to load
+ieee1394 before all other FW modules. Every other modules is loaded in
+the way that they are registered to the base ieee1394 module.
+Low-level ohci1394 is registered as new host, while high-level modules
+is registered as reserving the address space.
+
+> c) I placed our desired *RT_RAW1394* above  rt_ieee1394.  I think, raw
+> module can directly talk with rt_ieee1394 and also will use exported
+> symbols/functions from rt_ieee1394 . Is this ok?
+>
+Yes, that is right.
+
+> d) Is this case do we need a user library like  libraw1394 or
+> alternately, /dev/rt_raw1394 (with some IOCTLs) is sufficient for now?
+>
+Indeed, yes, but let's focus on the kernel side first. The user-space
+library should be made later, but maybe we can re-use the libraw1394,
+possibly only to add some new arguments in the RT flavor, e.g.
+priority of transaction.
+
+> I'm actually thinking for "at least async capable" rt_raw interface.
+> Could you please start discussion about that and also indicate what
+> kind of RT capability we have to put inside that rt_raw1394  module?
+>
+I am on the way:)
+
+> Soon I hope to repeat RT-FW testing on P-IV Intel motherboard with
+> ipipe patch + a minimum change in Kernel and Xenomai Configuration.
+> BTW, one person asked me the pronunciation of "Xenomai". Is this
+> "jeno-mayee" or "eno-mai" or ... :)
+>
+Personally, I do it as "iksnoomai". Just choose whaterver
+pronunciation as you feel comfortable, until there is an "offical"
+one:)
+
+Yuchen
+
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From yuchen623 at gmail.com  Sun Dec 18 00:39:48 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Sun, 18 Dec 2005 00:39:48 +0100
+Subject: [Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+In-Reply-To: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+References: <fc9dd8650512141038t60b49a1dke1b8a24b2fb9e996@mail.gmail.com>
+Message-ID: <95210d7e0512171539y7ec626a7nfe9102c908f28616@mail.gmail.com>
+
+On 12/14/05, M. Omar Faruque Sarker <writefaruq at gmail.com> wrote:
+
+> I'm actually thinking for "at least async capable" rt_raw interface.
+> Could you please start discussion about that and also indicate what
+> kind of RT capability we have to put inside that rt_raw1394  module?
+>
+Here I am again:)
+
+Today, I just checked in the first framecode of rtraw1394 in
+/trunk/highlevel/rtraw1394. Not too much code, but the basic things
+are there, I think.
+
+Let's start from the communication between kernel-side protocol stack
+and user-side application. In NRT Linux1394, it is thru /dev/raw1394.
+Now,in RT-FW, we need to rebuild this on RTDM. Conceptually they are
+quite similiar. Plus, we have another good reference, i.e. the
+real-time serial driver using RTDM (distributed with Xenomai).
+
+The 'rtraw1394" (dev in RTDM) will be like a char device in Linux, so
+we need to implement rt_raw1394_read and rt_raw1394_write. The basic
+concept in raw1394 can be moved here, i.e. writing and reading
+"pending_request" struct to the "rtraw1394". What I know now is we
+have to redesign and implement the synchronization scheme between user
+application and rtraw1394 module in kernel. For example, when the
+application on raw1394 try to poll "/dev/raw1394", the waiting_queue
+sync scheme is used if no completed request is pending, but if we also
+implement the poll operation here, we have to figure out another sync
+scheme which is real-time safe.  Another issue is mmap, but for now I
+dont know if we need it and how we can do it in real-time,
+specifically on RTDM.
+
+It will be nice if we can fully understand the functionalities of
+raw1394 first. But since now we only focus on asynchronous
+transactions, the isochronous operations can be temporarily skipped:
+ioctl and rawiso_XXX.
+
+Basically, an application has two means to use asynchronous service of
+RT-FW: Address Range Mapping (ARM) and Functional Control
+Protocol(FCP). ARM is to let application reserve a certain range of
+the logical space on FW, so any packets sent to that range of address
+will be re-directed to the application. FCP actually is two registers
+in the CSR range of address: FCP-request and FCP-response. Everytime a
+packet is sent to either of these two, CSR module will forward it to
+the high-level modules who has claimed to be interested in messages
+coming thru FCP, in this case, raw1394 will be notified. Then, it will
+further forward the packet to user applications who are listening to
+the FCP "channel". Again, all kernel-user communications here are NOT
+directly coupled: the kernel raw1394 module only generate a
+"pending_request" and pend it to the queue, where the applications
+will read.
+
+Next step is to fill in the framecode with more flesh code. The
+raw1394 works like a state machine, which we can further take a look
+and reuse for our design. Comments are welcome here, but also good if
+directly committed to the code (either comments or code).
+
+P.S. Tomorrow, I am going to take flight back to China for the xmas
+and new jaar holiday. I am gonna travel in a city for 3 days before I
+can go back to my hometown, which means I will not access Internet in
+next 3 days. But feel free to send mail when your
+remarks/ideas/questions are fresh:).
+
+Best regards,
+Yuchen
+
+_____________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From jan.kiszka at web.de  Mon Dec 19 22:05:51 2005
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 19 Dec 2005 22:05:51 +0100
+Subject: [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+In-Reply-To: <95210d7e0512121606j4dc6676kfd25c5cbeddea7fa@mail.gmail.com>
+References: <fc9dd8650512020604v737454cejf97001bef03c5c8@mail.gmail.com> <95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57@mail.gmail.com> <43936D46.40307@web.de> <95210d7e0512051220s4ccef472i595b4a5f914c13dd@mail.gmail.com> <439604A1.60507@web.de> <95210d7e0512061639r4718acd0l8564f15db3e86c6c@mail.gmail.com> <439767C2.2070004@web.de> <95210d7e0512081127s9be1ce5m2317fc4497c817d@mail.gmail.com> <4399EBF8.8030406@web.de> <95210d7e0512121606j4dc6676kfd25c5cbeddea7fa@mail.gmail.com>
+Message-ID: <43A720AF.6090201@web.de>
+
+Hi Yuchen,
+
+time to kick this discussion again ;) - no I didn't forget it!
+
+Yuchen Zhang wrote:
+> On 12/9/05, Jan Kiszka <jan.kiszka at web.de> wrote:
+> 
+>>Yuchen Zhang wrote:
+> 
+>>>
+>>>Ok, now time for real debating:)
+>>>Let's first sketch the main frame code to support this service.
+>>>
+>>>struct Cap_struct {
+>>>         struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+>>>captured packet to user-space*/
+>>>         struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+>>>compensate application memory come from*/
+>>>        int buffer_size;  /* the size of buffer that can be captured here */
+>>>}
+>>
+>>So, that structure describes a capturing instance, conceptually
+>>something like rtcap service of RTnet?
+>>
+> 
+> Here the difference is, compared with rtcap in RTnet, every single
+> Capturer has its own buffer pool and interface-to-userspace (the fake
+> Ethernet). The latter can be seen the same in RTnet, as you have tap
+> dev for each rtdev.
+
+Ok, sounds interesting. But I guess this does not yet mean that there
+can be multiple capturers for the same packet? I guess it means that you
+decide later during the stack traversal (or earlier when looking at the
+transmission path) if you want to grab a certain packet or not. Some
+kind of in-kernel capturing filter instead of doing this later with
+Ethereal&friends?
+
+> 
+> But all in all, the new Capturing is oriented to application instead
+> of network interface:
+> when rtcap module in RTnet is loaded, it changes the xmit_hook&rx_hook
+> of a certain rtdev  with informing the applications, i.e. the
+> capturing service is fully transparent to applications. (Fix me, if I
+> am wrong:)) The new Capturing is new mainly because it lets
+> applications take over the control of capturing.
+> 
+
+Mmh, doesn't this confuse the user and make the management of all those
+potential capturing sources a bit complicated? I already had problems to
+explain users why there is also a "rteth0-mac" that additionally records
+the queuing date of packets deferred by a RTmac discipline. Actually, I
+haven't stumbled over a useful use case for this feature on my own so far...
+
+> 
+>>>struct rt-buffer{
+>>>          .....
+>>>          struct Cap_struct *aCap;
+>>>}
+>>>
+>>
+>>And this link is needed as there can be multiple capturers, right? But
+>>what about the additional fields required by rtcap to save the initial
+>>buffer layout, the compensation buffer, timestamp, and other stuff? Note
+>>that rtcap does deferred capturing. Does your service in RT-FireWire
+>>work the same way?
+>>
+> 
+> My idea was also deferred capturing, but somehow it was not clearly expressed:)
+> And yes, the timestamp will be in rt-buffer struct also. For
+> compensation buffer, my initial idea was to only capture the rt-buffer
+> when it is being freed. In that case, we dont need the compesation
+> buffer pointer in rt-buffer struct, since the compensation buffer will
+> be immediately given to the application buffer pool, i.e. buffer
+> exchange between application and capturer. That's also why the
+
+I think to remember having created such a variant in the early rtcap
+days. It works well beside one "minor" ugliness: the queuing order in
+the rtcap pseudo device became chaotic due to deferred buffer release of
+certain NICs and other effects. This means that you will also see a
+non-chronological list in Ethereal! Ok, one may try to reorder the
+packets in rtcap before forwarding it, but this adds further complexity
+and delay (you first have to collect for a while, then reorder, and
+finally forward the packets).
+
+> cap_rtbuffer function should return the pointer to compensation
+> buffer. BUT now, I would rather choose to let application decide when
+> to capture the packet: stamping the time, assigning the compensation
+> packet and putting into the queue of captured packet. That is more
+> similiar to rtcap in RTnet.
+> 
+> So the rt-buffer struct will be
+> struct rt-buffer{
+>        ..........
+>        struct Cap_struct *aCap;
+>        struct rt-buffer *comp_buf;
+> }
+> 
+> 
+> 
+>>>/*function to create a Cap_struct*/
+>>>struct Cap_struct *create_cap( int size, //  the buffer size
+>>>                                             struct kernel_slab_pool
+>>>*parent_pool,
+>>>                                              char *name) // the name
+>>>of fake ethernet dev, should be
+>>>
+>>>//specific about application
+>>>{
+>>>       if(*name already exists){
+>>>               return (address of existing Cap_struct)
+>>>       }
+>>>      .............
+>>>}
+>>>
+>>>/*function to remove a Cap_struct*/
+>>>void remove_cap(struct Cap_struct *aCap_struct)
+>>>
+>>
+>>Ok, this makes sense.
+>>
+>>
+>>>/*function to capture a buffer*/
+>>>struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+>>>buffer_size, struct cap_struct *aCap)
+>>>{
+>>>     if(aCap->buffer_size != buffer_size)
+>>>                   //print error msg and return
+>>>     else{
+>>>          //allocate a compesating buffer from the cap pool
+>>>          // exchange buffers
+>>>          //deliver the captured buffer to fake ethernet dev
+>>
+>>I hope you do NOT deliver immediately, just pend the delivery for Linux
+>>to get in the CPU again.
+>>
+> 
+> I thought this would not be real-time killing, since the main work is
+> done in the signal handler invoked via netif_rx, but I just realized
+> it also should include one time dynamic memory allocation, so now it
+> will be wrapped in a Linux signal handler. Again like in RTnet.
+
+Yep, this is fine if it's just that non-RT signal.
+
+[mail #2]
+
+> Sorry, I sent the last mail by mistake, it has not been finished. So
+> the story continues here:)
+> 
+> The changed cap_rtbuffer is like:
+> 
+>   void cap_rtbuffer(struct rt-buffer *abuffer, int
+>   buffer_size, struct cap_struct *aCap)
+>  {
+>           if(aCap->buffer_size != buffer_size)
+>                    //print error msg and return
+>           else{
+>                    //allocate a compensating buffer from the cap pool
+>                   if(failed)
+>                         //out of memory failure and return
+>                   //assign comp buffer to abuffer
+>                  // stamp the time
+>                  //put the buffer to the queue as captured packet
+>          }
+> }
+> 
+
+In terms of rtcap: would cat_rtbuffer be something like
+rtcap_report_incoming and would it be called from the xmit-hook for
+outgoing packets?
+
+But we will certainly still have something like rtcap_mark_incoming to
+save the real packet dimension, don't we?
+
+> [...]
+> Em...I would like to know more about this: how to move the capturing
+> mark in RTnet from where it is now? Now, I see it only happens when
+> packets is transmitted or received.
+> 
+
+Well, the decision about capturing a packet or not is made for incoming
+packets via rtmac_report_incoming. For outgoing ones, we have the hook
+before the drivers transmission routing, a low intrusive approach
+regarding code modification. To move to incoming capturing point would
+be simple, but we would need a similar functions then also for outgoing
+packets to gain more flexibility.
+
+But this just raises the question for we what subsystems / packet
+producer you want to instrument separately in this way? And how will the
+user select the right one? Will there be bulks of pseudo network devices
+for capturing?
+
+> [...]
+> I just created a new branch in RTFW svn. Now only copied the files
+> from RTFW's rtpkbuff module, but can be compiled separately. A
+> starting point.
+> 
+
+That's a good step forward! Actually, I think we should keep all this
+capturing discussion in min, but first start off with the "real" work.
+RTnet's rtskbs and RT-FireWire's rtpks also began without capturing, so
+we should also be able to easily extend the first common (and maybe
+working) concept with this feature later.
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 256 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051219/a8b44467/attachment.pgp>
+

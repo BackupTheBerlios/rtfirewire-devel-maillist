@@ -1,0 +1,41 @@
+From cadence at optonline.net  Sun Sep 19 21:40:17 2010
+From: cadence at optonline.net (Edward Hoffman)
+Date: Sun, 19 Sep 2010 15:40:17 -0400
+Subject: [Rtfirewire-devel] RT Firewire Download Defective
+Message-ID: <!&!AAAAAAAAAAAYAAAAAAAAAK201mCKILxNtXUFPxXgoMrCgAAAEAAAALzvwj3jefJHlqaBJKHzqHQBAAAAAA==@optonline.net>
+
+The RT-Firewire-0.1 tar bz2 file is defective.  The archive cannot be
+decompressed with getting an error. 
+
+ 
+
+Please provide a link to a viable download. 
+
+ 
+
+Thanks.
+
+ 
+
+RSVP.
+
+ 
+
+Best Regards,
+
+ 
+
+Ed
+
+ 
+
+Edward Hoffman
+
+ <mailto:cadence at optonline.net> cadence at optonline.net
+
+ 
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20100919/66a62c40/attachment.html>
+

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Test results and bugs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C44C668A4.7060204%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000063.html">
+   <LINK REL="Next"  HREF="000065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Test results and bugs</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C44C668A4.7060204%40web.de%3E"
+       TITLE="[Rtfirewire-devel] Test results and bugs">jan.kiszka at web.de
+       </A><BR>
+    <I>Tue Jul 25 20:53:24 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000063.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+        <LI>Next message: <A HREF="000065.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Yuchen Zhang wrote:
+&gt;<i> On 7/25/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;&gt;&gt;&gt;<i> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+</I>&gt;&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;&gt;<i> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+</I>&gt;&gt;&gt;&gt;<i>  printing eip:
+</I>&gt;&gt;&gt;&gt;<i> c012eca8
+</I>&gt;&gt;&gt;&gt;<i> ...
+</I>&gt;&gt;&gt;&gt;<i> EIP: [&lt;c012eca8&gt;] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+</I>&gt;&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;&gt;<i> That's due to registering the OHCI IRQ with a NULL driver name (I called
+</I>&gt;&gt;&gt;&gt;<i> cat /proc/xenomai/irq).
+</I>&gt;&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> So, this is new in 2.6.17 kernel, Is it?
+</I>&gt;&gt;<i> You mean Xenomai 2.1, don't you? :)
+</I>&gt;&gt;<i> (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+</I>&gt;&gt;<i>
+</I>&gt;<i> Ok, now I get it:) You mean this oops only happens when you call
+</I>&gt;<i> /proc/xenomai/irq. I will try to fix this.
+</I>&gt;<i> 
+</I>&gt;&gt;&gt;&gt;<i> The second one comes after &quot;rtping -h fwhost0 -d 0 -s 500&quot; reported a failure and I
+</I>&gt;&gt;&gt;&gt;<i> tried to restart this command:
+</I>&gt;&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> This bug happens when running loopback rtping. I will try to reproduce
+</I>&gt;&gt;&gt;<i> this bug here at home.
+</I>&gt;&gt;<i> Ok. It's at least nicely reproducable.
+</I>&gt;&gt;<i>
+</I>&gt;<i> I acutally have fixed this bug long time ago. But due to some
+</I>&gt;<i> configuration management mistake, the head revision was not containing
+</I>&gt;<i> this fix. It has been fixed now, Just check out the head rev and give
+</I>&gt;<i> another try:)
+</I>
+Yes, works now. It's only that I had to replace &quot;-d 0&quot; with &quot;-d 1&quot; in
+the rtping call. All other values give &quot;Resource temporarily
+unavailable&quot;. I don't claim to understand yet what's going on. How does
+node numbering work? Was _that_ broken before?
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/f3e7a473/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/f3e7a473/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000063.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+	<LI>Next message: <A HREF="000065.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

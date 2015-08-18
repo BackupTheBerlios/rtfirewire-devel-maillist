@@ -1,0 +1,70 @@
+From yuchen623 at gmail.com  Sat Nov 10 23:45:28 2007
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Sat, 10 Nov 2007 23:45:28 +0100
+Subject: [Rtfirewire-devel] Fix-up hacks for latest kernels/Xenomai
+In-Reply-To: <4734913E.6020400@siemens.com>
+References: <4734913E.6020400@siemens.com>
+Message-ID: <95210d7e0711101445n6e4e5a9ag982f302caa92efe9@mail.gmail.com>
+
+Hi Jan,
+
+Just applied your patch. Now at least the code compiles with Linux
+2.6.23 and Xenomai2.4-rc5.
+
+I didnt try yet with Linux 2.4 for compilation. Also the code is not tested.
+
+sri_embedded(sorry that I didnt find your real name), can you please
+check out the trunk version: svn co
+https://rtfirewire.svn.sourceforge.net/svnroot/rtfirewire rtfirewire.
+Then try to compile with linux 2.4?
+
+Thanks!
+
+Yuchen
+
+On Nov 9, 2007 5:56 PM, Jan Kiszka <jan.kiszka at siemens.com> wrote:
+> Hi Yuchen,
+>
+> here is the set of patches (read: hacks) I promised. While packaging it,
+> I had another idea what may have caused the endless loop of the rt_serv
+> and changed the code a bit. It's not tested, so may still break.
+>
+> In any case, refactoring of the code to overcome the rtos_primitives
+> wrapping, would make things easier maintainable IMHO.
+>
+> Jan
+>
+> --
+> Siemens AG, Corporate Technology, CT SE 2
+> Corporate Competence Center Embedded Linux
+>
+
+
+From jan.kiszka at siemens.com  Fri Nov  9 17:56:30 2007
+From: jan.kiszka at siemens.com (Jan Kiszka)
+Date: Fri, 09 Nov 2007 17:56:30 +0100
+Subject: [Rtfirewire-devel] Fix-up hacks for latest kernels/Xenomai
+Message-ID: <4734913E.6020400@siemens.com>
+
+Hi Yuchen,
+
+here is the set of patches (read: hacks) I promised. While packaging it,
+I had another idea what may have caused the endless loop of the rt_serv
+and changed the code a bit. It's not tested, so may still break.
+
+In any case, refactoring of the code to overcome the rtos_primitives
+wrapping, would make things easier maintainable IMHO.
+
+Jan
+
+-- 
+Siemens AG, Corporate Technology, CT SE 2
+Corporate Competence Center Embedded Linux
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: fixup.patch
+Type: text/x-patch
+Size: 67413 bytes
+Desc: not available
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20071109/5a5f7bed/attachment.bin>
+

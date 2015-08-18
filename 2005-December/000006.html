@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20RT-FW%20User%20Space%20App%3A%20have%20a%20look%20to%20satisfy%0A%20a%20generic%20user%27s%20wish%21&In-Reply-To=%3C438F7E36.9090805%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000004.html">
+   <LINK REL="Next"  HREF="000014.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20RT-FW%20User%20Space%20App%3A%20have%20a%20look%20to%20satisfy%0A%20a%20generic%20user%27s%20wish%21&In-Reply-To=%3C438F7E36.9090805%40web.de%3E"
+       TITLE="[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!">jan.kiszka at web.de
+       </A><BR>
+    <I>Thu Dec  1 23:50:30 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000004.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+        <LI>Next message: <A HREF="000014.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+
+good chance to post my first mail to this list. :)
+
+Yuchen Zhang wrote:
+&gt;<i> Dear Faruque,
+</I>&gt;<i> 
+</I>&gt;&gt;<i>Thanks a lot for your warm reply. I'm very glad to join with rt-firewire
+</I>&gt;&gt;<i>team.
+</I>&gt;&gt;<i>we hope to make the rt firewire user friendly and useful soon.
+</I>
+Nice to hear that there is another contributor for this important project!
+
+&gt;<i> 
+</I>&gt;<i> I am just going to annouse the 0.1 release of rt-fw. After that, I would
+</I>&gt;<i> like to discuss about the short-term developement in the rt-fw mailing list.
+</I>&gt;<i> Basically, it would be the user-interface, like raw1394, and complete the
+</I>&gt;<i> packet captureing.
+</I>&gt;<i> 
+</I>
+What about Xenomai 2.1 support? Already planned for the near future? I'm
+asking as I recently reworked RTnet's build system for the new build
+model (in-kernel) of upcoming 2.1. But the eth1396 driver would not work
+yet, of course.
+
+At this chance, I also re-enabled kernel 2.4 support for RTnet. Xenomai
+works for x86 and PPC also over the &quot;old&quot; kernel now, and RTnet compiles
+against 2.4.31-adeos again (no clue if it runs as well, I didn't test
+it). I don't know how much of your code depends on 2.6 kernel features,
+but maybe it's worth checking how much work the build system would
+require for this. But: low priority, 2.4 support foremost targets
+low-end and existing systems where FireWire is not that often found.
+
+For all changes that where required, see RTnet SVN for details - or ask
+me. Also, feel free to bother me with any RTDM questions and quirks when
+defining and implementing raw1394 for that layer.
+
+Good luck for your future work!
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/313f0c1a/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/313f0c1a/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000004.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+	<LI>Next message: <A HREF="000014.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

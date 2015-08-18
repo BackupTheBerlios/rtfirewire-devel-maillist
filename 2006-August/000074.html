@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607312322y46328067m7707316afc48f0b1%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000075.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [PATCH] kernel 2.6.17 support</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607312322y46328067m7707316afc48f0b1%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] [PATCH] kernel 2.6.17 support">yuchen623 at gmail.com
+       </A><BR>
+    <I>Tue Aug  1 08:22:31 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000075.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>It seems the berlios svn server is out of space again. Currently I am
+considering to move the rtfw repository to gna.
+
+Yuchen
+
+On 7/31/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> Yuchen Zhang wrote:
+</I>&gt;<i> &gt; On 7/31/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;<i> &gt;&gt; Yuchen Zhang wrote:
+</I>&gt;<i> &gt;&gt; &gt; I tried with&quot; svnadmin recover&quot;, but still got the problem when
+</I>&gt;<i> &gt;&gt; &gt; checking out. Dont know yet how to fix it.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; At least checkout of rev. #98 still works. Something must have messed up
+</I>&gt;<i> &gt;&gt; the database later.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; I would suggest to grab a backup quickly (svnadmin dump, probably only
+</I>&gt;<i> &gt;&gt; up to #98), install it locally, and try to re-submit your patches to
+</I>&gt;<i> &gt;&gt; that copy. If this works, you could overwrite the existing repos with
+</I>&gt;<i> &gt;&gt; your fixed version. BTW, do you obtain updates of the repos regularly? I
+</I>&gt;<i> &gt;&gt; have to check now if we still do...
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt; I managed to dump from rev 0 to rev 98 to a file on the berlios
+</I>&gt;<i> &gt; server, but I could not transfer the file to my local PC. It says:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; when with scp
+</I>&gt;<i> &gt; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; scp ./dumpfile <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/
+</I>&gt;<i> &gt; -bash: /usr/bin/scp: Permission denied
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; when trying with sftp
+</I>&gt;<i> &gt; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at sheep</A>:~&gt; sftp <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at 145.120.12.100</A>:/home/zhang/ ./dumpfile
+</I>&gt;<i> &gt; Connecting to 145.120.12.100...
+</I>&gt;<i> &gt; exec: /usr/bin/ssh: Permission denied
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I also called scp from my local PC, but also got strange error:
+</I>&gt;<i> &gt; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhang at spacebox</A>:~/workspace$ scp\
+</I>&gt;<i> &gt; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>:/svnroot/repos/rtfirewire/dumpfile .
+</I>&gt;<i> &gt; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">zhangyuchen at svn.berlios.de</A>'s password:
+</I>&gt;<i> &gt; bash: line 1: /usr/bin/scp: Permission denied
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Did you manage to transfer any file from berlios server?
+</I>&gt;<i>
+</I>&gt;<i> Try to log in via shell.berlios.de: same home dir AND scp access.
+</I>&gt;<i>
+</I>&gt;<i> Jan
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000075.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

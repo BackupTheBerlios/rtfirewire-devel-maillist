@@ -1,0 +1,337 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20%5BRTnet-developers%5D%20Re%3A%20Common%20rt-buffers&In-Reply-To=%3C95210d7e0512081127s9be1ce5m2317fc4497c817d%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000024.html">
+   <LINK REL="Next"  HREF="000030.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20%5BRTnet-developers%5D%20Re%3A%20Common%20rt-buffers&In-Reply-To=%3C95210d7e0512081127s9be1ce5m2317fc4497c817d%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers">yuchen623 at gmail.com
+       </A><BR>
+    <I>Thu Dec  8 20:27:48 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000024.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+        <LI>Next message: <A HREF="000030.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#25">[ date ]</a>
+              <a href="thread.html#25">[ thread ]</a>
+              <a href="subject.html#25">[ subject ]</a>
+              <a href="author.html#25">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 12/7/05, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> Yuchen Zhang wrote:
+</I>&gt;<i> &gt; On 12/6/05, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;Yuchen Zhang wrote:
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;Jan,
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;&gt;BTW: Yuchen, we still need to think about that common rtskb format to
+</I>&gt;<i> &gt;&gt;&gt;&gt;avoid the additonal copy step in eth1394...
+</I>&gt;<i> &gt;&gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;The solution currently in my mind is to also use rtpkbuff module in
+</I>&gt;<i> &gt;&gt;&gt;RTnet, which will be exactly the same for RTnet and RT-FW. The
+</I>&gt;<i> &gt;&gt;&gt;rtpkbuff modules takes care of the general memory management, so all
+</I>&gt;<i> &gt;&gt;&gt;the current rtskb functions will be using the primitives from rtpkbuff
+</I>&gt;<i> &gt;&gt;&gt;module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+</I>&gt;<i> &gt;&gt;&gt;the same naming for all rtskb functions. See below how currently rtpkb
+</I>&gt;<i> &gt;&gt;&gt;is defined:
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;struct rtpkb {
+</I>&gt;<i> &gt;&gt;&gt;       /*meta stuff for general memory management*/
+</I>&gt;<i> &gt;&gt;&gt;         ......
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;        char          specific_stuff[256]; /*rtskb specific stuff goes here*/
+</I>&gt;<i> &gt;&gt;&gt;};
+</I>&gt;<i> &gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;Would like to know your opinion:)
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt;I checked the situation in more details again. This is how I see at ATM:
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+</I>&gt;<i> &gt;&gt;   fragment, starting with a buffer head, followed by a payload buffer.
+</I>&gt;<i> &gt;&gt;   RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+</I>&gt;<i> &gt;&gt;   4k. But RTnet may require more in case we ever start using jumbo
+</I>&gt;<i> &gt;&gt;   frames for gigabit Ethernet (i.e. &gt;8k).
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; o In order to make buffer fully exchangeable between RT-FireWire and
+</I>&gt;<i> &gt;&gt;   RTnet, both subsystems must agree on
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt;    1. a common rt-buffer size
+</I>&gt;<i> &gt;&gt;    2. a minimum buffer head size to let every user put some private
+</I>&gt;<i> &gt;&gt;       data into the header as well
+</I>&gt;<i> &gt;&gt;    3. the same kernel slab pool to take additional buffers from
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; What I understand about the buffer header is: it is composed of the
+</I>&gt;<i> &gt; meta stuff, which is used both for general memory management (like
+</I>&gt;<i> &gt; payload size, the pool where the buffer belongs to, etc) and for
+</I>&gt;<i> &gt; application-specific management (like the Ethernet frame headers), and
+</I>&gt;<i> &gt; the pointer to the payload memory. A rt-buffer struct pointer can be
+</I>&gt;<i> &gt; safely casted to an pointer to application-specific buffer struct, and
+</I>&gt;<i> &gt; vice versa.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;   The third item actually enforces the first one - but may
+</I>&gt;<i> &gt;&gt;   unfortunately do this in the wrong direction, i.e. provide too small
+</I>&gt;<i> &gt;&gt;   buffers for one instance.
+</I>&gt;<i> &gt;&gt;   Requirement 3 could be avoided by using kmalloc instead of
+</I>&gt;<i> &gt;&gt;   kmem_cache_alloc for each individual buffer, but this may easily
+</I>&gt;<i> &gt;&gt;   increase the overhead due to not optimally sized memory fragments.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Yes, I agree.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt; o As we should not simply set the worst-case size as default for all,
+</I>&gt;<i> &gt;&gt;   some flexibility at least during compile time is required regarding
+</I>&gt;<i> &gt;&gt;   the size parameters (1. and 2.). More precisely, that subsystem which
+</I>&gt;<i> &gt;&gt;   is closer to the physical media dictates the rt-packet size.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I also agree that the size of buffer should be flexible. It could be
+</I>&gt;<i> &gt; an argument that is specified to the pool allocating API in the
+</I>&gt;<i> &gt; general memory management(say RTDM).
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;Now let's think about some approaches to fulfill these requirements in a
+</I>&gt;<i> &gt;&gt;generic, maybe also extensible way:
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; o The rt-buffer pooling mechanism is a generic feature probably suited
+</I>&gt;<i> &gt;&gt;   for more scenarios than RTnet and RT-FireWire. I'm currently playing
+</I>&gt;<i> &gt;&gt;   with the idea to move the functionality into the RTDM layer. The core
+</I>&gt;<i> &gt;&gt;   features would be:
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Good idea. In RT-FireWire, the general memory management has been
+</I>&gt;<i> &gt; separated from application-specific buffer management: we have rtpkb
+</I>&gt;<i> &gt; (for general) and hpsb_packet (for FireWire protocol). But, to move
+</I>&gt;<i> &gt; the functionality to a base layer, like RTDM, seems more reasonable.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;    - Providing non-real-time allocation for rt-buffers from -what I
+</I>&gt;<i> &gt;&gt;      would call it- parent pools. Buffers from parent pools can be
+</I>&gt;<i> &gt;&gt;      organised in local real-time pools by the drivers and, in case
+</I>&gt;<i> &gt;&gt;      they come from the same parent pool, freely exchanged.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt;    - Parent pools need to be identified by a unique name. The first
+</I>&gt;<i> &gt;&gt;      user which accesses a parent pool under a yet unregistered name
+</I>&gt;<i> &gt;&gt;      will create that pool with rt-buffer size that it provides with
+</I>&gt;<i> &gt;&gt;      the request.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt;    - Any additional user of an existing parent pool specifying a
+</I>&gt;<i> &gt;&gt;      different rt-buffer size will receive an error. Thus we make sure
+</I>&gt;<i> &gt;&gt;      that all users cleanly agree on the same size beforehand. By
+</I>&gt;<i> &gt;&gt;      &quot;size&quot;, I also mean the minimum header size, i.e. actually two
+</I>&gt;<i> &gt;&gt;      parameters.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Above 3 seem fine to  me.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;    - Moreover, one can discuss which features from RT-FireWire's rtpk
+</I>&gt;<i> &gt;&gt;      and RTnet's rtskb implementation should make it into RTDM. I
+</I>&gt;<i> &gt;&gt;      haven't thought about this yet.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; rtpkb has some functions that rtskb does not have. We can take a look
+</I>&gt;<i> &gt; into these details later.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt; o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+</I>&gt;<i> &gt;&gt;   would first have to establish some mechanism to agree on rt-buffer
+</I>&gt;<i> &gt;&gt;   sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+</I>&gt;<i> &gt;&gt;   RT-FireWire and its buffers are (currently) smaller, it will simply
+</I>&gt;<i> &gt;&gt;   grab RT-FireWire's parameters from some exported header during
+</I>&gt;<i> &gt;&gt;   compile time. Then RTnet can call RTDM to either join or create the
+</I>&gt;<i> &gt;&gt;   fitting parent pool.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; The pool allocating API of RTDM can be called either when the pool (of
+</I>&gt;<i> &gt; which the name is specified as argument) has been allocated or not. If
+</I>&gt;<i> &gt; allocated, the API simply returns the existing pointer to the pool.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt; o Due to the significant overhead of using 4k buffers for standard
+</I>&gt;<i> &gt;&gt;   Ethernet and the possibility that RTnet may support jumbo frames in
+</I>&gt;<i> &gt;&gt;   the future, a scheme for using different parent pools, thus rt-buffer
+</I>&gt;<i> &gt;&gt;   sizes for different network devices has to be established in RTnet
+</I>&gt;<i> &gt;&gt;   later on. But this requires some refactoring and API extensions and
+</I>&gt;<i> &gt;&gt;   is nothing for a quick shot.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Ok, again, the buffer size can be set as argument. But for now, I
+</I>&gt;<i> &gt; think we only need to focus on the service-provider part, i.e. RTDM.
+</I>&gt;<i>
+</I>&gt;<i> Hey, convincing you of my idea was really easy. ;)
+</I>&gt;<i>
+</I>This is because my own idea was already more or less similiar to
+yours, i.e. to move memory management to a base layer, like RTDM. BUT,
+I dont think my idea is exactly the same as what you said, see below:
+1. I think the buffer size should be an argument to API of allocating
+parent pools, i.e. the kernel_slab_pool.
+
+2. I think  We DONT need to have different APIs for creating and
+joining parent pool. The name of the pool is given in the creating API
+anyway, but in case a pool of same name already exists, the pointer to
+the existing pool is returned. BUT this is transparent to
+applications.
+
+&gt;<i> &gt;
+</I>&gt;<i> &gt; Now, I have some further idea: what if we also bind the packet
+</I>&gt;<i> &gt; capturing service with the memory management. That is if a real-time
+</I>&gt;<i> &gt; application needs real-time memory allocation, it can also ask for
+</I>&gt;<i> &gt; capturing of all those allocated memory (packets). We can use some
+</I>&gt;<i> &gt; user-space tools to analyze the captured memory. The captured memory
+</I>&gt;<i> &gt; can be delivered via fake Ethernet interface, so tools like Ethereal
+</I>&gt;<i> &gt; can be used (only need to extend it based on the application).
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; The capturng of a packet can be done when that packet memory is freed,
+</I>&gt;<i> &gt; where the capturing operation is transparent to the application. Well,
+</I>&gt;<i> &gt; the application must claim somewhere  before the packet is freed that
+</I>&gt;<i> &gt; it should be captured, e.g. right after it is allocated.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Concerning the packet capturing idea, we can explore more, if it is
+</I>&gt;<i> &gt; agreed to be interesting and effort-worth.
+</I>&gt;<i>
+</I>&gt;<i> Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+</I>&gt;<i> useful.
+</I>&gt;<i>
+</I>Ok, now time for real debating:)
+Let's first sketch the main frame code to support this service.
+
+struct Cap_struct {
+         struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+captured packet to user-space*/
+         struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+compensate application memory come from*/
+        int buffer_size;  /* the size of buffer that can be captured here */
+}
+
+struct rt-buffer{
+          .....
+          struct Cap_struct *aCap;
+}
+
+/*function to create a Cap_struct*/
+struct Cap_struct *create_cap( int size, //  the buffer size
+                                             struct kernel_slab_pool
+*parent_pool,
+                                              char *name) // the name
+of fake ethernet dev, should be
+                                                               
+//specific about application
+{
+       if(*name already exists){
+               return (address of existing Cap_struct)
+       }
+      .............
+}
+
+/*function to remove a Cap_struct*/
+void remove_cap(struct Cap_struct *aCap_struct)
+
+/*function to capture a buffer*/
+struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+buffer_size, struct cap_struct *aCap)
+{
+     if(aCap-&gt;buffer_size != buffer_size)
+                   //print error msg and return
+     else{
+          //allocate a compesating buffer from the cap pool
+          // exchange buffers
+          //deliver the captured buffer to fake ethernet dev
+          //return the address of compensating buffer
+         return &amp;comp_buffer;
+     }
+}
+
+/*function to free a rt buffer*/
+void free_rtbuffer(struct rt-buffer *abuffer){
+    if(abuffer-&gt;aCap){ //pointer NOT null, so we should capture this one
+         abuffer = cap_rtbuffer(abuffer, sizeof(abuffer), abuffer-&gt;aCap);
+    }
+    //free abuffer
+    ......
+}
+
+&gt;<i> At least for RTnet, capturing is a debugging feature you don't what
+</I>&gt;<i> compiled in for production systems. It adds overhead to some critical
+</I>&gt;<i> paths that may hurt on low-end boxes.
+</I>&gt;<i>
+</I>I dont think the overhead is noticable. When the base module (say
+RTDM) has capturing option enabled, the only overhead that happens to
+applications that do NOT need capturing   is, in the free_rtbuffer
+function, the extra checking of a rt-buffer's cap_struct pointer.
+
+&gt;<i> The question to me is then what functionality of the capturing subsystem
+</I>&gt;<i> could be moved to RTDM while still keeping the control of using it or
+</I>&gt;<i> not (without runtime costs) at the configuration level of the driver
+</I>&gt;<i> using it. I would like to be able to switch capturing off during &quot;make
+</I>&gt;<i> menuconfig&quot; of RTnet, but maybe switching it on for RT-FireWire at the
+</I>&gt;<i> same time.
+</I>&gt;<i>
+</I>The capturing I am proposing is conceptually different from the
+capturing in RTnet (what I understood). It is fully oriented to
+applications, while RTnet's capturing is more or less per networking
+interface. That means in this new capturing service, buffer capturing
+can happen /anywhere/, even something totally away from network
+transaction. This is especially useful when we develop multiple
+applications over /one/ FireWire interface: we may only want to
+capture buffers used by one high-level application. Besides FireWire
+and Ethernet, other applications based on RTDM, like socketCAN, can
+also benefit from this service, as long as they need some analysis
+over the used memory to gain some insight to the system behavior.
+
+BTW, are you going to work on these soon, at least the memory
+management part? How can I contribute? My idea is to make RTDM
+temporarily a separate module that can be compiled over xenomai, and
+put it either on RTnet svn or RT-FireWire svn.
+
+Regards,
+Yuchen
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000024.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+	<LI>Next message: <A HREF="000030.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#25">[ date ]</a>
+              <a href="thread.html#25">[ thread ]</a>
+              <a href="subject.html#25">[ subject ]</a>
+              <a href="author.html#25">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

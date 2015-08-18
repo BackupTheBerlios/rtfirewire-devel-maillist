@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Query%20Regarding%20Using%20RTFW%20with%20RTnet&In-Reply-To=%3Cfc9dd8650512081429ya6803cam58a1f33ef8f0f92%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000028.html">
+   <LINK REL="Next"  HREF="000027.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Query Regarding Using RTFW with RTnet</H1>
+    <B>M. Omar Faruque Sarker</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Query%20Regarding%20Using%20RTFW%20with%20RTnet&In-Reply-To=%3Cfc9dd8650512081429ya6803cam58a1f33ef8f0f92%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Query Regarding Using RTFW with RTnet">writefaruq at gmail.com
+       </A><BR>
+    <I>Thu Dec  8 23:29:54 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000028.html">[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+</A></li>
+        <LI>Next message: <A HREF="000027.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear list,
+
+please consider this to answer using less jargon. I'm still in Users'
+side, not in Developers'  yet :)
+
+1. After loading Xenomai+RT-FW+ RTnet + rt_eth1394 modules I found the
+firewire card as &quot;rteth1&quot; using rtifconfig (also assigned an IP to
+it). Now,  If I attach a camera or any other ieee1394 capable 
+firewire node in that card's any port, in that case how   can I
+communicate with that node  under RTnet ? Does that node also have the
+same  IP?
+If yes, then if I use rt_dev_socket calls from user space code then
+what would be the parameters like AF_PACKET, SOCK_DGRAM etc. ? (I'm
+looking on RTnet's raw-packets.c and other example files)
+
+2. From rt_eth1394 module, as per my understanding, I saw if  2 PC
+have rt_eth1394 loaded then they can communicate (without any user
+interaction!). But If I want to send packet to a node that don't have
+rt_eth1394 module (in the same bus/ FW card's any port)  then I need
+to change the module. Could you please give me some hints?
+
+As I've checked the classic/ non-RT  ieee1394 driver's  eth1394 files
+and found some functions have been exported to user space to use by
+applications. In this case is it possible to do the same?
+
+3. For the sake of simplicity, can we start adopting raw1394's async
+part first and do iso later. you may ask me to do something by
+pointing out the major tasks in a specific manner.
+
+I'm again would like give you thanks and  appreciate for your attention.
+As you know that, to make something so-called user friendly it's
+sometimes obvious to face some unfriendly talks :)
+
+
+Best Regards,
+
+Faruque
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000028.html">[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+</A></li>
+	<LI>Next message: <A HREF="000027.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

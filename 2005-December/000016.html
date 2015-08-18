@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: About CSR Module and User Space Access
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20About%20CSR%20Module%20and%20User%20Space%20Access&In-Reply-To=%3C95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000013.html">
+   <LINK REL="Next"  HREF="000017.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: About CSR Module and User Space Access</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20About%20CSR%20Module%20and%20User%20Space%20Access&In-Reply-To=%3C95210d7e0512041314j7fb57dc2r6ffaf7d28d6dae57%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Re: About CSR Module and User Space Access">yuchen623 at gmail.com
+       </A><BR>
+    <I>Sun Dec  4 22:14:24 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000013.html">[Rtfirewire-devel] About CSR Module and User Space Access
+</A></li>
+        <LI>Next message: <A HREF="000017.html">[Rtfirewire-devel] Re: About CSR Module and User Space Access
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear Faruque,
+
+&gt;<i> I've tried  to compile the csr module by replacing obj-m line in
+</I>&gt;<i> Makefile of build/stack folder with this:
+</I>&gt;<i>
+</I>&gt;<i> obj-m +=csr.o
+</I>&gt;<i>
+</I>&gt;<i> and it compiles with some warning and after that when i tried to
+</I>&gt;<i> insert it and got error about missing symbol about
+</I>&gt;<i> &quot;high_level_fcp_request&quot; again I tried to build module highlevel.ko
+</I>&gt;<i> and similarly got error from insmod for the missing of the following
+</I>&gt;<i> symbols:
+</I>&gt;<i>
+</I>&gt;<i> ioctl_handlers
+</I>&gt;<i> hpsb_hosts_lock
+</I>&gt;<i> hpsb_hosts
+</I>&gt;<i> hpsb_update_config_rom_image
+</I>&gt;<i>
+</I>Em...I dont get the point why you wanna make csr and highlevel as
+separate modules.
+Anyway, since all these files are using some symbols from other files,
+if you wanna load them separately, you have to make sure other files
+are loaded before, which will prevent the missing symbol problem as
+you have seen.
+
+&gt;<i> I just did this without knowing inner details. As I need to show some
+</I>&gt;<i> demo of RT-FW   at my lab so I need a roadmap for sending read/write
+</I>&gt;<i> request to any ieee1394 capbale node.
+</I>&gt;<i> so please fix me about my planned steps to write a simple user space
+</I>&gt;<i> app using csr.ko:
+</I>&gt;<i>
+</I>&gt;<i> 1. loading all current rt-fw modules including this csr.ko (after fixing) ??
+</I>&gt;<i> 2. define struct csr_control and hpsb_host, hpsb_packet ...??
+</I>&gt;<i> 3. call  add_host() read_maps() read_regs() etc to fill up the struct members ??
+</I>&gt;<i> 4.  then use some packet sending functions ???
+</I>&gt;<i> 5. Read the CSR registers for status ??
+</I>&gt;<i> 6. And Where to find the content of the returned packet??
+</I>&gt;<i>
+</I>To write a user space function to talk to rt-fw module (without
+eth1394), you need to define a communication mechanism between kernel
+and user space. If you look into the libraw1394 (user-space library to
+access Linux raw1394), you can find: the communication is driven by
+user-side, which polls the kernel side for any newly coming message,
+either transaction message or other bus events (like bus reset). But I
+believe we do have quite some other options (mailbox, fifo, etc),
+which are more realtime, provided by Xenomai (also RTAI).
+
+Anyway, if you wanna write some user-space program on rt-fw, the
+current rt-fw cannot directly support that unless you use eth1394,
+which means your program will be no different from socket programming.
+
+BUT, the pressure to port raw1394 to rt-fw is obviously there, so we
+need to take some action anyway. I guess you are also interested, so
+let's start the work and keep on the discussion.
+
+&gt;<i> Anyway I hope to study ieee1394commander tool  soon and also off
+</I>&gt;<i> course I must make some (one stop painless) HOWTOs and Docs on RT-FW
+</I>&gt;<i> for new users :)
+</I>&gt;<i>
+</I>it will be very nice if you can put these HOWTOs in the rtfw repos.
+BTW, do you have account in berlios? If not, just create one and tell
+me, so I can add you to the team to allow you write access to the
+repos.
+
+&gt;<i> At this moment I'm remembering my past experience on 1999 when I saw
+</I>&gt;<i> no helpful Linux book was written in my native language. I was crazy
+</I>&gt;<i> enough to wrote a book for  beginning Linux and indeed it was a best
+</I>&gt;<i> seller at that time!
+</I>&gt;<i>
+</I>&gt;<i> Currently I got less time to document anything rather testing new
+</I>&gt;<i> things all the time!
+</I>&gt;<i>
+</I>&gt;<i> My lab is working for both RT Control and Vision and Now I'm involved
+</I>&gt;<i> in control part and hope to work on RT-FW for a long time.
+</I>That's really great!
+
+I've 2-3
+&gt;<i> PCs with ieee1394 cards and CCD Cameras and   soon I hope to get some
+</I>&gt;<i> ieee1394 enable DSPs. Actually I don't know much about DSPs. Then what
+</I>&gt;<i> other lab stuff may be  required in future?
+</I>&gt;<i>
+</I>Em...do you already know which kind of DSP boards you will get? Just
+drop me a weblink so I can also find them:) if/when you know. For
+other stuff, I dont know, should depends on what you will do.
+
+&gt;<i> Anyway I look forward to seeing better days with rt- fw based control.
+</I>&gt;<i>
+</I>Surely you will and keep in touch!
+
+Best regards,
+Yuchen
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000013.html">[Rtfirewire-devel] About CSR Module and User Space Access
+</A></li>
+	<LI>Next message: <A HREF="000017.html">[Rtfirewire-devel] Re: About CSR Module and User Space Access
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

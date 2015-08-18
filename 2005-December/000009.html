@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20Successful%21%3A%20RT-FW-0.1%2B%20Xenomai-2.0%20%2B%20Kernel%202.6.13%20with%20Adeos%20Patch%20at%20Ubuntu%205.10&In-Reply-To=%3C95210d7e0512020129v35e7b4i46490fe1885e40c1%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000021.html">
+   <LINK REL="Next"  HREF="000010.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20Successful%21%3A%20RT-FW-0.1%2B%20Xenomai-2.0%20%2B%20Kernel%202.6.13%20with%20Adeos%20Patch%20at%20Ubuntu%205.10&In-Reply-To=%3C95210d7e0512020129v35e7b4i46490fe1885e40c1%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10">yuchen623 at gmail.com
+       </A><BR>
+    <I>Fri Dec  2 10:29:03 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000021.html">[Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+</A></li>
+        <LI>Next message: <A HREF="000010.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear Faruque,
+
+&gt;<i> Congratulations!
+</I>Thanks!
+
+&gt;<i> The first release of rt-fw 0.1 on my Ubuntu 5.10 box (Intel P-III
+</I>&gt;<i> 128MB RAM) works fine with some minor adjustments.
+</I>&gt;<i>
+</I>&gt;<i> 1. I inserted xeno_native.ko module before inserting xeno_rtdm.ko
+</I>&gt;<i> otherwise I got:
+</I>&gt;<i> insmod: error inserting rt_serv.ko -1 Unknown Sysbol in Module
+</I>&gt;<i>
+</I>&gt;<i> 2.  I passed the &quot;lapic&quot; parameter to grub boot loader on booting my
+</I>&gt;<i> box. otherwise
+</I>&gt;<i> I got :
+</I>&gt;<i> insmod: error inserting xeno_hal.ko -1 No Such Device
+</I>&gt;<i>
+</I>&gt;<i> May be the problem is related to Xenomai.
+</I>&gt;<i>
+</I>&gt;<i> 3. I also inserted rt_sim1394.ko module and do a ping to sim_host0
+</I>&gt;<i>
+</I>I didnt put this module into the released package, because it may be
+NOT bug-free. I wrote this module also because I wanted to do test on
+my FireWire card-less laptop. But currently, only asynchronous
+transaction simulation is supported. The isochronous simulation will
+be much more complicated.
+
+&gt;<i> I've done this test at my room as I forgot to bring my firewire card
+</I>&gt;<i> from lab. So there is noway to do a &lt;rtping&gt; according to doc! So
+</I>&gt;<i> could you mention it in the doc, so that poor people can do the
+</I>&gt;<i> experiment without really buying a firewire card :))
+</I>&gt;<i>
+</I>Ok, it seems I should add this module to the released package for the
+sake of &quot;poor&quot; people:) I will make another announcement then.
+
+&gt;<i> Here my rtping wtt was 71.2 us and avg rtt is 30 us and  with real
+</I>&gt;<i> firewire card I got avg rtt 7 us (wtt 14 us)
+</I>&gt;<i>
+</I>Em....I think something wrong here. Do you mean avg 30 us (wtt 71.2
+us) is with REAL card, and avg 7us (wtt 14us) is with sim1394? Then
+they look quite ok.
+
+
+Yuchen
+
+&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="http://lists.berlios.de/mailman/listinfo/rtfirewire-devel">http://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000021.html">[Rtfirewire-devel] Test Successful!: RT-FW-0.1+ Xenomai-2.0 + Kernel 2.6.13 with Adeos Patch at Ubuntu 5.10
+</A></li>
+	<LI>Next message: <A HREF="000010.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

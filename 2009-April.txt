@@ -1,0 +1,144 @@
+From jan.kiszka at web.de  Tue Apr 28 09:05:18 2009
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 28 Apr 2009 09:05:18 +0200
+Subject: [Rtfirewire-devel] Does not exist "xnpod_start_timer" on
+	Xenomai 2.4.7 ???
+In-Reply-To: <49F69377.7090005@xenomai.org>
+References: <49F65852.6090401@gmail.com> <49F69377.7090005@xenomai.org>
+Message-ID: <49F6AAAE.9090200@web.de>
+
+Gilles Chanteperdrix wrote:
+> Kim, Hee-young wrote:
+>> Hi,
+>>
+>> I'm trying to patch "rt-firewire 0.1" for lastest xenomai patched
+>> kernel. I fixed some functions to altered one. But, xnpod_start_timer(),
+>> xnpod_stop_timer() and relates do not exist in pod.c.
+>> and try to find same function name in Xenomai but there are no exists.
+>> Where can I find these functions? or How to solve it?
+> 
+> The replacement is xnpod_enable_timesource, but you should not need to
+> call it explicitely, especially not in a driver. So, you should rather
+> remove these calls.
+> 
+> BTW, any plan to publish the modified code ?
+> 
+
+In any case, always use latest SVN as basis (it doesn't include that
+service anymore, BTW) and put the rtfirewire mailing list on CC.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 257 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20090428/69f86b0f/attachment.pgp>
+
+From plugdboy at gmail.com  Tue Apr 28 14:42:59 2009
+From: plugdboy at gmail.com (Kim, Hee-young)
+Date: Tue, 28 Apr 2009 21:42:59 +0900
+Subject: [Rtfirewire-devel] Does not exist "xnpod_start_timer" on
+	Xenomai 2.4.7 ???
+In-Reply-To: <49F6AAAE.9090200@web.de>
+References: <49F65852.6090401@gmail.com> <49F69377.7090005@xenomai.org>
+	<49F6AAAE.9090200@web.de>
+Message-ID: <49F6F9D3.8060503@gmail.com>
+
+Thanks Gilles Chanteperdrix and Jan Kiszka for your help.
+
+If I success to patch rt-firewire I'll post it on site. But, I can't 
+guarantee when it finish.
+I've just subscribed to rt-firewire mailing list. BTW, is it alive?
+
+Kim, Hee-young.
+
+Jan Kiszka ? ?:
+> Gilles Chanteperdrix wrote:
+>   
+>> Kim, Hee-young wrote:
+>>     
+>>> Hi,
+>>>
+>>> I'm trying to patch "rt-firewire 0.1" for lastest xenomai patched
+>>> kernel. I fixed some functions to altered one. But, xnpod_start_timer(),
+>>> xnpod_stop_timer() and relates do not exist in pod.c.
+>>> and try to find same function name in Xenomai but there are no exists.
+>>> Where can I find these functions? or How to solve it?
+>>>       
+>> The replacement is xnpod_enable_timesource, but you should not need to
+>> call it explicitely, especially not in a driver. So, you should rather
+>> remove these calls.
+>>
+>> BTW, any plan to publish the modified code ?
+>>
+>>     
+>
+> In any case, always use latest SVN as basis (it doesn't include that
+> service anymore, BTW) and put the rtfirewire mailing list on CC.
+>
+> Jan
+>
+>   
+
+
+From yuchen623 at gmail.com  Tue Apr 28 15:26:30 2009
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Tue, 28 Apr 2009 15:26:30 +0200
+Subject: [Rtfirewire-devel] Does not exist "xnpod_start_timer" on
+	Xenomai 2.4.7 ???
+In-Reply-To: <49F6F9D3.8060503@gmail.com>
+References: <49F65852.6090401@gmail.com> <49F69377.7090005@xenomai.org>
+	<49F6AAAE.9090200@web.de> <49F6F9D3.8060503@gmail.com>
+Message-ID: <95210d7e0904280626l78a89bc4t332f2ea0c90935ac@mail.gmail.com>
+
+Yes, it is alive. And yes, we need more noise there. Keep me posted
+about your progress-:)
+
+Yuchen
+
+On Tue, Apr 28, 2009 at 2:42 PM, Kim, Hee-young <plugdboy at gmail.com> wrote:
+> Thanks Gilles Chanteperdrix and Jan Kiszka for your help.
+>
+> If I success to patch rt-firewire I'll post it on site. But, I can't
+> guarantee when it finish.
+> I've just subscribed to rt-firewire mailing list. BTW, is it alive?
+>
+> Kim, Hee-young.
+>
+> Jan Kiszka ? ?:
+>> Gilles Chanteperdrix wrote:
+>>
+>>> Kim, Hee-young wrote:
+>>>
+>>>> Hi,
+>>>>
+>>>> I'm trying to patch "rt-firewire 0.1" for lastest xenomai patched
+>>>> kernel. I fixed some functions to altered one. But, xnpod_start_timer(),
+>>>> xnpod_stop_timer() and relates do not exist in pod.c.
+>>>> and try to find same function name in Xenomai but there are no exists.
+>>>> Where can I find these functions? or How to solve it?
+>>>>
+>>> The replacement is xnpod_enable_timesource, but you should not need to
+>>> call it explicitely, especially not in a driver. So, you should rather
+>>> remove these calls.
+>>>
+>>> BTW, any plan to publish the modified code ?
+>>>
+>>>
+>>
+>> In any case, always use latest SVN as basis (it doesn't include that
+>> service anymore, BTW) and put the rtfirewire mailing list on CC.
+>>
+>> Jan
+>>
+>>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+

@@ -1,0 +1,114 @@
+From ralfwiegand at gmx.de  Sat Mar  6 21:54:47 2010
+From: ralfwiegand at gmx.de (Ralf Wiegand)
+Date: Sat, 06 Mar 2010 21:54:47 +0100
+Subject: [Rtfirewire-devel] rt_serv issue
+Message-ID: <4B92C117.1050301@gmx.de>
+
+Hello,
+
+iam new on the mailinglist.
+
+i've read that there is a know issue during loading the rt_serv module. 
+Can anyone tell me some details about the problem ?
+I would like to run rt-firewire under xenomai-2.4.3 with kernel 2.6.24 
+and after loading rt_serv the systems freezes.
+
+
+Regards,
+
+Ralf Wiegand
+
+
+From sri_embedded at yahoo.com  Wed Mar 10 18:31:30 2010
+From: sri_embedded at yahoo.com (sss yyy)
+Date: Wed, 10 Mar 2010 09:31:30 -0800 (PST)
+Subject: [Rtfirewire-devel] Load rtpkbuff before loading rt_serv,
+	are you using config.h?
+In-Reply-To: <mailman.55.1267959610.5589.rtfirewire-devel@lists.berlios.de>
+Message-ID: <652146.87871.qm@web58007.mail.re3.yahoo.com>
+
+Hi Ralf ,
+I too faced the same problem long back.
+I have used xenomai-2.4.2 with rt-firewire.
+It wont freeze if you are loading in the proper order.
+Can you be more specific?
+Can you post a screenshot of this?
+What are the modules you have loaded succesfully
+Have you loaded rtpkbuff
+What is the version of rtnet you are using?
+
+Regards,
+Satya
+
+--- On Sun, 7/3/10, rtfirewire-devel-request at lists.berlios.de <rtfirewire-devel-request at lists.berlios.de> wrote:
+
+From: rtfirewire-devel-request at lists.berlios.de <rtfirewire-devel-request at lists.berlios.de>
+Subject: Rtfirewire-devel Digest, Vol 10, Issue 1
+To: rtfirewire-devel at lists.berlios.de
+Date: Sunday, 7 March, 2010, 4:30 PM
+
+Send Rtfirewire-devel mailing list submissions to
+??? rtfirewire-devel at lists.berlios.de
+
+To subscribe or unsubscribe via the World Wide Web, visit
+??? https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+or, via email, send a message with subject or body 'help' to
+??? rtfirewire-devel-request at lists.berlios.de
+
+You can reach the person managing the list at
+??? rtfirewire-devel-owner at lists.berlios.de
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of Rtfirewire-devel digest..."
+
+
+Today's Topics:
+
+???1. rt_serv issue (Ralf Wiegand)
+
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Sat, 06 Mar 2010 21:54:47 +0100
+From: Ralf Wiegand <ralfwiegand at gmx.de>
+To: rtfirewire-devel at lists.berlios.de
+Subject: [Rtfirewire-devel] rt_serv issue
+Message-ID: <4B92C117.1050301 at gmx.de>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+
+Hello,
+
+iam new on the mailinglist.
+
+i've read that there is a know issue during loading the rt_serv module. 
+Can anyone tell me some details about the problem ?
+I would like to run rt-firewire under xenomai-2.4.3 with kernel 2.6.24 
+and after loading rt_serv the systems freezes.
+
+
+Regards,
+
+Ralf Wiegand
+
+
+------------------------------
+
+_______________________________________________
+Rtfirewire-devel mailing list
+Rtfirewire-devel at lists.berlios.de
+https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+
+
+End of Rtfirewire-devel Digest, Vol 10, Issue 1
+***********************************************
+
+
+
+      Get your preferred Email name!
+Now you can @ymail.com and @rocketmail.com. 
+http://mail.promotions.yahoo.com/newdomains/aa/
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20100310/73e5d46a/attachment.html>
+

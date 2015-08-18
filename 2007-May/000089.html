@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] problems with configuring rtfirewire
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2007-May/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20problems%20with%20configuring%20rtfirewire&In-Reply-To=%3C465DB02F.3030608%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000088.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] problems with configuring rtfirewire</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20problems%20with%20configuring%20rtfirewire&In-Reply-To=%3C465DB02F.3030608%40web.de%3E"
+       TITLE="[Rtfirewire-devel] problems with configuring rtfirewire">jan.kiszka at web.de
+       </A><BR>
+    <I>Wed May 30 19:11:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000088.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">h.e.deboer at student.utwente.nl</A> wrote:
+&gt;<i> Hi all,
+</I>&gt;<i> 
+</I>&gt;<i> I'm a student of the university  of Twente. I am working on a short
+</I>&gt;<i> assignment which partly consists of porting the rtfirewire software
+</I>&gt;<i> to RTAI using RTDM.
+</I>&gt;<i> 
+</I>&gt;<i> I have a test setup consisting of two pc's with linux kernel 2.6.15.7
+</I>&gt;<i>  , RTAI 3.4 and Xenomai 2.1.3
+</I>&gt;<i> 
+</I>&gt;<i> I followed the instructions in the documentation folder, but couldn't
+</I>&gt;<i> configure RTfirewire under Xenomai 2.1.3. The configuration stucks on
+</I>&gt;<i> the --config argument. I think this is caused by the fact that for
+</I>&gt;<i> this xenomai version, no configuration menu is present. I tryed to
+</I>&gt;<i> change the auto configuration file, but I cannot open it. The next
+</I>&gt;<i> error occured: cannot open config/m4/libtool.m4 there is no such file
+</I>&gt;<i> or directory. I also couldn't configure RTAI 3.4, but after some
+</I>&gt;<i> modifications to the normal config file, I managed to get it working.
+</I>&gt;<i> For Xenomai however, this is a lot of work. How can I get this
+</I>&gt;<i> working? (otherwise I will use xenomai 2.0)
+</I>
+No need for this. RTFirewire is configured just like RTnet, except that
+it just comes with plain configure. You need to pass
+--with-linux=&lt;path-to-xenomai-kernel&gt;
+--with-rtext-config=&lt;path-to-xeno-config&gt; for modern Xenomai versions.
+
+&gt;<i> 
+</I>&gt;<i> Another question is, how does primitives.h know which RTAI or Xenomai
+</I>&gt;<i> version is defined? I couldn't find it.
+</I>
+Please, you or Yuchen: get rid of most of these primitives! We have RTDM
+as clear abstraction (minus RTAI legacy stuff like rtos_timer_start --
+but those are only _2_ functions). Use RTDM_API_VER to detect changes in
+that API. Additionally, you can check for CONFIG_XENO_21x or
+CONFIG_RTAI_3x to detect in what world you live. See RTnet
+(stack/include/rtnet_sys*.h) for how tiny this abstraction can look like
+today.
+
+&gt;<i> 
+</I>&gt;<i> FOr my assignment I also want to perform some latency tests to see if
+</I>&gt;<i> there is any latency difference between RTAI and Xenomai. I read in
+</I>
+Please pick recent versions for this! Don't benchmark Xenomai 2.0 e.g.,
+that's pointless for new projects. Also use a recent kernel, not 2.6.15.
+The same applies to RTAI as well (older versions than 3.5 are broken
+/wrt RTDM or unsupported anyway).
+
+&gt;<i> another post, that another tool than rtping is used to test the
+</I>&gt;<i> latency for isochronous transaction. I would like to use that tool in
+</I>&gt;<i> order to have a clear reference wit the test results shown in the Msc
+</I>&gt;<i> report.
+</I>&gt;<i> 
+</I>
+Can't help with the tool, but maybe with something else:
+
+I've hacked (it is _really_ a quick-hack!) support for building
+rtfirewire trunk against Xenomai trunk (RTDM rev. 6) and 2.6.20, see
+attachment (it's huge and packed due to generated automake changes).
+There were quite a few API violation popping up (namely around
+rtdm_lock_t vs. spinlock_t), and there are still warnings. So, be warned
+;), it may break.
+
+For comprehensive testing, I can recommend latest I-pipe patches
+(2.6.20-i386-1.8-04) with full debug options (CONFIG_IPIPE_DEBUG_CONTEXT
++ CONFIG_XENO_OPT_DEBUG_RTDM). This can help reveal broken pieces in the
+stack due to refactoring (or even older problems).
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: quick-hack-update.bz2
+Type: application/octet-stream
+Size: 114079 bytes
+Desc: not available
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070530/adf68be4/attachment.obj">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070530/adf68be4/attachment.obj</A>&gt;
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070530/adf68be4/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070530/adf68be4/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000088.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

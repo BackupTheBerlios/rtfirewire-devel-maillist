@@ -1,0 +1,152 @@
+From s0120871 at .SYNTAX-ERROR  Wed May 24 11:30:18 2006
+From: s0120871 at .SYNTAX-ERROR (s0120871 at .SYNTAX-ERROR)
+Date: Wed, 24 May 2006 11:30:18 +0200
+Subject: [Rtfirewire-devel] RTfirewire porting to RTAI
+Message-ID: <1148463018.447427aaa9c54@webmail.utwente.nl>
+
+Dear all,
+
+I am a student of the university of Twente (Embedded system design), and my 
+Pre-doctoral assignment is porting the RTfirewire software from xenomai to 
+RTAI that Yuchen Zhang wrote. This is because all the projects at our 
+department use the RTAI module.
+
+When I have questions about the source code would you want to answer them? And 
+do I have to send them by email?
+
+Thanks in advance.
+
+Greetings,
+
+Harm de Boer
+h.e.deboer at student.utwente.nl  
+
+
+
+
+
+
+
+From yuchen623 at gmail.com  Wed May 24 13:19:49 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Wed, 24 May 2006 13:19:49 +0200
+Subject: [Rtfirewire-devel] RTfirewire porting to RTAI
+In-Reply-To: <1148463018.447427aaa9c54@webmail.utwente.nl>
+References: <1148463018.447427aaa9c54@webmail.utwente.nl>
+Message-ID: <95210d7e0605240419jb1300e8g36aff07fada80cd2@mail.gmail.com>
+
+Hi,
+
+sure, I am willing to answer any questions concerning RT-FireWire.
+Unfortunately the work has been kind of stopped in the last few
+months, due to the fact that I am fully occupied by my official job.
+But I have the basic setup at home to try out the code, so again, in
+case you have any questions, proposals, or criticisms, dont hesitate
+to speak out in the list, or send mail to me personally.
+
+Good luck,
+Yuchen
+
+On 5/24/06, s0120871 at .syntax-error <s0120871 at .syntax-error> wrote:
+>
+> Dear all,
+>
+> I am a student of the university of Twente (Embedded system design), and my
+> Pre-doctoral assignment is porting the RTfirewire software from xenomai to
+> RTAI that Yuchen Zhang wrote. This is because all the projects at our
+> department use the RTAI module.
+>
+> When I have questions about the source code would you want to answer them? And
+> do I have to send them by email?
+>
+> Thanks in advance.
+>
+> Greetings,
+>
+> Harm de Boer
+> h.e.deboer at student.utwente.nl
+>
+>
+>
+>
+>
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> http://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From jan.kiszka at web.de  Wed May 24 13:47:23 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Wed, 24 May 2006 13:47:23 +0200
+Subject: [Rtfirewire-devel] RTfirewire porting to RTAI
+In-Reply-To: <1148463018.447427aaa9c54@webmail.utwente.nl>
+References: <1148463018.447427aaa9c54@webmail.utwente.nl>
+Message-ID: <447447CB.5020600@web.de>
+
+s0120871 at .SYNTAX-ERROR wrote:
+> Dear all,
+> 
+> I am a student of the university of Twente (Embedded system design), and my 
+> Pre-doctoral assignment is porting the RTfirewire software from xenomai to 
+> RTAI that Yuchen Zhang wrote. This is because all the projects at our 
+> department use the RTAI module.
+
+Some recommendation regarding this port from my POV: the port should
+definitely be RTDM-based!
+
+Either you are almost done in case you use 3.3 (better: magma to include
+all RTDM fixes), or you should weighing porting back the RTDM support to
+your older RTAI version (this would surely be welcome by users of other
+RTDM-based drivers) vs. upgrading your OS.
+
+Again, avoid hacking RTAI-specific calls directly into RT-Firewire, it
+would generate unmaintainable code. See also RTnet how to handle the
+RT-extension differences in a centralised way.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060524/b9090d29/attachment.pgp>
+
+From s0120871 at .SYNTAX-ERROR  Mon May 29 16:54:41 2006
+From: s0120871 at .SYNTAX-ERROR (s0120871 at .SYNTAX-ERROR)
+Date: Mon, 29 May 2006 16:54:41 +0200
+Subject: [Rtfirewire-devel] porting rtfirewire from xenomai to rtai
+Message-ID: <1148914481.447b0b317b463@webmail.utwente.nl>
+
+Hello,
+
+As I mailed you earlier, I am currently working on the assingment to port your 
+RTfirewire code from Xenomai to RTAI. This is a practical assignment I am 
+doing for the embedded system design group at the Twente University.
+
+Now I have been browsing through the code to get some feeling for what's in it 
+and its structure. I noticed that I need to focus mainly on the modules 
+rt_serv and rtpkbuff. These seem to be the only ones that provide 'services' 
+to the other modules and use the 'rtos' procedures which are RT platform 
+specific. Is this correct?
+
+I also noticed that there is a nice 'translation header-file' 
+(rtos_primitives.h) which transforms the RT platform specific calls to a more 
+generic call-type which is used by the code. As a starting point for the 
+porting, I wanted to compare the Xenomai translation to the RTAI API and 
+change where needed.
+
+The thing that puzzles me a bit is that in the rtos_primitives.h it seems as 
+if there is already a RTAI translation made (the conditional compiler code #if 
+defined(CONFIG_RTAI_24) etc). Is it so that the translation to RTAI is already 
+accounted for? Or has it been prepared but never verified? 
+
+
+Thanks in advance for your reply,
+
+Best regards, Harm
+
+

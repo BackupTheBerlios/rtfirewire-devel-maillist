@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RTfirewire porting to RTAI
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTfirewire%20porting%20to%20RTAI&In-Reply-To=%3C447447CB.5020600%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000041.html">
+   <LINK REL="Next"  HREF="000043.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RTfirewire porting to RTAI</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTfirewire%20porting%20to%20RTAI&In-Reply-To=%3C447447CB.5020600%40web.de%3E"
+       TITLE="[Rtfirewire-devel] RTfirewire porting to RTAI">jan.kiszka at web.de
+       </A><BR>
+    <I>Wed May 24 13:47:23 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000041.html">[Rtfirewire-devel] RTfirewire porting to RTAI
+</A></li>
+        <LI>Next message: <A HREF="000043.html">[Rtfirewire-devel] porting rtfirewire from xenomai to rtai
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE><A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">s0120871 at .SYNTAX-ERROR</A> wrote:
+&gt;<i> Dear all,
+</I>&gt;<i> 
+</I>&gt;<i> I am a student of the university of Twente (Embedded system design), and my 
+</I>&gt;<i> Pre-doctoral assignment is porting the RTfirewire software from xenomai to 
+</I>&gt;<i> RTAI that Yuchen Zhang wrote. This is because all the projects at our 
+</I>&gt;<i> department use the RTAI module.
+</I>
+Some recommendation regarding this port from my POV: the port should
+definitely be RTDM-based!
+
+Either you are almost done in case you use 3.3 (better: magma to include
+all RTDM fixes), or you should weighing porting back the RTDM support to
+your older RTAI version (this would surely be welcome by users of other
+RTDM-based drivers) vs. upgrading your OS.
+
+Again, avoid hacking RTAI-specific calls directly into RT-Firewire, it
+would generate unmaintainable code. See also RTnet how to handle the
+RT-extension differences in a centralised way.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060524/b9090d29/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060524/b9090d29/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000041.html">[Rtfirewire-devel] RTfirewire porting to RTAI
+</A></li>
+	<LI>Next message: <A HREF="000043.html">[Rtfirewire-devel] porting rtfirewire from xenomai to rtai
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

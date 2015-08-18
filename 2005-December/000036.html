@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW%20inter%20module%20dependencies%20and%20%28future%29%20position%20of%20RT_RAW1394%20in%20the%20dependency%20tree&In-Reply-To=%3C95210d7e0512171539y7ec626a7nfe9102c908f28616%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000035.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW%20inter%20module%20dependencies%20and%20%28future%29%20position%20of%20RT_RAW1394%20in%20the%20dependency%20tree&In-Reply-To=%3C95210d7e0512171539y7ec626a7nfe9102c908f28616%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree">yuchen623 at gmail.com
+       </A><BR>
+    <I>Sun Dec 18 00:39:48 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000035.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#36">[ date ]</a>
+              <a href="thread.html#36">[ thread ]</a>
+              <a href="subject.html#36">[ subject ]</a>
+              <a href="author.html#36">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 12/14/05, M. Omar Faruque Sarker &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">writefaruq at gmail.com</A>&gt; wrote:
+
+&gt;<i> I'm actually thinking for &quot;at least async capable&quot; rt_raw interface.
+</I>&gt;<i> Could you please start discussion about that and also indicate what
+</I>&gt;<i> kind of RT capability we have to put inside that rt_raw1394  module?
+</I>&gt;<i>
+</I>Here I am again:)
+
+Today, I just checked in the first framecode of rtraw1394 in
+/trunk/highlevel/rtraw1394. Not too much code, but the basic things
+are there, I think.
+
+Let's start from the communication between kernel-side protocol stack
+and user-side application. In NRT Linux1394, it is thru /dev/raw1394.
+Now,in RT-FW, we need to rebuild this on RTDM. Conceptually they are
+quite similiar. Plus, we have another good reference, i.e. the
+real-time serial driver using RTDM (distributed with Xenomai).
+
+The 'rtraw1394&quot; (dev in RTDM) will be like a char device in Linux, so
+we need to implement rt_raw1394_read and rt_raw1394_write. The basic
+concept in raw1394 can be moved here, i.e. writing and reading
+&quot;pending_request&quot; struct to the &quot;rtraw1394&quot;. What I know now is we
+have to redesign and implement the synchronization scheme between user
+application and rtraw1394 module in kernel. For example, when the
+application on raw1394 try to poll &quot;/dev/raw1394&quot;, the waiting_queue
+sync scheme is used if no completed request is pending, but if we also
+implement the poll operation here, we have to figure out another sync
+scheme which is real-time safe.  Another issue is mmap, but for now I
+dont know if we need it and how we can do it in real-time,
+specifically on RTDM.
+
+It will be nice if we can fully understand the functionalities of
+raw1394 first. But since now we only focus on asynchronous
+transactions, the isochronous operations can be temporarily skipped:
+ioctl and rawiso_XXX.
+
+Basically, an application has two means to use asynchronous service of
+RT-FW: Address Range Mapping (ARM) and Functional Control
+Protocol(FCP). ARM is to let application reserve a certain range of
+the logical space on FW, so any packets sent to that range of address
+will be re-directed to the application. FCP actually is two registers
+in the CSR range of address: FCP-request and FCP-response. Everytime a
+packet is sent to either of these two, CSR module will forward it to
+the high-level modules who has claimed to be interested in messages
+coming thru FCP, in this case, raw1394 will be notified. Then, it will
+further forward the packet to user applications who are listening to
+the FCP &quot;channel&quot;. Again, all kernel-user communications here are NOT
+directly coupled: the kernel raw1394 module only generate a
+&quot;pending_request&quot; and pend it to the queue, where the applications
+will read.
+
+Next step is to fill in the framecode with more flesh code. The
+raw1394 works like a state machine, which we can further take a look
+and reuse for our design. Comments are welcome here, but also good if
+directly committed to the code (either comments or code).
+
+P.S. Tomorrow, I am going to take flight back to China for the xmas
+and new jaar holiday. I am gonna travel in a city for 3 days before I
+can go back to my hometown, which means I will not access Internet in
+next 3 days. But feel free to send mail when your
+remarks/ideas/questions are fresh:).
+
+Best regards,
+Yuchen
+
+_____________________________________________
+&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="http://lists.berlios.de/mailman/listinfo/rtfirewire-devel">http://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000035.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#36">[ date ]</a>
+              <a href="thread.html#36">[ thread ]</a>
+              <a href="subject.html#36">[ subject ]</a>
+              <a href="author.html#36">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

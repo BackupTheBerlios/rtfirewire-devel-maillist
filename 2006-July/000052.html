@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5Bnews%5DRT-FireWire%20trunk%20revision%20in%20Berlios%0A%20compiles%20over%20Xenomai%202.1&In-Reply-To=%3C44C60821.2030201%40student.kuleuven.be%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000051.html">
+   <LINK REL="Next"  HREF="000053.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1</H1>
+    <B>Piet Levrier</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5Bnews%5DRT-FireWire%20trunk%20revision%20in%20Berlios%0A%20compiles%20over%20Xenomai%202.1&In-Reply-To=%3C44C60821.2030201%40student.kuleuven.be%3E"
+       TITLE="[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1">piet.levrier at student.kuleuven.be
+       </A><BR>
+    <I>Tue Jul 25 14:01:37 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000051.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios	compiles over Xenomai 2.1
+</A></li>
+        <LI>Next message: <A HREF="000053.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+
+Yuchen Zhang wrote:
+&gt;<i> On 7/24/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;<i>   
+</I>&gt;&gt;<i> Yuchen Zhang wrote:
+</I>&gt;&gt;<i>     
+</I>&gt;&gt;&gt;<i> Hi, all
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> the current trunk revision (96) of RT-FireWire svn repository in
+</I>&gt;&gt;&gt;<i> berlios compiles over Xenomai2.1. When compiling over Xenomai2.1, one
+</I>&gt;&gt;&gt;<i> has to specify two options along the configure tool:
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> --with-linux= the path to your real-time linux kernel
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> --with-rtext-config=the path to the xeno-config in your box (e.g.
+</I>&gt;&gt;&gt;<i> /usr/xenomai/bin/xeno-config)
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i> So far, the rtping test has been runnig without problem. The lastest
+</I>&gt;&gt;&gt;<i> xenomai2.2 has NOT been tested yet.
+</I>&gt;&gt;&gt;<i>       
+</I>&gt;&gt;<i> It also compiles fine against Xenomai trunk once you patched
+</I>&gt;&gt;<i> configure.ac (which I strongly recommend, Yuchen :)). There were no RTDM
+</I>&gt;&gt;<i> API changes between 2.1 and 2.2.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>     
+</I>&gt;<i> Yes, some minor changes in the configure.ac should enable the compile
+</I>&gt;<i> over xeno2.2 and trunk, also over ppc platform. Checked in already,
+</I>&gt;<i> but not tested yet:)
+</I>&gt;<i>   
+</I>
+We've adapted configure.ac a little bit and it compiles fine over 
+xenomai2.2.  However,
+rtping results in the following error: &quot;ioctl: Cannot allocate memory&quot;. 
+Any suggestions?
+
+piet
+
+&gt;&gt;<i> Some gcc-4.1 warning at this chance:
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+</I>&gt;&gt;<i> &#226;ohci_remove1&#226;:
+</I>&gt;&gt;<i> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3099: warning:
+</I>&gt;&gt;<i> enumeration value &#226;OHCI_INIT_HAVE_MEM_REGION&#226; not handled in switch
+</I>&gt;&gt;<i> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c: In function
+</I>&gt;&gt;<i> &#226;ohci1394_init_iso_ctx&#226;:
+</I>&gt;&gt;<i> /usr/src/rt-firewire/build/drivers/ohci/rt_ohci1394.c:3533: warning:
+</I>&gt;&gt;<i> label &#226;OHCI_ISO_MULTICHANNEL_RECEIVE&#226; defined but not used
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>     
+</I>&gt;<i> I also got these warnings, due to some legacy code from Linux driver,
+</I>&gt;<i> so far considered not harmful.
+</I>&gt;<i>
+</I>&gt;<i>   
+</I>&gt;&gt;<i> One restriction for now: MODULE_PARM got dropped on 2.6.17, so 2.6.16 is
+</I>&gt;&gt;<i> the limit for rt-firewire ATM.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Yuchen, there are also changes in the way module symbols are handled in
+</I>&gt;&gt;<i> 2.6.17, check RTnet rev. #995. Definitely not urging though.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>     
+</I>&gt;<i> Thanks for informing this. I am still using 2.6.14, so not yet
+</I>&gt;<i> confronted with this problem. Will look into it in the future when
+</I>&gt;<i> this limitation starts bothering us more:)
+</I>&gt;<i>
+</I>&gt;<i> Yuchen
+</I>&gt;<i>   
+</I>
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000051.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios	compiles over Xenomai 2.1
+</A></li>
+	<LI>Next message: <A HREF="000053.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

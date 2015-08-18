@@ -1,0 +1,98 @@
+From writefaruq at gmail.com  Wed Nov 30 14:23:07 2005
+From: writefaruq at gmail.com (Md. Omar Faruque Sarker)
+Date: Wed, 30 Nov 2005 22:23:07 +0900
+Subject: [Rtfirewire-devel] RT-FW User Space App: have a look to satisfy a generic user's wish!
+Message-ID: <fc9dd8650511300523u5aa36coe1176965b49f3308@mail.gmail.com>
+
+Dear Yuchen,
+
+Thanks a lot for your warm reply. I'm very glad to join with rt-firewire team.
+we hope to make the rt firewire user friendly and useful soon.
+
+[ CAUTION: please don't be hurry to reply or even read completely to
+this mail now! coz' its' a very long story  :) ]
+
+Well, i assume u have some time to read this mail, so let's have a
+look to address a generic user Mr. X's wish to talk with the firewire
+card C's 1st port's resident Mr. R (An OHCI compliant ieee1394 generic
+node ).
+
+Case-1: PHY/Async Quadlet Read
+--------------------------------------------------
+User X :  Hey Mr. R, Can you give me your NodeNumber ( first 6 bit
+from your OHCI NodeID Register located at Offset E8h) ?
+Node R: I got your request .please wait
+Node R: Here's the  quadlet, please check it.
+User X: Ok, Thanks.
+
+Case-2: PHY/Async Write
+------------------------------------
+User X: Hey R, can you write this busNumber to your busNumber Register
+(6-15 bit of NodeID Register) ?
+Node R: I got your request .please wait
+Node R: I complete your request, here's what i already wrote.
+User X: Ok, Thanks.
+
+Both cases are more or less similar (pls fix me if i am wrong). So as
+the rt-firewire developer how we can staisfy the demands ?
+
+As per my imagination the path of request/response flow is like this:
+
+User  X
+1----> rt-fw-client (User Space app)
+2----> rt-fw-server (process) or (rt_raw1394 and bis module using
+/dev/rt-firewire interfacing with rtdm)
+3---> rtdm ( upon posix/native skin of xeno_nucleus with xeno_hal)
+4----> rt_ohci1394 and rt_ieee1394 (using xenomai rtos api modules
+rtpc, rt_serv, rtpkbuff )
+5----> (hardware) ieee1394 Card C's 1st Port :
+Node R.
+
+For now, I'm very much curious how you sent async/iso packets to
+client and measure the time statistics  (as mentioned in your MSc
+Report) from user space ?
+
+1. with the current codes, is there any way to write some user space
+app to talk with /dev/rt-firewire for the above purpose? As I checked
+the source files i got a few ioctl() calling options are available,
+like IOC_RTFW_* PING, ISO_START, ISO_SHUTDOWN and some other BUS
+MANAGEMENT options(ohci_devctl) in rt_ohci1394 and some other old
+ioctl() options in ieee1394-ioctl.h file. Specifically how can I write
+a user space app to send/recv some requests to/from the running
+rt-firewire driver?
+
+2. Could you please suggest some good references for learning about
+how to write code of user space app to interact with  running kernel
+device driver ? I've already studied LDD, LKM Prog. Guide and
+Beginning Linux Prog.(from wrox) etc. But I'm in a complete dark
+position to interact with the rt-fw drivers except rtping / hostconfig
+(though i managed to read the 2kB OHCI registers by writing user space
+code using mmap call)
+
+3. BTW, is the  bis module support to add a new node ? if I attach a
+ieee1394 Camera how can I add this node and do a rtping to it?
+
+I hope to go through the Xenomai and RTDM soon and then i would like
+to uncover Linux raw1394,the existing black box, to get something like
+that in rt_* domain.
+what you think?
+
+Again I would like to give thanks for reading all my boring talks.
+
+
+Wishing you happiness 4 all the time
+
+Best Regards,
+
+Faruque
+
+
+--
+M. Omar Faruque Sarker
+MS Student,
+HCI and Robotics
+University of Science and Technology (UST)
+Seoul, Korea (South)
+Ph: +82-02-958-5759 (Lab) +82-02-958-6532(R)
+
+

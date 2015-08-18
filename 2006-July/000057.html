@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C44C63C69.8030205%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000056.html">
+   <LINK REL="Next"  HREF="000059.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [PATCH] kernel 2.6.17 support</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C44C63C69.8030205%40web.de%3E"
+       TITLE="[Rtfirewire-devel] [PATCH] kernel 2.6.17 support">jan.kiszka at web.de
+       </A><BR>
+    <I>Tue Jul 25 17:44:41 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000056.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios	compiles over Xenomai 2.1
+</A></li>
+        <LI>Next message: <A HREF="000059.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This patch enables 2.6.17 support (also 2.6.16 when compiling with gcc-4.1).
+
+Jan
+
+PS: A simple svn diff revealed a lot of whitespace changes after touching the files.
+I guess some cleanup wrt trailing spaces or line feeds is required.
+
+
+ drivers/ohci/rt_ohci1394.c |    6 +++---
+ rtpkbuff/rtpkbuff.c        |    2 +-
+ stack/csr.c                |    2 +-
+ stack/hosts.c              |    2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+Index: rtpkbuff/rtpkbuff.c
+===================================================================
+--- rtpkbuff/rtpkbuff.c	(revision 97)
++++ rtpkbuff/rtpkbuff.c	(working copy)
+@@ -39,7 +39,7 @@
+ 	rtdm_printk(&quot;RTPKB:%s[%d]: &quot; fmt &quot;\n&quot;,  __FUNCTION__, __LINE__, ## args)
+ 
+ static unsigned int rtpkb_cache_size = DEFAULT_RTPKB_CACHE_SIZE;
+-MODULE_PARM(rtpkb_cache_size, &quot;i&quot;);
++module_param(rtpkb_cache_size, uint, 0444);
+ MODULE_PARM_DESC(rtpkb_cache_size, &quot;Number of cached rtpkbs for creating pools in real-time&quot;);
+ 
+ 
+Index: stack/hosts.c
+===================================================================
+--- stack/hosts.c	(revision 97)
++++ stack/hosts.c	(working copy)
+@@ -59,7 +59,7 @@ DECLARE_MUTEX(hpsb_hosts_lock);
+ 
+ /*! module parameter,Number of additional global realtime packet buffers per network adapter*/
+ unsigned int device_rtpkbs = DEFAULT_DEVICE_RTPKBS;
+-MODULE_PARM(device_rtpkbs, &quot;i&quot;);
++module_param(device_rtpkbs, uint, 0444);
+ MODULE_PARM_DESC(device_rtpkbs, &quot;Number of additional global realtime packet &quot;
+                  &quot;buffers per network adapter&quot;);
+ 
+Index: stack/csr.c
+===================================================================
+--- stack/csr.c	(revision 97)
++++ stack/csr.c	(working copy)
+@@ -46,7 +46,7 @@
+ /* Module Parameters */
+ /* this module parameter can be used to disable mapping of the FCP registers */
+ static int fcp = 1;
+-MODULE_PARM(fcp,&quot;i&quot;);
++module_param(fcp, int, 0444);
+ MODULE_PARM_DESC(fcp, &quot;Map FCP registers (default = 1, disable = 0).&quot;);
+ 
+ static struct csr1212_keyval *node_cap = NULL;
+Index: drivers/ohci/rt_ohci1394.c
+===================================================================
+--- drivers/ohci/rt_ohci1394.c	(revision 97)
++++ drivers/ohci/rt_ohci1394.c	(working copy)
+@@ -151,13 +151,13 @@ static char version[] __devinitdata =
+ 
+ /* Module Parameters */
+ static int cards = 2;
+-MODULE_PARM(cards, &quot;i&quot;);
++module_param(cards, int, 0444);
+ MODULE_PARM_DESC(cards, &quot;Number of cards to be steered by this driver (default  = 2).&quot;);
+ static int disable_irm = 0;
+-MODULE_PARM(disable_irm, &quot;i&quot;);
++module_param(disable_irm, int, 0444);
+ MODULE_PARM_DESC(disable_irm, &quot;Disable Isochronous Resource Manager Contending on local adapter (default = NO).&quot;);
+ static int phys_dma = 1;
+-MODULE_PARM(phys_dma, &quot;i&quot;);
++module_param(phys_dma, int, 0444);
+ MODULE_PARM_DESC(phys_dma, &quot;Enable dma for physical packets (default = 1).&quot;);
+ 
+ static unsigned int cards_found;
+
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/c49ada1e/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/c49ada1e/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000056.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios	compiles over Xenomai 2.1
+</A></li>
+	<LI>Next message: <A HREF="000059.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

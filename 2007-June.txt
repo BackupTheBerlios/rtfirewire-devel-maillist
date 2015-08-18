@@ -1,0 +1,362 @@
+From yuchen623 at gmail.com  Fri Jun  1 00:30:37 2007
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Fri, 1 Jun 2007 00:30:37 +0200
+Subject: [Rtfirewire-devel] problems with configuring rtfirewire
+In-Reply-To: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>
+References: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>
+Message-ID: <95210d7e0705311530u7ad69cb6s93efc98b94529c7d@mail.gmail.com>
+
+Hi,
+>
+> I'm a student of the university  of Twente. I am working on a short assignment which partly consists of porting the rtfirewire software to RTAI using RTDM.
+>
+> I have a test setup consisting of two pc's with linux kernel 2.6.15.7
+> , RTAI 3.4 and Xenomai 2.1.3
+>
+> I followed the instructions in the documentation folder, but couldn't configure RTfirewire under Xenomai 2.1.3. The configuration stucks on the --config argument. I think this is caused by the fact that for this xenomai version, no configuration menu is present. I tryed to change the auto configuration file, but I cannot open it. The next error occured: cannot open config/m4/libtool.m4 there is no such file or directory. I also couldn't configure RTAI 3.4, but after some modifications to the normal config file, I managed to get it working. For Xenomai however, this is a lot of work. How can I get this working? (otherwise I will use xenomai 2.0)
+>
+I just tried again the trunk version on sourceforge, it compiles with
+xenomai-2.1 and Linux 2.6.14. Also rtping works well. Be aware that
+you need to specify the path to your real-time linux with
+--with-linux, and the path to your xenomai's configure tool with
+--with-rtext-config. See the README I just checked in -- in the top
+folder not the Documentation folder.
+
+> Another question is, how does primitives.h know which RTAI or Xenomai version is defined? I couldn't find it.
+>
+after running the configure tool, the CONFIG_RTAI_30 or others will be
+defined. rtos_primitive.h depends on these macros.
+
+> FOr my assignment I also want to perform some latency tests to see if there is any latency difference between RTAI and Xenomai. I read in another post, that another tool than rtping is used to test the latency for isochronous transaction. I would like to use that tool in order to have a clear reference wit the test results shown in the Msc report.
+
+I didnt make a specific tool for the isochronous testing -- maybe i
+expressed my wish to make such a tool. I did some workaround to make
+isochronous transaction happen and measured the data arrival interval.
+
+Kr
+Yuchen
+
+>
+> Thanks in advance..
+>
+> Greetings,
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From h.e.deboer at student.utwente.nl  Mon Jun  4 17:06:38 2007
+From: h.e.deboer at student.utwente.nl (h.e.deboer at student.utwente.nl)
+Date: Mon, 4 Jun 2007 17:06:38 +0200
+Subject: [Rtfirewire-devel] problems with configuring rtfirewire
+References: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>
+	<465DB02F.3030608@web.de>
+Message-ID: <167787201278ED4E982BA967BF86C13E107FB0@EX03.service.utwente.nl>
+
+I followed youre instructions about the configuring, but now I get stuck at the RTDM skin. (see console output below)
+
+checking for RT-extension... /usr/src/linux-2.6.15.7-Xenomai (kernel 2.6.15.7-xenomai2.1.3 + Xenomai)
+checking for Xenomai installation dir... /usr/xenomai
+checking for Xenomai DESTDIR... none
+checking for Xenomai version... 2.1.3
+checking for RTDM skin...   configure: error: *** Please enable RTDM skin
+
+For xenomai 2.1 there is no menu config anymore, it is done automatically. 
+In the compiled xenomai directory however, RTDM is present in the include directory. 
+What am I doing wrong?
+
+Greetings,
+
+Harm
+
+-----Original Message-----
+From: Jan Kiszka [mailto:jan.kiszka at web.de]
+Sent: Wed 5/30/2007 7:11 PM
+To: Boer, H.E. de (Harmen, Student EE)
+Cc: rtfirewire-devel at lists.berlios.de
+Subject: Re: [Rtfirewire-devel] problems with configuring rtfirewire
+ 
+Hi,
+
+h.e.deboer at student.utwente.nl wrote:
+> Hi all,
+> 
+> I'm a student of the university  of Twente. I am working on a short
+> assignment which partly consists of porting the rtfirewire software
+> to RTAI using RTDM.
+> 
+> I have a test setup consisting of two pc's with linux kernel 2.6.15.7
+>  , RTAI 3.4 and Xenomai 2.1.3
+> 
+> I followed the instructions in the documentation folder, but couldn't
+> configure RTfirewire under Xenomai 2.1.3. The configuration stucks on
+> the --config argument. I think this is caused by the fact that for
+> this xenomai version, no configuration menu is present. I tryed to
+> change the auto configuration file, but I cannot open it. The next
+> error occured: cannot open config/m4/libtool.m4 there is no such file
+> or directory. I also couldn't configure RTAI 3.4, but after some
+> modifications to the normal config file, I managed to get it working.
+> For Xenomai however, this is a lot of work. How can I get this
+> working? (otherwise I will use xenomai 2.0)
+
+No need for this. RTFirewire is configured just like RTnet, except that
+it just comes with plain configure. You need to pass
+--with-linux=<path-to-xenomai-kernel>
+--with-rtext-config=<path-to-xeno-config> for modern Xenomai versions.
+
+> 
+> Another question is, how does primitives.h know which RTAI or Xenomai
+> version is defined? I couldn't find it.
+
+Please, you or Yuchen: get rid of most of these primitives! We have RTDM
+as clear abstraction (minus RTAI legacy stuff like rtos_timer_start --
+but those are only _2_ functions). Use RTDM_API_VER to detect changes in
+that API. Additionally, you can check for CONFIG_XENO_21x or
+CONFIG_RTAI_3x to detect in what world you live. See RTnet
+(stack/include/rtnet_sys*.h) for how tiny this abstraction can look like
+today.
+
+> 
+> FOr my assignment I also want to perform some latency tests to see if
+> there is any latency difference between RTAI and Xenomai. I read in
+
+Please pick recent versions for this! Don't benchmark Xenomai 2.0 e.g.,
+that's pointless for new projects. Also use a recent kernel, not 2.6.15.
+The same applies to RTAI as well (older versions than 3.5 are broken
+/wrt RTDM or unsupported anyway).
+
+> another post, that another tool than rtping is used to test the
+> latency for isochronous transaction. I would like to use that tool in
+> order to have a clear reference wit the test results shown in the Msc
+> report.
+> 
+
+Can't help with the tool, but maybe with something else:
+
+I've hacked (it is _really_ a quick-hack!) support for building
+rtfirewire trunk against Xenomai trunk (RTDM rev. 6) and 2.6.20, see
+attachment (it's huge and packed due to generated automake changes).
+There were quite a few API violation popping up (namely around
+rtdm_lock_t vs. spinlock_t), and there are still warnings. So, be warned
+;), it may break.
+
+For comprehensive testing, I can recommend latest I-pipe patches
+(2.6.20-i386-1.8-04) with full debug options (CONFIG_IPIPE_DEBUG_CONTEXT
++ CONFIG_XENO_OPT_DEBUG_RTDM). This can help reveal broken pieces in the
+stack due to refactoring (or even older problems).
+
+Jan
+
+
+
+From jan.kiszka at web.de  Mon Jun  4 17:20:08 2007
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Mon, 04 Jun 2007 17:20:08 +0200
+Subject: [Rtfirewire-devel] problems with configuring rtfirewire
+In-Reply-To: <167787201278ED4E982BA967BF86C13E107FB0@EX03.service.utwente.nl>
+References: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>	<465DB02F.3030608@web.de>
+	<167787201278ED4E982BA967BF86C13E107FB0@EX03.service.utwente.nl>
+Message-ID: <46642DA8.1040906@web.de>
+
+h.e.deboer at student.utwente.nl wrote:
+> I followed youre instructions about the configuring, but now I get stuck at the RTDM skin. (see console output below)
+> 
+> checking for RT-extension... /usr/src/linux-2.6.15.7-Xenomai (kernel 2.6.15.7-xenomai2.1.3 + Xenomai)
+> checking for Xenomai installation dir... /usr/xenomai
+> checking for Xenomai DESTDIR... none
+> checking for Xenomai version... 2.1.3
+> checking for RTDM skin...   configure: error: *** Please enable RTDM skin
+> 
+> For xenomai 2.1 there is no menu config anymore, it is done automatically. 
+
+The kernel config moved where it belongs: into the kernel. Check the
+"Real-time sub-system" menu when configuring your kernel.
+
+> In the compiled xenomai directory however, RTDM is present in the include directory. 
+> What am I doing wrong?
+
+More details might be found in the config.log.
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070604/479b14e9/attachment.pgp>
+
+From h.e.deboer at student.utwente.nl  Tue Jun  5 15:27:43 2007
+From: h.e.deboer at student.utwente.nl (h.e.deboer at student.utwente.nl)
+Date: Tue, 5 Jun 2007 15:27:43 +0200
+Subject: [Rtfirewire-devel] problems with configuring rtfirewire
+References: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>	<465DB02F.3030608@web.de>
+	<167787201278ED4E982BA967BF86C13E107FB0@EX03.service.utwente.nl>
+	<46642DA8.1040906@web.de>
+Message-ID: <167787201278ED4E982BA967BF86C13E107FB3@EX03.service.utwente.nl>
+
+My patched xenomai kernel has the next selections for the "Real-time sub-system" menu:
+     <*> Native API                                                                                    
+  ? ?                                     [*]   Message pipes                                                                                           ? ?
+  ? ?                                     (4096)  Bytes in buffer space                                                                                 ? ?
+  ? ?                                     [*]   Counting semaphores                                                                                     ? ?
+  ? ?                                     [*]   Event flags                                                                                             ? ?
+  ? ?                                     ---   Mutexes                                                                                                 ? ?
+  ? ?                                     [*]   Condition variables                                                                                     ? ?
+  ? ?                                     [*]   Message queues                                                                                          ? ?
+  ? ?                                     [*]   Memory heaps                                                                                            ? ?
+  ? ?                                     [*]   Alarms                                                                                                  ? ?
+  ? ?                                     [*]   Message passing support                                                                                 ? ?
+  ? ?                                     [ ]   Interrupts                                                                                              ? ?
+  ? ?                                     <*> POSIX API                                                                                                 ? ?
+  ? ?                                     < > pSOS+ emulator                                                                                            ? ?
+  ? ?                                     < > uITRON API                                                                                                ? ?
+  ? ?                                     < > VRTX emulator                                                                                             ? ?
+  ? ?                                     < > VxWorks emulator                                                                                          ? ?
+  ? ?                                     --- RTAI emulator unavailable, disable native API or build it as module                                       ? ?
+  ? ?                                     <*> Real-Time Driver Model                                                                                    ? ?
+  ? ?                                     < > User-space VM support    
+
+As can be seen, is RTDM included in the kernel. 
+
+The part of the config.log (of the kernel cofiguration) where the RTDM option is shown:
+#
+# RTAI emulator unavailable, disable native API or build it as module
+#
+CONFIG_XENO_SKIN_RTDM=y
+# CONFIG_XENO_SKIN_UVM is not set
+
+Maybe I have to insert RTDM as a module to get it working..
+
+-----Original Message-----
+From: Jan Kiszka [mailto:jan.kiszka at web.de]
+Sent: Mon 6/4/2007 5:20 PM
+To: Boer, H.E. de (Harmen, Student EE)
+Cc: rtfirewire-devel at lists.berlios.de
+Subject: Re: [Rtfirewire-devel] problems with configuring rtfirewire
+ 
+h.e.deboer at student.utwente.nl wrote:
+> I followed youre instructions about the configuring, but now I get stuck at the RTDM skin. (see console output below)
+> 
+> checking for RT-extension... /usr/src/linux-2.6.15.7-Xenomai (kernel 2.6.15.7-xenomai2.1.3 + Xenomai)
+> checking for Xenomai installation dir... /usr/xenomai
+> checking for Xenomai DESTDIR... none
+> checking for Xenomai version... 2.1.3
+> checking for RTDM skin...   configure: error: *** Please enable RTDM skin
+> 
+> For xenomai 2.1 there is no menu config anymore, it is done automatically. 
+
+The kernel config moved where it belongs: into the kernel. Check the
+"Real-time sub-system" menu when configuring your kernel.
+
+> In the compiled xenomai directory however, RTDM is present in the include directory. 
+> What am I doing wrong?
+
+More details might be found in the config.log.
+
+Jan
+
+
+
+
+From jan.kiszka at web.de  Tue Jun  5 16:29:37 2007
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Tue, 05 Jun 2007 16:29:37 +0200
+Subject: [Rtfirewire-devel] problems with configuring rtfirewire
+In-Reply-To: <167787201278ED4E982BA967BF86C13E107FB3@EX03.service.utwente.nl>
+References: <167787201278ED4E982BA967BF86C13E107FAC@EX03.service.utwente.nl>	<465DB02F.3030608@web.de>
+	<167787201278ED4E982BA967BF86C13E107FB0@EX03.service.utwente.nl>
+	<46642DA8.1040906@web.de>
+	<167787201278ED4E982BA967BF86C13E107FB3@EX03.service.utwente.nl>
+Message-ID: <46657351.70804@web.de>
+
+h.e.deboer at student.utwente.nl wrote:
+> My patched xenomai kernel has the next selections for the "Real-time sub-system" menu:
+>      <*> Native API                                                                                    
+>   ? ?                                     [*]   Message pipes                                                                                           ? ?
+>   ? ?                                     (4096)  Bytes in buffer space                                                                                 ? ?
+>   ? ?                                     [*]   Counting semaphores                                                                                     ? ?
+>   ? ?                                     [*]   Event flags                                                                                             ? ?
+>   ? ?                                     ---   Mutexes                                                                                                 ? ?
+>   ? ?                                     [*]   Condition variables                                                                                     ? ?
+>   ? ?                                     [*]   Message queues                                                                                          ? ?
+>   ? ?                                     [*]   Memory heaps                                                                                            ? ?
+>   ? ?                                     [*]   Alarms                                                                                                  ? ?
+>   ? ?                                     [*]   Message passing support                                                                                 ? ?
+>   ? ?                                     [ ]   Interrupts                                                                                              ? ?
+>   ? ?                                     <*> POSIX API                                                                                                 ? ?
+>   ? ?                                     < > pSOS+ emulator                                                                                            ? ?
+>   ? ?                                     < > uITRON API                                                                                                ? ?
+>   ? ?                                     < > VRTX emulator                                                                                             ? ?
+>   ? ?                                     < > VxWorks emulator                                                                                          ? ?
+>   ? ?                                     --- RTAI emulator unavailable, disable native API or build it as module                                       ? ?
+>   ? ?                                     <*> Real-Time Driver Model                                                                                    ? ?
+>   ? ?                                     < > User-space VM support    
+> 
+> As can be seen, is RTDM included in the kernel. 
+> 
+> The part of the config.log (of the kernel cofiguration) where the RTDM option is shown:
+
+Sorry, I was referring to the config.log you'll find in your rt-firewire
+build directory. Mine locks like this in the interesting section:
+
+configure:18839: checking for RT-extension
+configure:18921: result: [...]/linux-2.6.20 (kernel 2.6.20.12 + Xenomai)
+configure:19077: checking for Xenomai installation dir
+configure:19080: result: [...]/xenomai/usr
+configure:19086: checking for Xenomai DESTDIR
+configure:19103: result: none
+configure:19107: checking for Xenomai version
+configure:19119: result: 2.4-devel
+configure:19201: checking for RTDM skin
+configure:19204: result: m
+configure:19341: checking for RT-extension target arch
+configure:19343: result: i386
+configure:19346: checking for RT-FireWire target arch
+configure:19348: result: i386
+configure:19384: checking for CROSS_COMPILE
+configure:19395: result: none
+configure:19451: checking for kernel module extension
+configure:19453: result: .ko
+configure:19483: checking for rtdm/rtdm.h
+configure:19507: make -C [...]/linux-2.6.20 ARCH=i386 CROSS_COMPILE= V=1
+M=[...]/rtfirewire/build SUBDIRS=[...]/rtfirewire/build modules > /dev/null
+configure:19513: $? = 0
+configure:19524: result: yes
+configure:19483: checking for rtdm/rtdm_driver.h
+configure:19507: make -C [...]/linux-2.6.20 ARCH=i386 CROSS_COMPILE= V=1
+M=[...]/rtfirewire/build SUBDIRS=[...]/rtfirewire/build modules > /dev/null
+configure:19513: $? = 0
+configure:19524: result: yes
+
+
+> #
+> # RTAI emulator unavailable, disable native API or build it as module
+> #
+> CONFIG_XENO_SKIN_RTDM=y
+> # CONFIG_XENO_SKIN_UVM is not set
+> 
+> Maybe I have to insert RTDM as a module to get it working..
+
+That won't help, rt-firewire's configure already tests for both:
+
+        # check for RTDM skin, needed by rt-firewire
+        AC_MSG_CHECKING([for RTDM skin])
+        case "${CONFIG_XENO_SKIN_RTDM}" in
+            y | m) AC_MSG_RESULT([${CONFIG_XENO_SKIN_RTDM}]) ;;
+            *) AC_MSG_ERROR([*** Please enable RTDM skin]) ;;
+        esac
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20070605/55d0d4bd/attachment.pgp>
+

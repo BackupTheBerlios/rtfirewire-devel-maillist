@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Common rt-buffers (was: About CSR Module and User Space Access)
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Common%20rt-buffers%20%28was%3A%20About%20CSR%20Module%20and%20User%20Space%20Access%29&In-Reply-To=%3C439604A1.60507%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000020.html">
+   <LINK REL="Next"  HREF="000023.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Common rt-buffers (was: About CSR Module and User Space Access)</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Common%20rt-buffers%20%28was%3A%20About%20CSR%20Module%20and%20User%20Space%20Access%29&In-Reply-To=%3C439604A1.60507%40web.de%3E"
+       TITLE="[Rtfirewire-devel] Common rt-buffers (was: About CSR Module and User Space Access)">jan.kiszka at web.de
+       </A><BR>
+    <I>Tue Dec  6 22:37:37 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000020.html">[Rtfirewire-devel] Re: About CSR Module and User Space Access
+</A></li>
+        <LI>Next message: <A HREF="000023.html">[Rtfirewire-devel] Re: Common rt-buffers (was: About CSR Module and User Space Access)
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#22">[ date ]</a>
+              <a href="thread.html#22">[ thread ]</a>
+              <a href="subject.html#22">[ subject ]</a>
+              <a href="author.html#22">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Yuchen Zhang wrote:
+&gt;<i> Jan,
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;&gt;<i>BTW: Yuchen, we still need to think about that common rtskb format to
+</I>&gt;&gt;<i>avoid the additonal copy step in eth1394...
+</I>&gt;&gt;<i>
+</I>&gt;<i> 
+</I>&gt;<i> The solution currently in my mind is to also use rtpkbuff module in
+</I>&gt;<i> RTnet, which will be exactly the same for RTnet and RT-FW. The
+</I>&gt;<i> rtpkbuff modules takes care of the general memory management, so all
+</I>&gt;<i> the current rtskb functions will be using the primitives from rtpkbuff
+</I>&gt;<i> module, like the hpsb_packet in RT-FW. That way, RTnet can still keep
+</I>&gt;<i> the same naming for all rtskb functions. See below how currently rtpkb
+</I>&gt;<i> is defined:
+</I>&gt;<i> 
+</I>&gt;<i> struct rtpkb {
+</I>&gt;<i>        /*meta stuff for general memory management*/
+</I>&gt;<i>          ......
+</I>&gt;<i> 
+</I>&gt;<i>         char		specific_stuff[256]; /*rtskb specific stuff goes here*/
+</I>&gt;<i> };
+</I>&gt;<i> 
+</I>&gt;<i> Would like to know your opinion:)
+</I>
+I checked the situation in more details again. This is how I see at ATM:
+
+ o rt-buffers as RT-FireWire and RTnet use consist of a single memory
+   fragment, starting with a buffer head, followed by a payload buffer.
+   RTnet requires almost 1700 bytes per buffer, RT-FireWire more than
+   4k. But RTnet may require more in case we ever start using jumbo
+   frames for gigabit Ethernet (i.e. &gt;8k).
+
+ o In order to make buffer fully exchangeable between RT-FireWire and
+   RTnet, both subsystems must agree on
+
+    1. a common rt-buffer size
+    2. a minimum buffer head size to let every user put some private
+       data into the header as well
+    3. the same kernel slab pool to take additional buffers from
+
+   The third item actually enforces the first one - but may
+   unfortunately do this in the wrong direction, i.e. provide too small
+   buffers for one instance.
+   Requirement 3 could be avoided by using kmalloc instead of
+   kmem_cache_alloc for each individual buffer, but this may easily
+   increase the overhead due to not optimally sized memory fragments.
+
+ o As we should not simply set the worst-case size as default for all,
+   some flexibility at least during compile time is required regarding
+   the size parameters (1. and 2.). More precisely, that subsystem which
+   is closer to the physical media dictates the rt-packet size.
+
+
+Now let's think about some approaches to fulfill these requirements in a
+generic, maybe also extensible way:
+
+ o The rt-buffer pooling mechanism is a generic feature probably suited
+   for more scenarios than RTnet and RT-FireWire. I'm currently playing
+   with the idea to move the functionality into the RTDM layer. The core
+   features would be:
+
+    - Providing non-real-time allocation for rt-buffers from -what I
+      would call it- parent pools. Buffers from parent pools can be
+      organised in local real-time pools by the drivers and, in case
+      they come from the same parent pool, freely exchanged.
+
+    - Parent pools need to be identified by a unique name. The first
+      user which accesses a parent pool under a yet unregistered name
+      will create that pool with rt-buffer size that it provides with
+      the request.
+
+    - Any additional user of an existing parent pool specifying a
+      different rt-buffer size will receive an error. Thus we make sure
+      that all users cleanly agree on the same size beforehand. By
+      &quot;size&quot;, I also mean the minimum header size, i.e. actually two
+      parameters.
+
+    - Moreover, one can discuss which features from RT-FireWire's rtpk
+      and RTnet's rtskb implementation should make it into RTDM. I
+      haven't thought about this yet.
+
+ o Applying this new RTDM feature to the RTnet/RT-FireWire situation, we
+   would first have to establish some mechanism to agree on rt-buffer
+   sizes. As RTnet with its rt_eth1394 driver is stacked on top of
+   RT-FireWire and its buffers are (currently) smaller, it will simply
+   grab RT-FireWire's parameters from some exported header during
+   compile time. Then RTnet can call RTDM to either join or create the
+   fitting parent pool.
+
+ o Due to the significant overhead of using 4k buffers for standard
+   Ethernet and the possibility that RTnet may support jumbo frames in
+   the future, a scheme for using different parent pools, thus rt-buffer
+   sizes for different network devices has to be established in RTnet
+   later on. But this requires some refactoring and API extensions and
+   is nothing for a quick shot.
+
+So far my ideas. Comments are welcome, questions as well. I hope the
+actual implementation is not half as long as this posting. ;)
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 254 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051206/1384642c/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051206/1384642c/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000020.html">[Rtfirewire-devel] Re: About CSR Module and User Space Access
+</A></li>
+	<LI>Next message: <A HREF="000023.html">[Rtfirewire-devel] Re: Common rt-buffers (was: About CSR Module and User Space Access)
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#22">[ date ]</a>
+              <a href="thread.html#22">[ thread ]</a>
+              <a href="subject.html#22">[ subject ]</a>
+              <a href="author.html#22">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

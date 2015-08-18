@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW-0.1%20RTDM%20Unknown%20Symbol&In-Reply-To=%3C43903EB3.4070103%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000010.html">
+   <LINK REL="Next"  HREF="000012.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW-0.1%20RTDM%20Unknown%20Symbol&In-Reply-To=%3C43903EB3.4070103%40web.de%3E"
+       TITLE="[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol">jan.kiszka at web.de
+       </A><BR>
+    <I>Fri Dec  2 13:31:47 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000010.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+        <LI>Next message: <A HREF="000012.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Md. Omar Faruque Sarker wrote:
+&gt;<i> Hi Jan,
+</I>&gt;<i> 
+</I>&gt;<i> Best Greetings!
+</I>&gt;<i> Nice to write you 4 the first time.
+</I>&gt;<i> 
+</I>&gt;<i> Referring to my RT-FW-0.1 installation process,  If I try to insert
+</I>&gt;<i> rt_serv.ko without loading xeno_native.ko it misses &quot;rt_timer_start&quot;
+</I>&gt;<i> symbol.
+</I>
+I see. We have a similar issue in RTnet, but I worked around this in the
+new, lean RTOS abstraction layer of RTnet:
+
+<A HREF="http://www.rts.uni-hannover.de/rtnet/lxr/source/stack/include/rtnet_sys_xenomai.h">http://www.rts.uni-hannover.de/rtnet/lxr/source/stack/include/rtnet_sys_xenomai.h</A>
+
+I hope that we can overcome this issue one day when we move the system
+timer control away from the user API to some central control point in
+Xenomai (module parameter of xeno_native or common sysfs entry for all
+skins).
+
+&gt;<i> 
+</I>&gt;<i> I also compiled the RTnet on the same PC but at first I failed to
+</I>&gt;<i> compile rt_eth1394 because of rt-fw header file missing. then I copied
+</I>&gt;<i> all rt-fw include/*.h into RTnet's drivers/eth1394/ folder. then it
+</I>&gt;<i> compiled without error. Is there anything unlinked?
+</I>
+Which RTnet version? RTnet should detect the right RT-FireWire path
+during configure and fail there when anything is broken - not later.
+
+&gt;<i> 
+</I>&gt;<i> Could you please add some generic hints about the  TDMA settings in
+</I>&gt;<i> rtnet.conf. In most cases I expect PnP settings or some easy
+</I>&gt;<i> instruction from the developer. coz at first setup I feel to be a lazy
+</I>&gt;<i> user to read all your readme doc :)
+</I>
+Just read item 3 of &quot;How to test it?&quot; in the README:
+
+3. Check &lt;PREFIX&gt;/etc/rtnet.conf and adapt at least the following
+   parameters: RT_DRIVER, IPADDR, TDMA_MODE, TDMA_SLAVES.
+
+Comments are in the rtnet.conf.
+
+&gt;<i> 
+</I>&gt;<i> If I have two linux box (one RT and another NRT)  connected directly
+</I>&gt;<i> (NIC 2 NIC)then what  should be my typical TDMA settings? Hopefully
+</I>&gt;<i> after a big test I may be able to report the rtnet's result also.
+</I>
+Use the &quot;simple&quot; TDMA mode, i.e. the one pre-configured.
+
+&gt;<i> 
+</I>&gt;<i> Now have a brief about my study (as I saw some &quot;??&quot; in your reply)
+</I>&gt;<i> 
+</I>&gt;<i> Well, I've just enrolled myself in this MS course last September'05. 
+</I>&gt;<i> My BSc was in Mechanical Engineering. So right now, no high-level
+</I>&gt;<i> algorithms at all! You're exactly right about my plan to use RT-FW in
+</I>&gt;<i> Robotics Project.
+</I>
+...for real-time vision or real-time control/data communication?
+
+&gt;<i> 
+</I>&gt;<i> Currently I'm associated with Intelligent Robotics Research Center at
+</I>&gt;<i> Korea Institute of Science and Technology(KIST, not KAIST). Sounds
+</I>&gt;<i> very amazing! Haha, I'm a foreign student (they call us &quot;Alien&quot;) and
+</I>&gt;<i> upto now a good observer!
+</I>&gt;<i> 
+</I>&gt;<i> Actually from my undergraduate I'm using Linux (Since Red Hat 6.x) and
+</I>&gt;<i> also did some job as Sys Admin. So I love the freedom and power of
+</I>&gt;<i> computing in Linux. And now trying to discover RT domain. It's already
+</I>&gt;<i> a lot I have told you, isn't it :)
+</I>&gt;<i> 
+</I>
+Greetings,
+Jan
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051202/f74f23bd/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051202/f74f23bd/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000010.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+	<LI>Next message: <A HREF="000012.html">[Rtfirewire-devel] RT-FW-0.1 RTDM Unknown Symbol
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

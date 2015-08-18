@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: Realtime camera over firewire
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-October/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20Realtime%20camera%20over%20firewire&In-Reply-To=%3C95210d7e0510311452x3a9e8a9bs831662c354015500%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: Realtime camera over firewire</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20Realtime%20camera%20over%20firewire&In-Reply-To=%3C95210d7e0510311452x3a9e8a9bs831662c354015500%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Re: Realtime camera over firewire">yuchen623 at gmail.com
+       </A><BR>
+    <I>Mon Oct 31 23:52:37 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Rtfirewire-devel] Fwd: Realtime camera over firewire
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear Herman,
+
+nice to hear from you:)
+
+&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> I've read your paper for the Realtime Linux Workshop later this week, but
+</I>&gt;<i> from it, it isn't clear to me how one would use a firewire camera in
+</I>&gt;<i> realtime mode. Is this possible, and how? Does one need to adapt the linux
+</I>&gt;<i> firewire driver or not? How can one find out whether one's firewire camera
+</I>&gt;<i> is realtime or not?
+</I>
+
+FireWire camera itself is just a node in the FireWire network. Normally,
+there is no software in the camera, which means from the physical layer to
+application layer (digital video signal coding and sending) everything is
+implemented in hardware. While on the other side, e.g. on Linux box with
+FireWire interface, a specific driver (e.g. dv1394, video1394) is used to
+dump the video data and decode it according to certain protocol. This driver
+needs to be adapted in order to do real-time video signal processing. As to
+the camera, I dont think we need to do anything in order to make it
+&quot;real-time&quot;, because, as I said, most of case it is just a piece of
+hardware.
+
+Actually, the adaption of Linux driver for FireWire camera is on the roadmap
+of RT-FireWire, but due to the lack of hardware, also the limited time in my
+MSc project, I havent started this task.
+
+&gt;<i> PS I lost the url to the realtime firewire mailinglist ... (Not the one on
+</I>&gt;<i> Berlios, because that contains no messages at all :-)
+</I>
+
+Indeed, the berlios mailing list is the only official mailing list of
+RT-FireWire. But sadly enough, it is still almost empty, due to the fact
+that RT-FireWire is still a start-up project, and I havent done any
+advertising in the community. But, I have forwarded your message to the
+mailing list, so from now on, all interesting discussions will/should be
+archived.
+
+Some words about myself:)
+I finished my MSc project in the end of august. Now, I am employed as a
+trainee in Technical University of Eindhoven, a 2-year program for Embedded
+System Design, so called post-MSc. Although I am still deeply interested to
+work on FireWire, I can only use my free time in the evening / weekends.
+Even that depends on the task load in my job. Like today, I could not find
+time earlier to reply you. Personally, I would be very happy if someone can
+take over part of the FireWire work, e.g. the branch on real-time video. In
+that case, I will try my best to deliver my current knowledge and offer
+other support. Also, to develop things like real-time video, it is better to
+have a complete setup (with some actuating device, instead of just a
+camera), which is however impossible to put in my private room.
+
+I am really interested to keep on the discussion about real-time video over
+FireWire:)
+
+Best regards,
+Yuchen
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051031/09633b00/attachment.html">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051031/09633b00/attachment.html</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Rtfirewire-devel] Fwd: Realtime camera over firewire
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

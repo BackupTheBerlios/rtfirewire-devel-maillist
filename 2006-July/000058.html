@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Test results and bugs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C44C63C70.3030807%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000073.html">
+   <LINK REL="Next"  HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Test results and bugs</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C44C63C70.3030807%40web.de%3E"
+       TITLE="[Rtfirewire-devel] Test results and bugs">jan.kiszka at web.de
+       </A><BR>
+    <I>Tue Jul 25 17:44:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000073.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+        <LI>Next message: <A HREF="000060.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+
+BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+ printing eip:
+c012eca8
+...
+EIP: [&lt;c012eca8&gt;] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+
+That's due to registering the OHCI IRQ with a NULL driver name (I called
+cat /proc/xenomai/irq).
+
+
+The second one comes after &quot;rtping -h fwhost0 -d 0 -s 500&quot; reported a failure and I
+tried to restart this command:
+
+/usr/src/rt-firewire/build/stack/ieee1394_core.c[abort_timedouts]: packet sent to node[65472] from fwhost0 timeouts!!!
+
+/usr/src/rt-firewire/build/stack/ieee1394_core.c[hpsb_free_packet]: packet to fwhost0 still refered!
+
+BUG: unable to handle kernel paging request at virtual address 6b6b6b6f
+ printing eip:
+c011ee08
+*pde = 00000000
+Oops: 0002 [#2]
+Modules linked in: bis1394 rtpc rt_ohci1394 rt_ieee1394 rt_serv rtpkbuff 8139too e100
+CPU:    0
+EIP:    0060:[&lt;c011ee08&gt;]    Not tainted VLI
+EFLAGS: 00010246   (2.6.17.6 #8) 
+EIP is at prepare_to_wait+0x2e/0x5f
+eax: 6b6b6b6b   ebx: f7063e98   ecx: 00000200   edx: f7063ea4
+esi: f75050a8   edi: 00000001   ebp: f7063e68   esp: f7063e5c
+ds: 007b   es: 007b   ss: 0068
+Process rtping (pid: 946, threadinfo=f7062000 task=f7c2b070)
+Stack: f7505090 f7063f04 f7063e8c f7063eb8 f88d434d f7063e94 0000007d 00000000 
+       00000000 00000000 00000000 00000000 0804a260 f7062000 f7063ea4 00000000 
+       f7c2b070 c011ec9b f7063ea4 f7063ea4 ffffffe7 c02c0100 f7063ed8 f7063f10 
+Call Trace:
+ &lt;c0102cc4&gt; show_stack_log_lvl+0x86/0x91  &lt;c0102e5c&gt; show_registers+0x149/0x1b6
+ &lt;c0103024&gt; die+0x15b/0x277  &lt;c010b1e9&gt; do_page_fault+0x4ab/0x59d
+ &lt;c010916c&gt; __ipipe_handle_exception+0x61/0x91  &lt;c0102784&gt; error_code+0x54/0x70
+ &lt;f88d434d&gt; rtfw_rtpc_dispatch_call+0x165/0x278 [rtpc]  &lt;f88d7113&gt; bis_ioctl+0x6c/0x101 [bis1394]
+ &lt;f88bfcb9&gt; ieee1394_ioctl+0x87/0xbc [rt_ieee1394]  &lt;c016bd46&gt; do_ioctl+0x4e/0x5f
+ &lt;c016bf59&gt; vfs_ioctl+0x202/0x21c  &lt;c016bfc0&gt; sys_ioctl+0x4d/0x69
+ &lt;c0275806&gt; syscall_call+0x7/0xb 
+Code: 57 56 53 e8 b7 a3 fe ff 83 22 fe 89 d3 89 cf 89 c6 e8 6f cc 00 00 8d 53 0c 83 f8 01 19 c9 81 e1 00 02 00 00 39 53 0c 75 0d 8b 06 &lt;89&gt; 50 04 89 43 0c 89 72 04 89 16 83 7b 04 00 74 0b b8 00 e0 ff 
+EIP: [&lt;c011ee08&gt;] prepare_to_wait+0x2e/0x5f SS:ESP 0068:f7063e5c
+
+
+That pattern 6b6b6b6b indicates some release bug (CONFIG_DEBUG_SLAB):
+/usr/src/linux/mm/slab.c:#define POISON_FREE    0x6b    /* for use-after-free poisoning */ 
+
+Jan
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/91d7f78b/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060725/91d7f78b/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000073.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+	<LI>Next message: <A HREF="000060.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

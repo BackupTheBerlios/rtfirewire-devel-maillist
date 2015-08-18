@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTnet%20svn%20%2B%20RT-Firewire%20svn%20%2B%20Xenomai%20%3E%202.0&In-Reply-To=%3C44F71CF2.1000000%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000076.html">
+   <LINK REL="Next"  HREF="000081.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTnet%20svn%20%2B%20RT-Firewire%20svn%20%2B%20Xenomai%20%3E%202.0&In-Reply-To=%3C44F71CF2.1000000%40web.de%3E"
+       TITLE="[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0">jan.kiszka at web.de
+       </A><BR>
+    <I>Thu Aug 31 19:31:30 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000076.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+        <LI>Next message: <A HREF="000081.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Yuchen Zhang wrote:
+&gt;<i> Hi,
+</I>&gt;<i> 
+</I>&gt;<i> when you configure RTnet, did you specify the location of your RTFW?
+</I>&gt;<i> Seems to me that the RTnet auto configurator cannot find RTFW, so just
+</I>&gt;<i> use the /usr/src/rtnet/drivers/... as the default path too seek all
+</I>&gt;<i> the header files.
+</I>&gt;<i> 
+</I>
+Let's pick this up again. When compiling latest SVN checkouts (*) I get
+this:
+
+...
+make[3]: Entering directory `/usr/src/LiRE/SRC/linux/linux-2.6.17.8'
+  CC [M]  /usr/src/rtnet/buildxeno/drivers/rt_8139too.o
+  CC [M]  /usr/src/rtnet/buildxeno/drivers/rt_eepro100.o
+  CC [M]  /usr/src/rtnet/buildxeno/drivers/rt_eth1394.o
+In file included from
+/usr/src/rt-firewire/bin/include/ieee1394_transactions.h:13,
+                 from /usr/src/rtnet/buildxeno/drivers/rt_eth1394.c:44:
+/usr/src/rt-firewire/bin/include/rtos_primitives.h:36: error:
+redefinition of typedef 'nanosecs_t'
+/usr/src/rtnet/stack/include/rtnet_sys.h:35: error: previous declaration
+of 'nanosecs_t' was here
+In file included from /usr/src/rtnet/buildxeno/drivers/rt_eth1394.c:44:
+/usr/src/rt-firewire/bin/include/ieee1394_transactions.h:19: error:
+expected specifier-qualifier-list before 'rtos_event_t'
+
+
+We somehow collide over our RTOS abstractions. Do we need the
+RT-Firewire side for the includes of rt_eth1394? What changed since
+things last worked?
+
+Jan
+
+
+(*) RT-firewire requires adoption of the new Xenomai revision, I use
+    &quot;2.[[1-9]]*&quot; in RTnet now (i.e. &gt;=2.1).
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060831/f02cdc69/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20060831/f02cdc69/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000076.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+	<LI>Next message: <A HREF="000081.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

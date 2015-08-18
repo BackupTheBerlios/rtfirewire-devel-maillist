@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] bis1394 problems
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20bis1394%20problems&In-Reply-To=%3C95210d7e0610161615u15b64902w2b4947799a39d435%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000084.html">
+   <LINK REL="Next"  HREF="000086.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] bis1394 problems</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20bis1394%20problems&In-Reply-To=%3C95210d7e0610161615u15b64902w2b4947799a39d435%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] bis1394 problems">yuchen623 at gmail.com
+       </A><BR>
+    <I>Tue Oct 17 01:15:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000084.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+        <LI>Next message: <A HREF="000086.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+sorry for the a bit late response.
+
+Which version of RTFW are you using? I just tried the latest version
+from <A HREF="https://svn.sourceforge.net/svnroot/rtfirewire/trunk">https://svn.sourceforge.net/svnroot/rtfirewire/trunk</A> with Xenomai
+2.2, and I can load bis1394 without any problem. But I got another
+problem that rtping is not working any more:(. I dont have much time
+thesedays to work on RTFW, but I think we'd better to make RTFW more
+diagnosable, in order to more efficiently find a clue when things go
+weird. Kgdb would be an option here. Another is to just add more
+configurable message print-out in critical paths, such as
+hpsb_register_highlevel.
+
+Yuchen
+
+On 10/13/06, Bernhard Zeller &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">bzeller at lpr.e-technik.tu-muenchen.de</A>&gt; wrote:
+&gt;<i> Hi all!
+</I>&gt;<i>
+</I>&gt;<i> I have successfully installed rt-firewire over Xenomai 2.2. I started playing
+</I>&gt;<i> around a bit, but when I try to load the module bis1394, my system freezes.
+</I>&gt;<i> The critical call seems to be &quot;hpsb_register_highlevel(&amp;bis_highlevel);&quot;. Has
+</I>&gt;<i> anybody encountered this before? I could load all other modules without
+</I>&gt;<i> problems.
+</I>&gt;<i>
+</I>&gt;<i> Bernhard.
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">https://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000084.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+	<LI>Next message: <A HREF="000086.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

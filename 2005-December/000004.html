@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20RT-FW%20User%20Space%20App%3A%20have%20a%20look%20to%20satisfy%20a%20generic%20user%27s%20wish%21&In-Reply-To=%3C95210d7e0512011416w23185dd4w640e0e203776dc35%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000006.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20RT-FW%20User%20Space%20App%3A%20have%20a%20look%20to%20satisfy%20a%20generic%20user%27s%20wish%21&In-Reply-To=%3C95210d7e0512011416w23185dd4w640e0e203776dc35%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!">yuchen623 at gmail.com
+       </A><BR>
+    <I>Thu Dec  1 23:16:17 CET 2005</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000006.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#4">[ date ]</a>
+              <a href="thread.html#4">[ thread ]</a>
+              <a href="subject.html#4">[ subject ]</a>
+              <a href="author.html#4">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear Faruque,
+
+
+&gt;<i> Thanks a lot for your warm reply. I'm very glad to join with rt-firewire
+</I>&gt;<i> team.
+</I>&gt;<i> we hope to make the rt firewire user friendly and useful soon.
+</I>
+
+I am just going to annouse the 0.1 release of rt-fw. After that, I would
+like to discuss about the short-term developement in the rt-fw mailing list.
+Basically, it would be the user-interface, like raw1394, and complete the
+packet captureing.
+
+[ CAUTION: please don't be hurry to reply or even read completely to
+&gt;<i> this mail now! coz' its' a very long story  :) ]
+</I>&gt;<i>
+</I>&gt;<i> Well, i assume u have some time to read this mail, so let's have a
+</I>&gt;<i> look to address a generic user Mr. X's wish to talk with the firewire
+</I>&gt;<i> card C's 1st port's resident Mr. R (An OHCI compliant ieee1394 generic
+</I>&gt;<i> node ).
+</I>&gt;<i>
+</I>&gt;<i> Case-1: PHY/Async Quadlet Read
+</I>&gt;<i> --------------------------------------------------
+</I>&gt;<i> User X :  Hey Mr. R, Can you give me your NodeNumber ( first 6 bit
+</I>&gt;<i> from your OHCI NodeID Register located at Offset E8h) ?
+</I>&gt;<i> Node R: I got your request .please wait
+</I>&gt;<i> Node R: Here's the  quadlet, please check it.
+</I>&gt;<i> User X: Ok, Thanks.
+</I>
+
+the csr module is taking care of the access to all the base registers. See
+the csr.c file. Basically, the csr module is no more than a module in the
+application layer: registered to take care of a certain range of address (in
+the 48-bit 1394 address).
+
+Case-2: PHY/Async Write
+&gt;<i> ------------------------------------
+</I>&gt;<i> User X: Hey R, can you write this busNumber to your busNumber Register
+</I>&gt;<i> (6-15 bit of NodeID Register) ?
+</I>&gt;<i> Node R: I got your request .please wait
+</I>&gt;<i> Node R: I complete your request, here's what i already wrote.
+</I>&gt;<i> User X: Ok, Thanks.
+</I>
+the same, csr is taking care of this.
+
+
+Both cases are more or less similar (pls fix me if i am wrong). So as
+&gt;<i> the rt-firewire developer how we can staisfy the demands ?
+</I>
+
+there is a  non real-time command tool called 1394commander developed on
+Linux 1394 subsystem, exactly for the same purpose, i.e. accessing the base
+registers. But, it is based on raw1394. On current implementation of rt-fw,
+we either have to make a kernel module specifically to deal with the access
+to base registers, so on the user side, we only need to give some IOCTL
+command via, say /dev/rt-firewrie, OR we make rt_raw1394 to allow fully
+access to the whole address space from user space, which of course includes
+the base registers.
+
+As per my imagination the path of request/response flow is like this:
+&gt;<i>
+</I>&gt;<i> User  X
+</I>&gt;<i> 1----&gt; rt-fw-client (User Space app)
+</I>&gt;<i> 2----&gt; rt-fw-server (process) or (rt_raw1394 and bis module using
+</I>&gt;<i> /dev/rt-firewire interfacing with rtdm)
+</I>&gt;<i> 3---&gt; rtdm ( upon posix/native skin of xeno_nucleus with xeno_hal)
+</I>&gt;<i> 4----&gt; rt_ohci1394 and rt_ieee1394 (using xenomai rtos api modules
+</I>&gt;<i> rtpc, rt_serv, rtpkbuff )
+</I>&gt;<i> 5----&gt; (hardware) ieee1394 Card C's 1st Port :
+</I>&gt;<i> Node R.
+</I>
+
+Basically, you are right.
+
+For now, I'm very much curious how you sent async/iso packets to
+&gt;<i> client and measure the time statistics  (as mentioned in your MSc
+</I>&gt;<i> Report) from user space ?
+</I>
+
+For asyn packets, I measured the roundtrip latency just using the rtping.
+For iso packets, I used another program to measure the data arrival interval
+drift on the packet receiving side, since the iso transmission is only
+1-way. This is a bit tricky.
+
+
+1. with the current codes, is there any way to write some user space
+&gt;<i> app to talk with /dev/rt-firewire for the above purpose? As I checked
+</I>&gt;<i> the source files i got a few ioctl() calling options are available,
+</I>&gt;<i> like IOC_RTFW_* PING, ISO_START, ISO_SHUTDOWN and some other BUS
+</I>&gt;<i> MANAGEMENT options(ohci_devctl) in rt_ohci1394 and some other old
+</I>&gt;<i> ioctl() options in ieee1394-ioctl.h file. Specifically how can I write
+</I>&gt;<i> a user space app to send/recv some requests to/from the running
+</I>&gt;<i> rt-firewire driver?
+</I>
+
+As you can also conclude from what I said above, it is currently not
+implemented to let user-space program get full direct access to the 1394
+address space. In the non real-time Linux 1394 world, this access is (again)
+fully based on raw1394. Currently, we only can use eth1394 to get access to
+FireWire like to Ethernet, but the access range is only limited to the space
+registered by the eth1394 driver.
+
+2. Could you please suggest some good references for learning about
+&gt;<i> how to write code of user space app to interact with  running kernel
+</I>&gt;<i> device driver ? I've already studied LDD, LKM Prog. Guide and
+</I>&gt;<i> Beginning Linux Prog.(from wrox) etc. But I'm in a complete dark
+</I>&gt;<i> position to interact with the rt-fw drivers except rtping / hostconfig
+</I>&gt;<i> (though i managed to read the 2kB OHCI registers by writing user space
+</I>&gt;<i> code using mmap call)
+</I>
+
+Em......the best one in my mind is Linux Device Driver 3rd edition, which
+probably you have read:)
+
+3. BTW, is the  bis module support to add a new node ? if I attach a
+&gt;<i> ieee1394 Camera how can I add this node and do a rtping to it?
+</I>
+
+Nope. Bis module can only talk to another PC-based 1394 node, which must
+have loaded bis module also.
+
+I hope to go through the Xenomai and RTDM soon and then i would like
+&gt;<i> to uncover Linux raw1394,the existing black box, to get something like
+</I>&gt;<i> that in rt_* domain.
+</I>&gt;<i> what you think?
+</I>
+
+For me, it is good:). If I may ask, are you going to work on this like for
+your MSc project? Do you have some real lab stuff to do some testing? I am
+not giving you any pressure, but I am just curious to know:)
+
+Again I would like to give thanks for reading all my boring talks.
+
+
+Haha, I like this kind of discussion very much. You are always welcome to
+ask questions, even some really boring one:)
+
+Wishing you happiness 4 all the time
+
+
+Thanks, the same 2 you.
+
+
+Yuchen
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/16b987a6/attachment.html">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051201/16b987a6/attachment.html</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000006.html">[Rtfirewire-devel] Re: RT-FW User Space App: have a look to satisfy a generic user's wish!
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#4">[ date ]</a>
+              <a href="thread.html#4">[ thread ]</a>
+              <a href="subject.html#4">[ subject ]</a>
+              <a href="author.html#4">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

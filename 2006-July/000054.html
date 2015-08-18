@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5Bnews%5DRT-FireWire%20trunk%20revision%20in%20Berlios%0A%20compiles%20over%20Xenomai%202.1&In-Reply-To=%3C44C61B44.70205%40student.kuleuven.be%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000053.html">
+   <LINK REL="Next"  HREF="000055.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1</H1>
+    <B>Piet Levrier</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5Bnews%5DRT-FireWire%20trunk%20revision%20in%20Berlios%0A%20compiles%20over%20Xenomai%202.1&In-Reply-To=%3C44C61B44.70205%40student.kuleuven.be%3E"
+       TITLE="[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1">piet.levrier at student.kuleuven.be
+       </A><BR>
+    <I>Tue Jul 25 15:23:16 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000053.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+        <LI>Next message: <A HREF="000055.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+
+Yuchen Zhang wrote:
+&gt;<i> On 7/25/06, Piet Levrier &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">piet.levrier at student.kuleuven.be</A>&gt; wrote:
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Yuchen Zhang wrote:
+</I>&gt;&gt;<i> &gt; On 7/25/06, Piet Levrier &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">piet.levrier at student.kuleuven.be</A>&gt; wrote:
+</I>&gt;&gt;<i> &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; Yuchen Zhang wrote:
+</I>&gt;&gt;<i> &gt;&gt; &gt; On 7/24/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;&gt;<i> &gt;&gt; &gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt; Yuchen Zhang wrote:
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; Hi, all
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; the current trunk revision (96) of RT-FireWire svn repository in
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; berlios compiles over Xenomai2.1. When compiling over Xenomai2.1,
+</I>&gt;&gt;<i> &gt;&gt; one
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; has to specify two options along the configure tool:
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; --with-linux= the path to your real-time linux kernel
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; --with-rtext-config=the path to the xeno-config in your box (e.g.
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; /usr/xenomai/bin/xeno-config)
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; So far, the rtping test has been runnig without problem. The 
+</I>&gt;&gt;<i> lastest
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt; xenomai2.2 has NOT been tested yet.
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt; It also compiles fine against Xenomai trunk once you patched
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt; configure.ac (which I strongly recommend, Yuchen :)). There were
+</I>&gt;&gt;<i> &gt;&gt; no RTDM
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt; API changes between 2.1 and 2.2.
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; &gt; Yes, some minor changes in the configure.ac should enable the 
+</I>&gt;&gt;<i> compile
+</I>&gt;&gt;<i> &gt;&gt; &gt; over xeno2.2 and trunk, also over ppc platform. Checked in already,
+</I>&gt;&gt;<i> &gt;&gt; &gt; but not tested yet:)
+</I>&gt;&gt;<i> &gt;&gt; &gt;
+</I>&gt;&gt;<i> &gt;&gt;
+</I>&gt;&gt;<i> &gt;&gt; We've adapted configure.ac a little bit and it compiles fine over
+</I>&gt;&gt;<i> &gt;&gt; xenomai2.2.  However,
+</I>&gt;&gt;<i> &gt;&gt; rtping results in the following error: &quot;ioctl: Cannot allocate 
+</I>&gt;&gt;<i> memory&quot;.
+</I>&gt;&gt;<i> &gt;&gt; Any suggestions?
+</I>&gt;&gt;<i> &gt;&gt;
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt; Can you tell me what the dmesg said?
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> ./rtping -h fwhost0 -d 0 -s 500 results solely in
+</I>&gt;&gt;<i> &quot;Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with
+</I>&gt;&gt;<i> priority 0.&quot;
+</I>&gt;&gt;<i> and then
+</I>&gt;&gt;<i> &quot;ioctl: Cannot allocate memory&quot;
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> dmesg says nothing.
+</I>&gt;&gt;<i>
+</I>&gt;<i> Ok, try to unload all the rtfw modules, see if you got memory leakage?
+</I>&gt;<i> I guess the error happens in bis_send_echo, when it cannot allocate
+</I>&gt;<i> new packet. If yes, the possible cause is the internal memory leakage.
+</I>&gt;<i>
+</I>&gt;<i> Yuchen
+</I>&gt;<i>
+</I>When I unload all the rtfw modules (rtpkbuff, rt_serv, rtpc, 
+rt_ieee1394, rt_ohci1394 and bis1394), memory is released.
+After reloading the modules, rtping worked... but not for long. 
+Here's what I did after insmodding the modules:
+
+# ./hostconfig fwhost0
+
+fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+          Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+          Pending Packets:0
+          [NO FLAGS]  Max Packet Size: 2048
+          Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+          Iso xmit DMA ctx:8   Usage:ffffff00
+          Iso rcv DMA ctx:4   Usage:fffffff0
+          Isochronous BW:4915    Channels:fffffffeffffffff
+
+# ./hostconfig fwhost0 up
+
+# ./hostconfig fwhost0
+
+fwhost0   Medium: OHCI1394   G-U-ID: 55:F6:B2:00:56:03:D0:00
+          Bus Generation:2  Node ID:0  IRM:0  Bus Manager:63
+          Pending Packets:0
+          UP RUNNING  Max Packet Size: 2048
+          Interrupt:10  Base Address:d0882000  Memory:e7805000-e78057ff
+          Iso xmit DMA ctx:8   Usage:ffffff00
+          Iso rcv DMA ctx:4   Usage:fffffff0
+          Isochronous BW:4915    Channels:fffffffeffffffff
+
+----------------------------------------------------------&gt;&gt;&gt;&gt; So far so 
+good
+
+# ./rtping -h fwhost0 -d 0 -s 500
+Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+priority 0.
+500 bytes roundtriping fwhost0 and 0: time=65.5 us
+500 bytes roundtriping fwhost0 and 0: time=56.2 us
+500 bytes roundtriping fwhost0 and 0: time=59.8 us
+500 bytes roundtriping fwhost0 and 0: time=56.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.0 us
+500 bytes roundtriping fwhost0 and 0: time=66.1 us
+500 bytes roundtriping fwhost0 and 0: time=59.8 us
+500 bytes roundtriping fwhost0 and 0: time=59.3 us
+500 bytes roundtriping fwhost0 and 0: time=59.5 us
+500 bytes roundtriping fwhost0 and 0: time=59.6 us
+500 bytes roundtriping fwhost0 and 0: time=57.9 us
+500 bytes roundtriping fwhost0 and 0: time=57.8 us
+500 bytes roundtriping fwhost0 and 0: time=58.4 us
+ioctl: Resource temporarily unavailable
+
+-------------------------------------------------------&gt;&gt;&gt;&gt; retry...
+
+# ./rtping -h fwhost0 -d 0 -s 500
+Real-time PING over FireWire: fwhost0 to node_0 500 bytes of data with 
+priority 0.
+ioctl: Cannot allocate memory
+
+# dmesg | tail
+[ 6070.296204] New ioctl RT-Firewire Core registered
+[ 6070.297826] RT-Firewire:Real-Time FireWire Stack Initialized!
+[ 6074.300420] OHCI driver for RT-FireWire project
+[ 6074.300462] PCI: Found IRQ 10 for device 0000:00:0a.0
+[ 6074.351377] RT-firewire: register fwhost0
+[ 6080.679353] New ioctl Bus Internal Service on FireWire registered
+[ 6136.192210] 
+/usr/src/RT-FireWire/build/stack/ieee1394_core.c[abort_timedouts]: 
+packet sent to node[65472] from fwhost0 timeouts!!!
+[ 6136.192224]
+[ 6142.495884] 
+/usr/src/RT-FireWire/build/stack/ieee1394_core.c[hpsb_free_packet]: 
+packet to fwhost0 still refered!
+[ 6142.495900]
+
+
+During rtping, no further memory was consumed.
+
+piet
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000053.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+	<LI>Next message: <A HREF="000055.html">[Rtfirewire-devel] [news]RT-FireWire trunk revision in Berlios compiles over Xenomai 2.1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

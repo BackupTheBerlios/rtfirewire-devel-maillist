@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] bis1394 problems
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20bis1394%20problems&In-Reply-To=%3C200610181410.45181.B.Zeller%40gmx.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000085.html">
+   <LINK REL="Next"  HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] bis1394 problems</H1>
+    <B>Bernhard Zeller</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20bis1394%20problems&In-Reply-To=%3C200610181410.45181.B.Zeller%40gmx.de%3E"
+       TITLE="[Rtfirewire-devel] bis1394 problems">B.Zeller at gmx.de
+       </A><BR>
+    <I>Wed Oct 18 14:10:45 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000085.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+        <LI>Next message: <A HREF="000087.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Friday 13 October 2006 14:24, Bernhard Zeller wrote:
+&gt;<i> Hi all!
+</I>&gt;<i>
+</I>&gt;<i> I have successfully installed rt-firewire over Xenomai 2.2. I started
+</I>&gt;<i> playing around a bit, but when I try to load the module bis1394, my system
+</I>&gt;<i> freezes. The critical call seems to be
+</I>&gt;<i> &quot;hpsb_register_highlevel(&amp;bis_highlevel);&quot;. Has anybody encountered this
+</I>&gt;<i> before? I could load all other modules without problems.
+</I>&gt;<i>
+</I>
+Huh? If I use &quot;modprobe&quot; instead of &quot;insmod&quot;, it works... But I'm sure I 
+didn't forget any modules, &quot;lsmod&quot; lists exactly the same ones as before 
+(except for bis1394 of course). That's weird...
+
+Thanks for the debugging tips Jan, I've set up a serial console now, just in 
+case.
+
+Bernhard.
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000085.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+	<LI>Next message: <A HREF="000087.html">[Rtfirewire-devel] bis1394 problems
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

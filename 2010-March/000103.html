@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Load rtpkbuff before loading rt_serv,	are you using config.h?
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2010-March/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Load%20rtpkbuff%20before%20loading%20rt_serv%2C%0A%09are%20you%20using%20config.h%3F&In-Reply-To=%3C652146.87871.qm%40web58007.mail.re3.yahoo.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000102.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Load rtpkbuff before loading rt_serv,	are you using config.h?</H1>
+    <B>sss yyy</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Load%20rtpkbuff%20before%20loading%20rt_serv%2C%0A%09are%20you%20using%20config.h%3F&In-Reply-To=%3C652146.87871.qm%40web58007.mail.re3.yahoo.com%3E"
+       TITLE="[Rtfirewire-devel] Load rtpkbuff before loading rt_serv,	are you using config.h?">sri_embedded at yahoo.com
+       </A><BR>
+    <I>Wed Mar 10 18:31:30 CET 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000102.html">[Rtfirewire-devel] rt_serv issue
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Ralf ,
+I too faced the same problem long back.
+I have used xenomai-2.4.2 with rt-firewire.
+It wont freeze if you are loading in the proper order.
+Can you be more specific?
+Can you post a screenshot of this?
+What are the modules you have loaded succesfully
+Have you loaded rtpkbuff
+What is the version of rtnet you are using?
+
+Regards,
+Satya
+
+--- On Sun, 7/3/10, <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-request at lists.berlios.de</A> &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-request at lists.berlios.de</A>&gt; wrote:
+
+From: <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-request at lists.berlios.de</A> &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-request at lists.berlios.de</A>&gt;
+Subject: Rtfirewire-devel Digest, Vol 10, Issue 1
+To: <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel at lists.berlios.de</A>
+Date: Sunday, 7 March, 2010, 4:30 PM
+
+Send Rtfirewire-devel mailing list submissions to
+&#160;&#160;&#160; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel at lists.berlios.de</A>
+
+To subscribe or unsubscribe via the World Wide Web, visit
+&#160;&#160;&#160; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">https://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+or, via email, send a message with subject or body 'help' to
+&#160;&#160;&#160; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-request at lists.berlios.de</A>
+
+You can reach the person managing the list at
+&#160;&#160;&#160; <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel-owner at lists.berlios.de</A>
+
+When replying, please edit your Subject line so it is more specific
+than &quot;Re: Contents of Rtfirewire-devel digest...&quot;
+
+
+Today's Topics:
+
+&#160;&#160;&#160;1. rt_serv issue (Ralf Wiegand)
+
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Sat, 06 Mar 2010 21:54:47 +0100
+From: Ralf Wiegand &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">ralfwiegand at gmx.de</A>&gt;
+To: <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel at lists.berlios.de</A>
+Subject: [Rtfirewire-devel] rt_serv issue
+Message-ID: &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">4B92C117.1050301 at gmx.de</A>&gt;
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+
+Hello,
+
+iam new on the mailinglist.
+
+i've read that there is a know issue during loading the rt_serv module. 
+Can anyone tell me some details about the problem ?
+I would like to run rt-firewire under xenomai-2.4.3 with kernel 2.6.24 
+and after loading rt_serv the systems freezes.
+
+
+Regards,
+
+Ralf Wiegand
+
+
+------------------------------
+
+_______________________________________________
+Rtfirewire-devel mailing list
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">https://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+
+
+End of Rtfirewire-devel Digest, Vol 10, Issue 1
+***********************************************
+
+
+
+      Get your preferred Email name!
+Now you can @ymail.com and @rocketmail.com. 
+<A HREF="http://mail.promotions.yahoo.com/newdomains/aa/">http://mail.promotions.yahoo.com/newdomains/aa/</A>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20100310/73e5d46a/attachment.html">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20100310/73e5d46a/attachment.html</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000102.html">[Rtfirewire-devel] rt_serv issue
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

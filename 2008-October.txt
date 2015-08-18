@@ -1,0 +1,60 @@
+From reck.vikasgarg at gmail.com  Wed Oct 29 14:37:48 2008
+From: reck.vikasgarg at gmail.com (Vikas Garg)
+Date: Wed, 29 Oct 2008 14:37:48 +0100
+Subject: [Rtfirewire-devel] Data transfer over firewire
+Message-ID: <ae699bf70810290637i6c3b6df4v1a283bd8f2e222da@mail.gmail.com>
+
+Hello,
+
+I want to transfer byte data between applications running on two
+different PCs running Linux OS. I want to do it over Firewire. So i am
+looking for a high level protocol over ieee1394 for connection
+management and data transfer. The data is not image data but large
+number of bytes (~500 KB every 50 ms). I don't want to use etherner
+communication because i have witnessed some delay in data transfer
+which causes problem in my application. Please suggest on this.
+
+My PC runs linux kernel 2.6 with real time extensions.
+
+Best Regards
+Luvy Garg
+
+
+From yuchen623 at gmail.com  Thu Oct 30 01:52:38 2008
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Thu, 30 Oct 2008 01:52:38 +0100
+Subject: [Rtfirewire-devel] Data transfer over firewire
+In-Reply-To: <ae699bf70810290637i6c3b6df4v1a283bd8f2e222da@mail.gmail.com>
+References: <ae699bf70810290637i6c3b6df4v1a283bd8f2e222da@mail.gmail.com>
+Message-ID: <95210d7e0810291752i223cf68ep599fee388054c6a6@mail.gmail.com>
+
+In general you can use FireWIre. It is meant for this kind of bulk
+data transfer. What kind of real time extension do you have for your
+kernel?
+
+BTW, what kind of delay do you see when using ethernet?
+
+Yuchen
+
+On Wed, Oct 29, 2008 at 2:37 PM, Vikas Garg <reck.vikasgarg at gmail.com> wrote:
+> Hello,
+>
+> I want to transfer byte data between applications running on two
+> different PCs running Linux OS. I want to do it over Firewire. So i am
+> looking for a high level protocol over ieee1394 for connection
+> management and data transfer. The data is not image data but large
+> number of bytes (~500 KB every 50 ms). I don't want to use etherner
+> communication because i have witnessed some delay in data transfer
+> which causes problem in my application. Please suggest on this.
+>
+> My PC runs linux kernel 2.6 with real time extensions.
+>
+> Best Regards
+> Luvy Garg
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+

@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Test results and bugs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C95210d7e0607251029q43353eacr89058d6058dd1734%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000058.html">
+   <LINK REL="Next"  HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Test results and bugs</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C95210d7e0607251029q43353eacr89058d6058dd1734%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Test results and bugs">yuchen623 at gmail.com
+       </A><BR>
+    <I>Tue Jul 25 19:29:35 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000058.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+        <LI>Next message: <A HREF="000062.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 7/25/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> Hi,
+</I>&gt;<i>
+</I>&gt;<i> some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+</I>&gt;<i>
+</I>&gt;<i> BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+</I>&gt;<i>  printing eip:
+</I>&gt;<i> c012eca8
+</I>&gt;<i> ...
+</I>&gt;<i> EIP: [&lt;c012eca8&gt;] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+</I>&gt;<i>
+</I>&gt;<i> That's due to registering the OHCI IRQ with a NULL driver name (I called
+</I>&gt;<i> cat /proc/xenomai/irq).
+</I>&gt;<i>
+</I>So, this is new in 2.6.17 kernel, Is it?
+
+&gt;<i>
+</I>&gt;<i> The second one comes after &quot;rtping -h fwhost0 -d 0 -s 500&quot; reported a failure and I
+</I>&gt;<i> tried to restart this command:
+</I>&gt;<i>
+</I>This bug happens when running loopback rtping. I will try to reproduce
+this bug here at home.
+
+Yuchen
+
+&gt;<i> /usr/src/rt-firewire/build/stack/ieee1394_core.c[abort_timedouts]: packet sent to node[65472] from fwhost0 timeouts!!!
+</I>&gt;<i>
+</I>&gt;<i> /usr/src/rt-firewire/build/stack/ieee1394_core.c[hpsb_free_packet]: packet to fwhost0 still refered!
+</I>&gt;<i>
+</I>&gt;<i> BUG: unable to handle kernel paging request at virtual address 6b6b6b6f
+</I>&gt;<i>  printing eip:
+</I>&gt;<i> c011ee08
+</I>&gt;<i> *pde = 00000000
+</I>&gt;<i> Oops: 0002 [#2]
+</I>&gt;<i> Modules linked in: bis1394 rtpc rt_ohci1394 rt_ieee1394 rt_serv rtpkbuff 8139too e100
+</I>&gt;<i> CPU:    0
+</I>&gt;<i> EIP:    0060:[&lt;c011ee08&gt;]    Not tainted VLI
+</I>&gt;<i> EFLAGS: 00010246   (2.6.17.6 #8)
+</I>&gt;<i> EIP is at prepare_to_wait+0x2e/0x5f
+</I>&gt;<i> eax: 6b6b6b6b   ebx: f7063e98   ecx: 00000200   edx: f7063ea4
+</I>&gt;<i> esi: f75050a8   edi: 00000001   ebp: f7063e68   esp: f7063e5c
+</I>&gt;<i> ds: 007b   es: 007b   ss: 0068
+</I>&gt;<i> Process rtping (pid: 946, threadinfo=f7062000 task=f7c2b070)
+</I>&gt;<i> Stack: f7505090 f7063f04 f7063e8c f7063eb8 f88d434d f7063e94 0000007d 00000000
+</I>&gt;<i>        00000000 00000000 00000000 00000000 0804a260 f7062000 f7063ea4 00000000
+</I>&gt;<i>        f7c2b070 c011ec9b f7063ea4 f7063ea4 ffffffe7 c02c0100 f7063ed8 f7063f10
+</I>&gt;<i> Call Trace:
+</I>&gt;<i>  &lt;c0102cc4&gt; show_stack_log_lvl+0x86/0x91  &lt;c0102e5c&gt; show_registers+0x149/0x1b6
+</I>&gt;<i>  &lt;c0103024&gt; die+0x15b/0x277  &lt;c010b1e9&gt; do_page_fault+0x4ab/0x59d
+</I>&gt;<i>  &lt;c010916c&gt; __ipipe_handle_exception+0x61/0x91  &lt;c0102784&gt; error_code+0x54/0x70
+</I>&gt;<i>  &lt;f88d434d&gt; rtfw_rtpc_dispatch_call+0x165/0x278 [rtpc]  &lt;f88d7113&gt; bis_ioctl+0x6c/0x101 [bis1394]
+</I>&gt;<i>  &lt;f88bfcb9&gt; ieee1394_ioctl+0x87/0xbc [rt_ieee1394]  &lt;c016bd46&gt; do_ioctl+0x4e/0x5f
+</I>&gt;<i>  &lt;c016bf59&gt; vfs_ioctl+0x202/0x21c  &lt;c016bfc0&gt; sys_ioctl+0x4d/0x69
+</I>&gt;<i>  &lt;c0275806&gt; syscall_call+0x7/0xb
+</I>&gt;<i> Code: 57 56 53 e8 b7 a3 fe ff 83 22 fe 89 d3 89 cf 89 c6 e8 6f cc 00 00 8d 53 0c 83 f8 01 19 c9 81 e1 00 02 00 00 39 53 0c 75 0d 8b 06 &lt;89&gt; 50 04 89 43 0c 89 72 04 89 16 83 7b 04 00 74 0b b8 00 e0 ff
+</I>&gt;<i> EIP: [&lt;c011ee08&gt;] prepare_to_wait+0x2e/0x5f SS:ESP 0068:f7063e5c
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> That pattern 6b6b6b6b indicates some release bug (CONFIG_DEBUG_SLAB):
+</I>&gt;<i> /usr/src/linux/mm/slab.c:#define POISON_FREE    0x6b    /* for use-after-free poisoning */
+</I>&gt;<i>
+</I>&gt;<i> Jan
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="http://bat.berlios.de/mailman/listinfo/rtfirewire-devel">http://bat.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000058.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+	<LI>Next message: <A HREF="000062.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

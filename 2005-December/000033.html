@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW%20inter%20module%20dependencies%20and%20%28future%29%20position%20of%20RT_RAW1394%20in%20the%20dependency%20tree&In-Reply-To=%3Cfc9dd8650512141038t60b49a1dke1b8a24b2fb9e996%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000029.html">
+   <LINK REL="Next"  HREF="000034.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree</H1>
+    <B>M. Omar Faruque Sarker</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RT-FW%20inter%20module%20dependencies%20and%20%28future%29%20position%20of%20RT_RAW1394%20in%20the%20dependency%20tree&In-Reply-To=%3Cfc9dd8650512141038t60b49a1dke1b8a24b2fb9e996%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree">writefaruq at gmail.com
+       </A><BR>
+    <I>Wed Dec 14 19:38:21 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000029.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+        <LI>Next message: <A HREF="000034.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Dear Yuchen,
+
+It's very nice that in spite of your busy schedule you replied me. I
+never mind if it's fast or late, coz, i'm  enjoying very much to
+discover and uncover  this new field and also I'm prepared to go a
+long way :)
+
+As a part of my discovery, I've tried to make a layered structure of
+RT-FW current modules using modinfo. I found something like this
+(please fix me if I'm wrong):
+
+
+                      bis1394                     *User App* (talks
+with /dev/rt_raw1394)
+                          |                               |
+                 --------------                       |
+                 |                |                      |
+                 |          [rt_ohci1394]     *RT_RAW1394*
+                 |                |                      |
+                 |                |     ----------------
+                 |                |     |
+                 |             [rt_ieee1394]
+                 |                      |
+                 |        ------------------------
+             (rtpc)   |                             |
+                 |       |                             |
+             (rt_serv)                            |
+                 |                                    |
+              ----------                           |
+              |           |                          |
+&lt;xeno_rtdm&gt; &lt;xeno_native&gt;    |
+         |                 |                      |
+&lt;&lt;xeno_nucleus&gt;&gt;                 (rt_pkbuff)
+             |                                        |
+             |           ------------------------
+             |          |
+ &lt;&lt;&lt;xeno_hal&gt;&gt;&gt;
+
+Please Note:
+a) My art may not be so good, Anyway I noticed that modinfo is saying
+that rt_ohci1394 is dependent on ieee1394 (Non-RT)! is this mistake or
+anything else?
+
+  b) In the libraw1394 document
+(<A HREF="http://www.linux1394.org/doc/overview.php">http://www.linux1394.org/doc/overview.php</A>) it is said that ohci1394
+is lower level driver with respect to ieee1394, but modinfo says that
+ohci1394 is dependent on ieee1394. what is your explanation regarding
+RT-FW?
+
+c) I placed our desired *RT_RAW1394* above  rt_ieee1394.  I think, raw
+module can directly talk with rt_ieee1394 and also will use exported
+symbols/functions from rt_ieee1394 . Is this ok?
+
+d) Is this case do we need a user library like  libraw1394 or
+alternately, /dev/rt_raw1394 (with some IOCTLs) is sufficient for now?
+
+I'm actually thinking for &quot;at least async capable&quot; rt_raw interface.
+Could you please start discussion about that and also indicate what
+kind of RT capability we have to put inside that rt_raw1394  module?
+
+Soon I hope to repeat RT-FW testing on P-IV Intel motherboard with
+ipipe patch + a minimum change in Kernel and Xenomai Configuration. 
+BTW, one person asked me the pronunciation of &quot;Xenomai&quot;. Is this
+&quot;jeno-mayee&quot; or &quot;eno-mai&quot; or ... :)
+
+Have a nice  time !
+
+Best Reagrds,
+
+Faruque
+
+
+
+
+
+--
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000029.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+	<LI>Next message: <A HREF="000034.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

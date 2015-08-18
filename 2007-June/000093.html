@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] problems with configuring rtfirewire
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20problems%20with%20configuring%20rtfirewire&In-Reply-To=%3C167787201278ED4E982BA967BF86C13E107FB3%40EX03.service.utwente.nl%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000092.html">
+   <LINK REL="Next"  HREF="000094.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] problems with configuring rtfirewire</H1>
+    <B>h.e.deboer at student.utwente.nl</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20problems%20with%20configuring%20rtfirewire&In-Reply-To=%3C167787201278ED4E982BA967BF86C13E107FB3%40EX03.service.utwente.nl%3E"
+       TITLE="[Rtfirewire-devel] problems with configuring rtfirewire">h.e.deboer at student.utwente.nl
+       </A><BR>
+    <I>Tue Jun  5 15:27:43 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000092.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+        <LI>Next message: <A HREF="000094.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>My patched xenomai kernel has the next selections for the &quot;Real-time sub-system&quot; menu:
+     &lt;*&gt; Native API                                                                                    
+  ? ?                                     [*]   Message pipes                                                                                           ? ?
+  ? ?                                     (4096)  Bytes in buffer space                                                                                 ? ?
+  ? ?                                     [*]   Counting semaphores                                                                                     ? ?
+  ? ?                                     [*]   Event flags                                                                                             ? ?
+  ? ?                                     ---   Mutexes                                                                                                 ? ?
+  ? ?                                     [*]   Condition variables                                                                                     ? ?
+  ? ?                                     [*]   Message queues                                                                                          ? ?
+  ? ?                                     [*]   Memory heaps                                                                                            ? ?
+  ? ?                                     [*]   Alarms                                                                                                  ? ?
+  ? ?                                     [*]   Message passing support                                                                                 ? ?
+  ? ?                                     [ ]   Interrupts                                                                                              ? ?
+  ? ?                                     &lt;*&gt; POSIX API                                                                                                 ? ?
+  ? ?                                     &lt; &gt; pSOS+ emulator                                                                                            ? ?
+  ? ?                                     &lt; &gt; uITRON API                                                                                                ? ?
+  ? ?                                     &lt; &gt; VRTX emulator                                                                                             ? ?
+  ? ?                                     &lt; &gt; VxWorks emulator                                                                                          ? ?
+  ? ?                                     --- RTAI emulator unavailable, disable native API or build it as module                                       ? ?
+  ? ?                                     &lt;*&gt; Real-Time Driver Model                                                                                    ? ?
+  ? ?                                     &lt; &gt; User-space VM support    
+
+As can be seen, is RTDM included in the kernel. 
+
+The part of the config.log (of the kernel cofiguration) where the RTDM option is shown:
+#
+# RTAI emulator unavailable, disable native API or build it as module
+#
+CONFIG_XENO_SKIN_RTDM=y
+# CONFIG_XENO_SKIN_UVM is not set
+
+Maybe I have to insert RTDM as a module to get it working..
+
+-----Original Message-----
+From: Jan Kiszka [mailto:<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>]
+Sent: Mon 6/4/2007 5:20 PM
+To: Boer, H.E. de (Harmen, Student EE)
+Cc: <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">rtfirewire-devel at lists.berlios.de</A>
+Subject: Re: [Rtfirewire-devel] problems with configuring rtfirewire
+ 
+<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">h.e.deboer at student.utwente.nl</A> wrote:
+&gt;<i> I followed youre instructions about the configuring, but now I get stuck at the RTDM skin. (see console output below)
+</I>&gt;<i> 
+</I>&gt;<i> checking for RT-extension... /usr/src/linux-2.6.15.7-Xenomai (kernel 2.6.15.7-xenomai2.1.3 + Xenomai)
+</I>&gt;<i> checking for Xenomai installation dir... /usr/xenomai
+</I>&gt;<i> checking for Xenomai DESTDIR... none
+</I>&gt;<i> checking for Xenomai version... 2.1.3
+</I>&gt;<i> checking for RTDM skin...   configure: error: *** Please enable RTDM skin
+</I>&gt;<i> 
+</I>&gt;<i> For xenomai 2.1 there is no menu config anymore, it is done automatically. 
+</I>
+The kernel config moved where it belongs: into the kernel. Check the
+&quot;Real-time sub-system&quot; menu when configuring your kernel.
+
+&gt;<i> In the compiled xenomai directory however, RTDM is present in the include directory. 
+</I>&gt;<i> What am I doing wrong?
+</I>
+More details might be found in the config.log.
+
+Jan
+
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000092.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+	<LI>Next message: <A HREF="000094.html">[Rtfirewire-devel] problems with configuring rtfirewire
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

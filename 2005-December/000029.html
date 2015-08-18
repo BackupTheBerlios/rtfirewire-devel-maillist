@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Query%20Regarding%20Using%20RTFW%20with%20RTnet&In-Reply-To=%3C95210d7e0512090104n2aac9892m62826580b5fb95be%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000027.html">
+   <LINK REL="Next"  HREF="000033.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Query Regarding Using RTFW with RTnet</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Query%20Regarding%20Using%20RTFW%20with%20RTnet&In-Reply-To=%3C95210d7e0512090104n2aac9892m62826580b5fb95be%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Query Regarding Using RTFW with RTnet">yuchen623 at gmail.com
+       </A><BR>
+    <I>Fri Dec  9 10:04:14 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000027.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+        <LI>Next message: <A HREF="000033.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 12/9/05, Yuchen Zhang &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">yuchen623 at gmail.com</A>&gt; wrote:
+&gt;<i> On 12/8/05, M. Omar Faruque Sarker &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">writefaruq at gmail.com</A>&gt; wrote:
+</I>&gt;<i> &gt; Dear list,
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; please consider this to answer using less jargon. I'm still in Users'
+</I>&gt;<i> &gt; side, not in Developers'  yet :)
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; 1. After loading Xenomai+RT-FW+ RTnet + rt_eth1394 modules I found the
+</I>&gt;<i> &gt; firewire card as &quot;rteth1&quot; using rtifconfig (also assigned an IP to
+</I>&gt;<i> &gt; it). Now,  If I attach a camera or any other ieee1394 capable
+</I>&gt;<i> &gt; firewire node in that card's any port, in that case how   can I
+</I>&gt;<i> &gt; communicate with that node  under RTnet ? Does that node also have the
+</I>&gt;<i> &gt; same  IP?
+</I>&gt;<i>
+</I>&gt;<i> With another ieee1394 capable PC, you can build a fake Ethernet
+</I>&gt;<i> connection between 2 PCs, both holding different IP. But you /cannot/
+</I>&gt;<i> use rt_eth1394 to communicate with a 1394 camera. The communication
+</I>&gt;<i> over rt_eth1394 only happens via asynchronous transaction. As I know,
+</I>&gt;<i> 1394 camera only supports isochronous streaming on one or more
+</I>&gt;<i> channels, which means your PC has to listen to that isochronous
+</I>&gt;<i> channel in order to receive the video signal. Unfortunately, the
+</I>&gt;<i> real-time video module in RT-FW has not yet been implemented / ported
+</I>&gt;<i> from Linux.
+</I>&gt;<i>
+</I>&gt;<i> &gt; If yes, then if I use rt_dev_socket calls from user space code then
+</I>&gt;<i> &gt; what would be the parameters like AF_PACKET, SOCK_DGRAM etc. ? (I'm
+</I>&gt;<i> &gt; looking on RTnet's raw-packets.c and other example files)
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; 2. From rt_eth1394 module, as per my understanding, I saw if  2 PC
+</I>&gt;<i> &gt; have rt_eth1394 loaded then they can communicate (without any user
+</I>&gt;<i> &gt; interaction!). But If I want to send packet to a node that don't have
+</I>&gt;<i> &gt; rt_eth1394 module (in the same bus/ FW card's any port)  then I need
+</I>&gt;<i> &gt; to change the module. Could you please give me some hints?
+</I>&gt;<i> &gt;
+</I>&gt;<i> NO, in principle it is not suggested.
+</I>&gt;<i> Let's see how high-level applications over FireWire work first.
+</I>&gt;<i>
+</I>&gt;<i> A high-level application, being rt_eth1394 or others, claims to
+</I>&gt;<i> reserve a certain range of the low-level 48-bit address space on the
+</I>&gt;<i> local node.
+</I>
+One remark: here we only talk about asynchronous transaction-based
+application, like rt_eth1394. If you use isochronous transaction, like
+video streaming, then what I said here does not apply. But then:
+
+the application claims to reserve a certain channel for sending or
+receiving or both. In FireWire bus, there is isochronous resource
+management that is handled by a node called isochronous manager (All
+PC-based 1394 nodes are capable of this job). Any node who wants to
+reserve a new channel (and bandwidth) or give up a channel should
+(according to 1394spec) send a message to iso manager to let him
+update the new channel usage. In case of reserving a channel or
+bandwidth, the iso manager may say /NO/ if that channel has been
+occupied by someone. The communication with iso manager is actually
+read, write or lock operation on the two CSR registers of iso manager
+node: the iso channel register and bus bandwidth register.
+
+Go back to RT-FW, the communication with iso manager is not implicitly
+done by the protocol stack. That is if a new application will be
+developed to use the iso transaction on FireWire, it must itself agree
+on the initial procedure and try to communicate with the iso manager.
+For the iso manager, see the output of hostconfig: the one with extra
+bus channel and bandwidth display is the iso manager.
+
+Hope this piece of text can help. But if somehow you got confused,
+dont hesitate to tell me:)
+
+Later on, all the communication of that applicatoin only
+&gt;<i> happen in that range of address. In RT-FW, the address range of a
+</I>&gt;<i> certain applicaion is fixed on all nodes, and that is used to
+</I>&gt;<i> construct the FW frame header in the lower FireWire protocol stack.
+</I>&gt;<i> That means if you customize your own application which occupies the
+</I>&gt;<i> same address range (or at least with some overlap) with rt_eth1394's,
+</I>&gt;<i> you can use rt_eth1394 on one node to send packets to the customized
+</I>&gt;<i> application on another node. But, I dont see the point of doing this.
+</I>&gt;<i> Maybe you can explain to me more about your intention?
+</I>&gt;<i>
+</I>&gt;<i> &gt; As I've checked the classic/ non-RT  ieee1394 driver's  eth1394 files
+</I>&gt;<i> &gt; and found some functions have been exported to user space to use by
+</I>&gt;<i> &gt; applications. In this case is it possible to do the same?
+</I>&gt;<i> &gt;
+</I>&gt;<i> Which functions do you mean? Could you point them out explicitly here?
+</I>&gt;<i>
+</I>&gt;<i> &gt; 3. For the sake of simplicity, can we start adopting raw1394's async
+</I>&gt;<i> &gt; part first and do iso later. you may ask me to do something by
+</I>&gt;<i> &gt; pointing out the major tasks in a specific manner.
+</I>&gt;<i> &gt;
+</I>&gt;<i> Yes. I am going to sketch the code frame of rt_raw1394 module.
+</I>&gt;<i> Hopefully within 2-3 days, we can start dicussion here and see how to
+</I>&gt;<i> allcoate the task:)
+</I>&gt;<i>
+</I>&gt;<i> &gt; I'm again would like give you thanks and  appreciate for your attention.
+</I>&gt;<i> &gt; As you know that, to make something so-called user friendly it's
+</I>&gt;<i> &gt; sometimes obvious to face some unfriendly talks :)
+</I>&gt;<i> &gt;
+</I>&gt;<i> The final destination of us is to make RT-FW competitive and user friendly.
+</I>&gt;<i>
+</I>&gt;<i> Btw, a good book for learning FireWire: &lt;&lt;FireWire System
+</I>&gt;<i> Architecture, 2nd Edition&gt;&gt; by Anderson.D.
+</I>&gt;<i>
+</I>&gt;<i> Keep in touch.
+</I>&gt;<i>
+</I>&gt;<i> Yuchen
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000027.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+	<LI>Next message: <A HREF="000033.html">[Rtfirewire-devel] RT-FW inter module dependencies and (future) position of RT_RAW1394 in the dependency tree
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

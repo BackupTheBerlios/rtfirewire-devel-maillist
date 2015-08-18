@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607310040wc5db6b6j6ffd3820392f158e%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000061.html">
+   <LINK REL="Next"  HREF="000069.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] [PATCH] kernel 2.6.17 support</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20%5BPATCH%5D%20kernel%202.6.17%20support&In-Reply-To=%3C95210d7e0607310040wc5db6b6j6ffd3820392f158e%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] [PATCH] kernel 2.6.17 support">yuchen623 at gmail.com
+       </A><BR>
+    <I>Mon Jul 31 09:40:33 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000061.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+        <LI>Next message: <A HREF="000069.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Patch applied, but not yet tested with compiling with 2.6.17 or better.
+
+Thanks,
+Yuchen
+
+On 7/25/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> This patch enables 2.6.17 support (also 2.6.16 when compiling with gcc-4.1).
+</I>&gt;<i>
+</I>&gt;<i> Jan
+</I>&gt;<i>
+</I>&gt;<i> PS: A simple svn diff revealed a lot of whitespace changes after touching the files.
+</I>&gt;<i> I guess some cleanup wrt trailing spaces or line feeds is required.
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>  drivers/ohci/rt_ohci1394.c |    6 +++---
+</I>&gt;<i>  rtpkbuff/rtpkbuff.c        |    2 +-
+</I>&gt;<i>  stack/csr.c                |    2 +-
+</I>&gt;<i>  stack/hosts.c              |    2 +-
+</I>&gt;<i>  4 files changed, 6 insertions(+), 6 deletions(-)
+</I>&gt;<i> Index: rtpkbuff/rtpkbuff.c
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- rtpkbuff/rtpkbuff.c (revision 97)
+</I>&gt;<i> +++ rtpkbuff/rtpkbuff.c (working copy)
+</I>&gt;<i> @@ -39,7 +39,7 @@
+</I>&gt;<i>         rtdm_printk(&quot;RTPKB:%s[%d]: &quot; fmt &quot;\n&quot;,  __FUNCTION__, __LINE__, ## args)
+</I>&gt;<i>
+</I>&gt;<i>  static unsigned int rtpkb_cache_size = DEFAULT_RTPKB_CACHE_SIZE;
+</I>&gt;<i> -MODULE_PARM(rtpkb_cache_size, &quot;i&quot;);
+</I>&gt;<i> +module_param(rtpkb_cache_size, uint, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(rtpkb_cache_size, &quot;Number of cached rtpkbs for creating pools in real-time&quot;);
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> Index: stack/hosts.c
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- stack/hosts.c       (revision 97)
+</I>&gt;<i> +++ stack/hosts.c       (working copy)
+</I>&gt;<i> @@ -59,7 +59,7 @@ DECLARE_MUTEX(hpsb_hosts_lock);
+</I>&gt;<i>
+</I>&gt;<i>  /*! module parameter,Number of additional global realtime packet buffers per network adapter*/
+</I>&gt;<i>  unsigned int device_rtpkbs = DEFAULT_DEVICE_RTPKBS;
+</I>&gt;<i> -MODULE_PARM(device_rtpkbs, &quot;i&quot;);
+</I>&gt;<i> +module_param(device_rtpkbs, uint, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(device_rtpkbs, &quot;Number of additional global realtime packet &quot;
+</I>&gt;<i>                   &quot;buffers per network adapter&quot;);
+</I>&gt;<i>
+</I>&gt;<i> Index: stack/csr.c
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- stack/csr.c (revision 97)
+</I>&gt;<i> +++ stack/csr.c (working copy)
+</I>&gt;<i> @@ -46,7 +46,7 @@
+</I>&gt;<i>  /* Module Parameters */
+</I>&gt;<i>  /* this module parameter can be used to disable mapping of the FCP registers */
+</I>&gt;<i>  static int fcp = 1;
+</I>&gt;<i> -MODULE_PARM(fcp,&quot;i&quot;);
+</I>&gt;<i> +module_param(fcp, int, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(fcp, &quot;Map FCP registers (default = 1, disable = 0).&quot;);
+</I>&gt;<i>
+</I>&gt;<i>  static struct csr1212_keyval *node_cap = NULL;
+</I>&gt;<i> Index: drivers/ohci/rt_ohci1394.c
+</I>&gt;<i> ===================================================================
+</I>&gt;<i> --- drivers/ohci/rt_ohci1394.c  (revision 97)
+</I>&gt;<i> +++ drivers/ohci/rt_ohci1394.c  (working copy)
+</I>&gt;<i> @@ -151,13 +151,13 @@ static char version[] __devinitdata =
+</I>&gt;<i>
+</I>&gt;<i>  /* Module Parameters */
+</I>&gt;<i>  static int cards = 2;
+</I>&gt;<i> -MODULE_PARM(cards, &quot;i&quot;);
+</I>&gt;<i> +module_param(cards, int, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(cards, &quot;Number of cards to be steered by this driver (default  = 2).&quot;);
+</I>&gt;<i>  static int disable_irm = 0;
+</I>&gt;<i> -MODULE_PARM(disable_irm, &quot;i&quot;);
+</I>&gt;<i> +module_param(disable_irm, int, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(disable_irm, &quot;Disable Isochronous Resource Manager Contending on local adapter (default = NO).&quot;);
+</I>&gt;<i>  static int phys_dma = 1;
+</I>&gt;<i> -MODULE_PARM(phys_dma, &quot;i&quot;);
+</I>&gt;<i> +module_param(phys_dma, int, 0444);
+</I>&gt;<i>  MODULE_PARM_DESC(phys_dma, &quot;Enable dma for physical packets (default = 1).&quot;);
+</I>&gt;<i>
+</I>&gt;<i>  static unsigned int cards_found;
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="http://bat.berlios.de/mailman/listinfo/rtfirewire-devel">http://bat.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000061.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+	<LI>Next message: <A HREF="000069.html">[Rtfirewire-devel] [PATCH] kernel 2.6.17 support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

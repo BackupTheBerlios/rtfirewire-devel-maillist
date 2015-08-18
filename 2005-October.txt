@@ -1,0 +1,107 @@
+From yuchen623 at gmail.com  Mon Oct 31 21:21:43 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Oct 2005 21:21:43 +0100
+Subject: [Rtfirewire-devel] Fwd: Realtime camera over firewire
+In-Reply-To: <Pine.LNX.4.64.0510311200200.7112@localhost.localdomain>
+References: <Pine.LNX.4.64.0510311200200.7112@localhost.localdomain>
+Message-ID: <95210d7e0510311221k4e46e5b6xca1114899c582f4e@mail.gmail.com>
+
+---------- Forwarded message ----------
+From: Herman Bruyninckx <Herman.Bruyninckx at mech.kuleuven.be>
+Date: Oct 31, 2005 12:02 PM
+Subject: Realtime camera over firewire
+To: Yuchen623 at gmail.com
+Cc: Herman Bruyninckx <Herman.Bruyninckx at mech.kuleuven.be>
+
+Dear Yuchen,
+
+I've read your paper for the Realtime Linux Workshop later this week, but
+from it, it isn't clear to me how one would use a firewire camera in
+realtime mode. Is this possible, and how? Does one need to adapt the linux
+firewire driver or not? How can one find out whether one's firewire camera
+is realtime or not?
+
+Best regards,
+
+Herman
+
+PS I lost the url to the realtime firewire mailinglist ... (Not the one on
+Berlios, because that contains no messages at all :-)
+--
+K.U.Leuven, Mechanical Eng., Mechatronics & Robotics Research Group
+<http://people.mech.kuleuven.be/~bruyninc> Tel: +32 16 322480
+
+Disclaimer: http://www.kuleuven.be/cwis/email_disclaimer.htm
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051031/aa805f40/attachment.html>
+
+From yuchen623 at gmail.com  Mon Oct 31 23:52:37 2005
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 31 Oct 2005 23:52:37 +0100
+Subject: [Rtfirewire-devel] Re: Realtime camera over firewire
+In-Reply-To: <Pine.LNX.4.64.0510311200200.7112@localhost.localdomain>
+References: <Pine.LNX.4.64.0510311200200.7112@localhost.localdomain>
+Message-ID: <95210d7e0510311452x3a9e8a9bs831662c354015500@mail.gmail.com>
+
+Dear Herman,
+
+nice to hear from you:)
+
+>
+>
+> I've read your paper for the Realtime Linux Workshop later this week, but
+> from it, it isn't clear to me how one would use a firewire camera in
+> realtime mode. Is this possible, and how? Does one need to adapt the linux
+> firewire driver or not? How can one find out whether one's firewire camera
+> is realtime or not?
+
+
+FireWire camera itself is just a node in the FireWire network. Normally,
+there is no software in the camera, which means from the physical layer to
+application layer (digital video signal coding and sending) everything is
+implemented in hardware. While on the other side, e.g. on Linux box with
+FireWire interface, a specific driver (e.g. dv1394, video1394) is used to
+dump the video data and decode it according to certain protocol. This driver
+needs to be adapted in order to do real-time video signal processing. As to
+the camera, I dont think we need to do anything in order to make it
+"real-time", because, as I said, most of case it is just a piece of
+hardware.
+
+Actually, the adaption of Linux driver for FireWire camera is on the roadmap
+of RT-FireWire, but due to the lack of hardware, also the limited time in my
+MSc project, I havent started this task.
+
+> PS I lost the url to the realtime firewire mailinglist ... (Not the one on
+> Berlios, because that contains no messages at all :-)
+
+
+Indeed, the berlios mailing list is the only official mailing list of
+RT-FireWire. But sadly enough, it is still almost empty, due to the fact
+that RT-FireWire is still a start-up project, and I havent done any
+advertising in the community. But, I have forwarded your message to the
+mailing list, so from now on, all interesting discussions will/should be
+archived.
+
+Some words about myself:)
+I finished my MSc project in the end of august. Now, I am employed as a
+trainee in Technical University of Eindhoven, a 2-year program for Embedded
+System Design, so called post-MSc. Although I am still deeply interested to
+work on FireWire, I can only use my free time in the evening / weekends.
+Even that depends on the task load in my job. Like today, I could not find
+time earlier to reply you. Personally, I would be very happy if someone can
+take over part of the FireWire work, e.g. the branch on real-time video. In
+that case, I will try my best to deliver my current knowledge and offer
+other support. Also, to develop things like real-time video, it is better to
+have a complete setup (with some actuating device, instead of just a
+camera), which is however impossible to put in my private room.
+
+I am really interested to keep on the discussion about real-time video over
+FireWire:)
+
+Best regards,
+Yuchen
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051031/09633b00/attachment.html>
+

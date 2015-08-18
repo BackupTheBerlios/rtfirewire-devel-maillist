@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Test results and bugs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C95210d7e0607251202v32403826xd756e4036aa0f811%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next"  HREF="000066.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Test results and bugs</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Test%20results%20and%20bugs&In-Reply-To=%3C95210d7e0607251202v32403826xd756e4036aa0f811%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] Test results and bugs">yuchen623 at gmail.com
+       </A><BR>
+    <I>Tue Jul 25 21:02:22 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000064.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+        <LI>Next message: <A HREF="000066.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On 7/25/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+&gt;<i> Yuchen Zhang wrote:
+</I>&gt;<i> &gt; On 7/25/06, Jan Kiszka &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">jan.kiszka at web.de</A>&gt; wrote:
+</I>&gt;<i> &gt;&gt;&gt;&gt; some bugs I ran on during a quick test with 2.6.17. The first one is simple:
+</I>&gt;<i> &gt;&gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;&gt; BUG: unable to handle kernel NULL pointer dereference at virtual address 00000000
+</I>&gt;<i> &gt;&gt;&gt;&gt;  printing eip:
+</I>&gt;<i> &gt;&gt;&gt;&gt; c012eca8
+</I>&gt;<i> &gt;&gt;&gt;&gt; ...
+</I>&gt;<i> &gt;&gt;&gt;&gt; EIP: [&lt;c012eca8&gt;] xnintr_irq_proc+0x64/0x93 SS:ESP 0068:f7657ed8
+</I>&gt;<i> &gt;&gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt;&gt; That's due to registering the OHCI IRQ with a NULL driver name (I called
+</I>&gt;<i> &gt;&gt;&gt;&gt; cat /proc/xenomai/irq).
+</I>&gt;<i> &gt;&gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt; So, this is new in 2.6.17 kernel, Is it?
+</I>&gt;<i> &gt;&gt; You mean Xenomai 2.1, don't you? :)
+</I>&gt;<i> &gt;&gt; (part of the IRQ subsystem restructuring in Xenomai and Adeos)
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt; Ok, now I get it:) You mean this oops only happens when you call
+</I>&gt;<i> &gt; /proc/xenomai/irq. I will try to fix this.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt;&gt;&gt; The second one comes after &quot;rtping -h fwhost0 -d 0 -s 500&quot; reported a failure and I
+</I>&gt;<i> &gt;&gt;&gt;&gt; tried to restart this command:
+</I>&gt;<i> &gt;&gt;&gt;&gt;
+</I>&gt;<i> &gt;&gt;&gt; This bug happens when running loopback rtping. I will try to reproduce
+</I>&gt;<i> &gt;&gt;&gt; this bug here at home.
+</I>&gt;<i> &gt;&gt; Ok. It's at least nicely reproducable.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt; I acutally have fixed this bug long time ago. But due to some
+</I>&gt;<i> &gt; configuration management mistake, the head revision was not containing
+</I>&gt;<i> &gt; this fix. It has been fixed now, Just check out the head rev and give
+</I>&gt;<i> &gt; another try:)
+</I>&gt;<i>
+</I>&gt;<i> Yes, works now. It's only that I had to replace &quot;-d 0&quot; with &quot;-d 1&quot; in
+</I>&gt;<i> the rtping call. All other values give &quot;Resource temporarily
+</I>&gt;<i> unavailable&quot;. I don't claim to understand yet what's going on. How does
+</I>&gt;<i> node numbering work? Was _that_ broken before?
+</I>&gt;<i>
+</I>How many cards do you have in your box? If you do hostconfig, you can
+see the node ID of each card. The node ID is the id of that card in
+the _whole_ FW network. So if the node ID is 1, it must be connected
+to at least another FW device/card.
+
+Yuchen
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000064.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+	<LI>Next message: <A HREF="000066.html">[Rtfirewire-devel] Test results and bugs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

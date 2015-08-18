@@ -1,0 +1,163 @@
+From bzeller at lpr.e-technik.tu-muenchen.de  Fri Oct 13 14:24:40 2006
+From: bzeller at lpr.e-technik.tu-muenchen.de (Bernhard Zeller)
+Date: Fri, 13 Oct 2006 14:24:40 +0200
+Subject: [Rtfirewire-devel] bis1394 problems
+Message-ID: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+
+Hi all!
+
+I have successfully installed rt-firewire over Xenomai 2.2. I started playing 
+around a bit, but when I try to load the module bis1394, my system freezes. 
+The critical call seems to be "hpsb_register_highlevel(&bis_highlevel);". Has 
+anybody encountered this before? I could load all other modules without 
+problems.
+
+Bernhard.
+
+
+From jan.kiszka at web.de  Fri Oct 13 17:10:41 2006
+From: jan.kiszka at web.de (Jan Kiszka)
+Date: Fri, 13 Oct 2006 17:10:41 +0200
+Subject: [Rtfirewire-devel] bis1394 problems
+In-Reply-To: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+References: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+Message-ID: <452FAC71.3080902@web.de>
+
+Bernhard Zeller wrote:
+> Hi all!
+> 
+> I have successfully installed rt-firewire over Xenomai 2.2. I started playing 
+> around a bit, but when I try to load the module bis1394, my system freezes. 
+> The critical call seems to be "hpsb_register_highlevel(&bis_highlevel);". Has 
+> anybody encountered this before? I could load all other modules without 
+> problems.
+
+Not being able to comment on what precisely may happen here, I would
+suggest to try catching more information. Maybe there is an oops going
+on you just cannot see anymore. Check
+
+linux/Documentation/serial-console.txt or
+linux/Documentation/networking/netconsole.txt
+
+how to catch anything the kernel may spit out before going South.
+
+If you want to dive deeper, this may be of some interest as well:
+
+http://download.gna.org/adeos/patches/v2.6/i386/kgdb/
+(just keep CONFIG_PREEMPT off for now, kgdb has a bug)
+
+Jan
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 250 bytes
+Desc: OpenPGP digital signature
+URL: <https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20061013/7ff2aca4/attachment.pgp>
+
+From yuchen623 at gmail.com  Tue Oct 17 01:15:48 2006
+From: yuchen623 at gmail.com (Yuchen Zhang)
+Date: Mon, 16 Oct 2006 23:15:48 +0000
+Subject: [Rtfirewire-devel] bis1394 problems
+In-Reply-To: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+References: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+Message-ID: <95210d7e0610161615u15b64902w2b4947799a39d435@mail.gmail.com>
+
+Hi,
+
+sorry for the a bit late response.
+
+Which version of RTFW are you using? I just tried the latest version
+from https://svn.sourceforge.net/svnroot/rtfirewire/trunk with Xenomai
+2.2, and I can load bis1394 without any problem. But I got another
+problem that rtping is not working any more:(. I dont have much time
+thesedays to work on RTFW, but I think we'd better to make RTFW more
+diagnosable, in order to more efficiently find a clue when things go
+weird. Kgdb would be an option here. Another is to just add more
+configurable message print-out in critical paths, such as
+hpsb_register_highlevel.
+
+Yuchen
+
+On 10/13/06, Bernhard Zeller <bzeller at lpr.e-technik.tu-muenchen.de> wrote:
+> Hi all!
+>
+> I have successfully installed rt-firewire over Xenomai 2.2. I started playing
+> around a bit, but when I try to load the module bis1394, my system freezes.
+> The critical call seems to be "hpsb_register_highlevel(&bis_highlevel);". Has
+> anybody encountered this before? I could load all other modules without
+> problems.
+>
+> Bernhard.
+> _______________________________________________
+> Rtfirewire-devel mailing list
+> Rtfirewire-devel at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/rtfirewire-devel
+>
+
+
+From B.Zeller at gmx.de  Wed Oct 18 14:10:45 2006
+From: B.Zeller at gmx.de (Bernhard Zeller)
+Date: Wed, 18 Oct 2006 14:10:45 +0200
+Subject: [Rtfirewire-devel] bis1394 problems
+In-Reply-To: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+References: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+Message-ID: <200610181410.45181.B.Zeller@gmx.de>
+
+On Friday 13 October 2006 14:24, Bernhard Zeller wrote:
+> Hi all!
+>
+> I have successfully installed rt-firewire over Xenomai 2.2. I started
+> playing around a bit, but when I try to load the module bis1394, my system
+> freezes. The critical call seems to be
+> "hpsb_register_highlevel(&bis_highlevel);". Has anybody encountered this
+> before? I could load all other modules without problems.
+>
+
+Huh? If I use "modprobe" instead of "insmod", it works... But I'm sure I 
+didn't forget any modules, "lsmod" lists exactly the same ones as before 
+(except for bis1394 of course). That's weird...
+
+Thanks for the debugging tips Jan, I've set up a serial console now, just in 
+case.
+
+Bernhard.
+
+
+From piet.levrier at student.kuleuven.be  Wed Oct 18 14:46:12 2006
+From: piet.levrier at student.kuleuven.be (Piet Levrier)
+Date: Wed, 18 Oct 2006 14:46:12 +0200
+Subject: [Rtfirewire-devel] bis1394 problems
+In-Reply-To: <200610181410.45181.B.Zeller@gmx.de>
+References: <200610131424.40160.bzeller@lpr.e-technik.tu-muenchen.de>
+	<200610181410.45181.B.Zeller@gmx.de>
+Message-ID: <45362214.3070705@student.kuleuven.be>
+
+
+>> Hi all!
+>>
+>> I have successfully installed rt-firewire over Xenomai 2.2. I started
+>> playing around a bit, but when I try to load the module bis1394, my system
+>> freezes. The critical call seems to be
+>> "hpsb_register_highlevel(&bis_highlevel);". Has anybody encountered this
+>> before? I could load all other modules without problems.
+>>
+>>     
+>
+> Huh? If I use "modprobe" instead of "insmod", it works... But I'm sure I 
+> didn't forget any modules, "lsmod" lists exactly the same ones as before 
+> (except for bis1394 of course). That's weird...
+>   
+I think the reason for that is that modprobe uses insmod to first load 
+any prerequisite modules into the kernel, and then the requested 
+module.  Modprobe also knows the correct location of the prerequisite 
+modules, which is important because it's possible to have more than one 
+module called e.g. raw1394 on your machine.  This is one explanation i 
+guess.
+
+-- 
+greetings
+Piet
+
+

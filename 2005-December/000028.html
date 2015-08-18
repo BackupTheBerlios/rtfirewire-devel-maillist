@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTFW-0.1%20in%20P-IV%20D915PCY%20M/B%3A%20While%20loading%20rt_serv%20module%20Xenomai%20complains%20about%20%27irq_brk%27&In-Reply-To=%3C95210d7e0512081531q4ffc28cxb74458778fcfbca6%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000019.html">
+   <LINK REL="Next"  HREF="000026.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTFW-0.1%20in%20P-IV%20D915PCY%20M/B%3A%20While%20loading%20rt_serv%20module%20Xenomai%20complains%20about%20%27irq_brk%27&In-Reply-To=%3C95210d7e0512081531q4ffc28cxb74458778fcfbca6%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'">yuchen623 at gmail.com
+       </A><BR>
+    <I>Fri Dec  9 00:31:10 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000019.html">[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+</A></li>
+        <LI>Next message: <A HREF="000026.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Just tested with 2.6.13-ipipe, Xenomai 2.0 and RT-FW 0.1. BUT no problem at all!
+
+Probably you should re-compile everything, including Linux kernel,
+modules, and xenomai, and try again. If you still have the problem,
+feel free to tell me.
+
+Yuchen
+
+On 12/5/05, Yuchen Zhang &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">yuchen623 at gmail.com</A>&gt; wrote:
+&gt;<i> On 12/5/05, M. Omar Faruque Sarker &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">writefaruq at gmail.com</A>&gt; wrote:
+</I>&gt;<i> &gt; Hi all,
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Today during my extensive test on RT-FW-0.1 in the above mentioned PC
+</I>&gt;<i> &gt; with Linux 2.6.13 (with ipipe patch) I found an error which made my
+</I>&gt;<i> &gt; machine  non-responding.
+</I>&gt;<i> &gt;
+</I>&gt;<i> I havent tried RT-FW with ipipe patched kernel. So the problem could
+</I>&gt;<i> be RT-FW somehow is not compatible with ipipe patch.
+</I>&gt;<i>
+</I>&gt;<i> &gt; Just after successful loading of Xenomai modules I inserted rt-fw
+</I>&gt;<i> &gt; rtpkbuff and rt_serv and then got this:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; [ Xenomai: suspending kernel thread  f72de810('irq_brk') at 0xf8d47a7
+</I>&gt;<i> &gt; after exception 0.
+</I>&gt;<i> &gt;  ata: command 0x35 timed out stat 0x50 host stat 0x24 ]
+</I>&gt;<i> &gt;
+</I>&gt;<i> The problem is only in rt_serv module. irq_brk is the irq broker
+</I>&gt;<i> thread. For the time being, I dont know what exception 0 means, but
+</I>&gt;<i> that could be a very important clue.
+</I>&gt;<i>
+</I>&gt;<i> &gt; then if i insert other modules like rt_ohci1394 the system becomes
+</I>&gt;<i> &gt; completely unresponsive and noway but hard reboot ;(
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I disable HT from BIOS but no change.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> Anyway, I would likely to make this error happen on my box.
+</I>&gt;<i>
+</I>&gt;<i> Yuchen
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000019.html">[Rtfirewire-devel] RTFW-0.1 in P-IV D915PCY M/B: While loading rt_serv module Xenomai complains about 'irq_brk'
+</A></li>
+	<LI>Next message: <A HREF="000026.html">[Rtfirewire-devel] Query Regarding Using RTFW with RTnet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

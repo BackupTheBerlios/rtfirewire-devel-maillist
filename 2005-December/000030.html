@@ -1,0 +1,282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2005-December/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20%5BRTnet-developers%5D%20Re%3A%20Common%20rt-buffers&In-Reply-To=%3C4399EBF8.8030406%40web.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000025.html">
+   <LINK REL="Next"  HREF="000031.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers</H1>
+    <B>Jan Kiszka</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20Re%3A%20%5BRTnet-developers%5D%20Re%3A%20Common%20rt-buffers&In-Reply-To=%3C4399EBF8.8030406%40web.de%3E"
+       TITLE="[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers">jan.kiszka at web.de
+       </A><BR>
+    <I>Fri Dec  9 21:41:28 CET 2005</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000025.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+        <LI>Next message: <A HREF="000031.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Yuchen Zhang wrote:
+&gt;<i> [...]
+</I>&gt;<i> This is because my own idea was already more or less similiar to
+</I>&gt;<i> yours, i.e. to move memory management to a base layer, like RTDM. BUT,
+</I>&gt;<i> I dont think my idea is exactly the same as what you said, see below:
+</I>&gt;<i> 1. I think the buffer size should be an argument to API of allocating
+</I>&gt;<i> parent pools, i.e. the kernel_slab_pool.
+</I>
+Did I expressed this differently? Yes, this makes sense most (more
+precisely: buffer size and minimum header size).
+
+&gt;<i> 
+</I>&gt;<i> 2. I think  We DONT need to have different APIs for creating and
+</I>&gt;<i> joining parent pool. The name of the pool is given in the creating API
+</I>&gt;<i> anyway, but in case a pool of same name already exists, the pointer to
+</I>&gt;<i> the existing pool is returned. BUT this is transparent to
+</I>&gt;<i> applications.
+</I>
+Also what I meant. You call some rtdm_prntpool_create(name, buf_size,
+min_head_size) or so, and that pool gets either created or the existing
+one is returned.
+
+&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;&gt;&gt;<i>Now, I have some further idea: what if we also bind the packet
+</I>&gt;&gt;&gt;<i>capturing service with the memory management. That is if a real-time
+</I>&gt;&gt;&gt;<i>application needs real-time memory allocation, it can also ask for
+</I>&gt;&gt;&gt;<i>capturing of all those allocated memory (packets). We can use some
+</I>&gt;&gt;&gt;<i>user-space tools to analyze the captured memory. The captured memory
+</I>&gt;&gt;&gt;<i>can be delivered via fake Ethernet interface, so tools like Ethereal
+</I>&gt;&gt;&gt;<i>can be used (only need to extend it based on the application).
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i>The capturng of a packet can be done when that packet memory is freed,
+</I>&gt;&gt;&gt;<i>where the capturing operation is transparent to the application. Well,
+</I>&gt;&gt;&gt;<i>the application must claim somewhere  before the packet is freed that
+</I>&gt;&gt;&gt;<i>it should be captured, e.g. right after it is allocated.
+</I>&gt;&gt;&gt;<i>
+</I>&gt;&gt;&gt;<i>Concerning the packet capturing idea, we can explore more, if it is
+</I>&gt;&gt;&gt;<i>agreed to be interesting and effort-worth.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>Actually, I'm not yet convinced that outsourcing /this/ job to RTDM is
+</I>&gt;&gt;<i>useful.
+</I>&gt;&gt;<i>
+</I>&gt;<i> 
+</I>&gt;<i> Ok, now time for real debating:)
+</I>&gt;<i> Let's first sketch the main frame code to support this service.
+</I>&gt;<i> 
+</I>&gt;<i> struct Cap_struct {
+</I>&gt;<i>          struct net_dev *fakedev;  /*the fake ethernet dev to deliver
+</I>&gt;<i> captured packet to user-space*/
+</I>&gt;<i>          struct rt-buffer-pool   *cap_pool;  /*where the buffers to
+</I>&gt;<i> compensate application memory come from*/
+</I>&gt;<i>         int buffer_size;  /* the size of buffer that can be captured here */
+</I>&gt;<i> }
+</I>
+So, that structure describes a capturing instance, conceptually
+something like rtcap service of RTnet?
+
+&gt;<i> 
+</I>&gt;<i> struct rt-buffer{
+</I>&gt;<i>           .....
+</I>&gt;<i>           struct Cap_struct *aCap;
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>
+And this link is needed as there can be multiple capturers, right? But
+what about the additional fields required by rtcap to save the initial
+buffer layout, the compensation buffer, timestamp, and other stuff? Note
+that rtcap does deferred capturing. Does your service in RT-FireWire
+work the same way?
+
+&gt;<i> /*function to create a Cap_struct*/
+</I>&gt;<i> struct Cap_struct *create_cap( int size, //  the buffer size
+</I>&gt;<i>                                              struct kernel_slab_pool
+</I>&gt;<i> *parent_pool,
+</I>&gt;<i>                                               char *name) // the name
+</I>&gt;<i> of fake ethernet dev, should be
+</I>&gt;<i>                                                                
+</I>&gt;<i> //specific about application
+</I>&gt;<i> {
+</I>&gt;<i>        if(*name already exists){
+</I>&gt;<i>                return (address of existing Cap_struct)
+</I>&gt;<i>        }
+</I>&gt;<i>       .............
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> /*function to remove a Cap_struct*/
+</I>&gt;<i> void remove_cap(struct Cap_struct *aCap_struct)
+</I>&gt;<i> 
+</I>
+Ok, this makes sense.
+
+&gt;<i> /*function to capture a buffer*/
+</I>&gt;<i> struct rt-buffer *cap_rtbuffer(struct rt-buffer *abuffer, int
+</I>&gt;<i> buffer_size, struct cap_struct *aCap)
+</I>&gt;<i> {
+</I>&gt;<i>      if(aCap-&gt;buffer_size != buffer_size)
+</I>&gt;<i>                    //print error msg and return
+</I>&gt;<i>      else{
+</I>&gt;<i>           //allocate a compesating buffer from the cap pool
+</I>&gt;<i>           // exchange buffers
+</I>&gt;<i>           //deliver the captured buffer to fake ethernet dev
+</I>
+I hope you do NOT deliver immediately, just pend the delivery for Linux
+to get in the CPU again.
+
+&gt;<i>           //return the address of compensating buffer
+</I>&gt;<i>          return &amp;comp_buffer;
+</I>&gt;<i>      }
+</I>&gt;<i> }
+</I>
+What's the caller supposed to do with that returned buffer?
+
+&gt;<i> 
+</I>&gt;<i> /*function to free a rt buffer*/
+</I>&gt;<i> void free_rtbuffer(struct rt-buffer *abuffer){
+</I>&gt;<i>     if(abuffer-&gt;aCap){ //pointer NOT null, so we should capture this one
+</I>&gt;<i>          abuffer = cap_rtbuffer(abuffer, sizeof(abuffer), abuffer-&gt;aCap);
+</I>
+Is this the only use case for cap_rtbuffer? How do you mark the actual
+capturing date? Only on buffer release? Or did you leave out this aspect
+in the draft?
+
+&gt;<i>     }
+</I>&gt;<i>     //free abuffer
+</I>&gt;<i>     ......
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;&gt;<i>At least for RTnet, capturing is a debugging feature you don't what
+</I>&gt;&gt;<i>compiled in for production systems. It adds overhead to some critical
+</I>&gt;&gt;<i>paths that may hurt on low-end boxes.
+</I>&gt;&gt;<i>
+</I>&gt;<i> 
+</I>&gt;<i> I dont think the overhead is noticable. When the base module (say
+</I>&gt;<i> RTDM) has capturing option enabled, the only overhead that happens to
+</I>&gt;<i> applications that do NOT need capturing   is, in the free_rtbuffer
+</I>&gt;<i> function, the extra checking of a rt-buffer's cap_struct pointer.
+</I>
+Well, the current kfree_rtskb in RTnet has to do more. It iterates over
+all rtskbs in a (possible) chain and checks for each if it is a captured
+one. Anyway, this needless overhead in the capturing-compiled-in-but-
+not-used case can be avoided with a simple check before entering any
+loop. So, you are likely right, the overhead is acceptable - and could
+still be reduced when we add a CONFIG_switch to RTDM.
+
+Apropos chains: does RT-FireWire's rtpk support them? If we drag
+capturing into the core service layer, this is required.
+
+&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;&gt;<i>The question to me is then what functionality of the capturing subsystem
+</I>&gt;&gt;<i>could be moved to RTDM while still keeping the control of using it or
+</I>&gt;&gt;<i>not (without runtime costs) at the configuration level of the driver
+</I>&gt;&gt;<i>using it. I would like to be able to switch capturing off during &quot;make
+</I>&gt;&gt;<i>menuconfig&quot; of RTnet, but maybe switching it on for RT-FireWire at the
+</I>&gt;&gt;<i>same time.
+</I>&gt;&gt;<i>
+</I>&gt;<i> 
+</I>&gt;<i> The capturing I am proposing is conceptually different from the
+</I>&gt;<i> capturing in RTnet (what I understood). It is fully oriented to
+</I>&gt;<i> applications, while RTnet's capturing is more or less per networking
+</I>&gt;<i> interface. That means in this new capturing service, buffer capturing
+</I>&gt;<i> can happen /anywhere/, even something totally away from network
+</I>&gt;<i> transaction. This is especially useful when we develop multiple
+</I>&gt;<i> applications over /one/ FireWire interface: we may only want to
+</I>&gt;<i> capture buffers used by one high-level application. Besides FireWire
+</I>
+I may not know my own code well enough, but I don't see a reason why
+setting the capturing mark in RTnet should not be movable, also away
+from the general places where it is right now.
+
+&gt;<i> and Ethernet, other applications based on RTDM, like socketCAN, can
+</I>&gt;<i> also benefit from this service, as long as they need some analysis
+</I>&gt;<i> over the used memory to gain some insight to the system behavior.
+</I>
+I had Socket-CAN in mind as well first, but Sebastian's implementation
+is smartly not using discrete CAN-packet buffers. Rather, there are ring
+buffers per receiving socket. This is more efficient than throwing
+around 8 bytes data + some bytes head per CAN frame in individual
+packets. CAN packets are too small to justify the maintenance costs of
+skb-like approaches - that's at least my strong believe (but we should
+soon be able to do some benchmarks on this as well - there is a Linux
+skb-based variant on the way).
+
+Anyway, one may consider if &quot;external&quot; users of the rt-packet capturing
+services make sense as well. But that's more kind of a second or third step.
+
+&gt;<i> 
+</I>&gt;<i> BTW, are you going to work on these soon, at least the memory
+</I>&gt;<i> management part? How can I contribute? My idea is to make RTDM
+</I>
+My plan was to burden much of the development on you, as my time is more
+than just limited. ;)
+
+Well, I have no fixed schedule, but I guess things will move quickly as
+soon as we have some API and data structures.
+
+&gt;<i> temporarily a separate module that can be compiled over xenomai, and
+</I>&gt;<i> put it either on RTnet svn or RT-FireWire svn.
+</I>
+I wouldn't drag the whole RTDM module back in RTnet again (that's too
+platform dependent anyway). I would suggest to develop the required
+services as an optional subsystem first inside RT-FireWire and RTnet. As
+soon as this API is stable for each individual project, we could than
+merge it into a private Xenomai tree, test the cooperation between RTnet
+and RT-FireWire, and then start submitting patches against Xenomai first
+and RTAI later.
+
+And, with the RTDM-packet subsystem still in both projects available, we
+could continue to provide support for older RTDM cores without that
+feature. Detecting the RTDM API revision is easy and could be used to
+decide if the internal rt-packet code should be build.
+
+Jan
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 256 bytes
+Desc: OpenPGP digital signature
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051209/600f7c40/attachment.pgp">https://lists.berlios.de/pipermail/rtfirewire-devel/attachments/20051209/600f7c40/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000025.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+	<LI>Next message: <A HREF="000031.html">[Rtfirewire-devel] Re: [RTnet-developers] Re: Common rt-buffers
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,471 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rtfirewire-devel/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTnet%20svn%20%2B%20RT-Firewire%20svn%20%2B%20Xenomai%20%3E%202.0&In-Reply-To=%3C95210d7e0608260755x1446d12dm8dccb309673120ee%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000075.html">
+   <LINK REL="Next"  HREF="000080.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0</H1>
+    <B>Yuchen Zhang</B> 
+    <A HREF="mailto:rtfirewire-devel%40lists.berlios.de?Subject=Re%3A%20%5BRtfirewire-devel%5D%20RTnet%20svn%20%2B%20RT-Firewire%20svn%20%2B%20Xenomai%20%3E%202.0&In-Reply-To=%3C95210d7e0608260755x1446d12dm8dccb309673120ee%40mail.gmail.com%3E"
+       TITLE="[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0">yuchen623 at gmail.com
+       </A><BR>
+    <I>Sat Aug 26 16:55:13 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000075.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+        <LI>Next message: <A HREF="000080.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+when you configure RTnet, did you specify the location of your RTFW?
+Seems to me that the RTnet auto configurator cannot find RTFW, so just
+use the /usr/src/rtnet/drivers/... as the default path too seek all
+the header files.
+
+Yuchen
+
+On 8/21/06, Beyer Philipp &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">admin at network-crawler.de</A>&gt; wrote:
+&gt;<i> Hello List,
+</I>&gt;<i>
+</I>&gt;<i> I have some Difficulties with RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0.
+</I>&gt;<i>
+</I>&gt;<i> After some dirty hacks I managed to compile the module but shame on me
+</I>&gt;<i> Xenomai kernel suspended.
+</I>&gt;<i> What I did:
+</I>&gt;<i>
+</I>&gt;<i> I got the newest Version from the svn tree and but it in
+</I>&gt;<i> /usr/src/RT-Firewire then I configured RTnet via
+</I>&gt;<i> make ARCH=i386 CROSS_COMPILE=i486-linux-uclibc- menuconfig (I am using
+</I>&gt;<i> an embedded system with uclibc as target and my build host is a x86_64
+</I>&gt;<i> smp). In RTnet menuconfig I used:
+</I>&gt;<i>
+</I>&gt;<i> #
+</I>&gt;<i> # Misc Drivers
+</I>&gt;<i> #
+</I>&gt;<i> CONFIG_RTNET_DRV_LOOPBACK=y
+</I>&gt;<i> # CONFIG_RTNET_DRV_SMC91111 is not set
+</I>&gt;<i> CONFIG_RTNET_DRV_ETH1394=y
+</I>&gt;<i> CONFIG_RTNET_RTFIREWIRE_DIR=&quot;/usr/src/RT-Firewire&quot;
+</I>&gt;<i> # CONFIG_RTNET_EXP_DRIVERS is not set
+</I>&gt;<i>
+</I>&gt;<i> During compilation I got:
+</I>&gt;<i>
+</I>&gt;<i> make[3]: Entering directory `/usr/src/linux-2.6.16-ipipe-xeno2.2'
+</I>&gt;<i>   CC [M]  /usr/src/rtnet/drivers/rt_eth1394.o
+</I>&gt;<i> In file included from /usr/src/rtnet/drivers/rt_eth1394.c:37:
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.h:27:22: ieee1394.h: No such file or
+</I>&gt;<i> directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:41:28: ieee1394_types.h: No such
+</I>&gt;<i> file or directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:42:27: ieee1394_core.h: No such file
+</I>&gt;<i> or directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:43:35: ieee1394_transactions.h: No
+</I>&gt;<i> such file or directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:45:23: highlevel.h: No such file or
+</I>&gt;<i> directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:46:17: iso.h: No such file or directory
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:142: error: variable `eth1394_ops'
+</I>&gt;<i> has initializer but incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:143: error: unknown field `write'
+</I>&gt;<i> specified in initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:143: warning: excess elements in
+</I>&gt;<i> struct initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:143: warning: (near initialization
+</I>&gt;<i> for `eth1394_ops')
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:151: error: variable
+</I>&gt;<i> `eth1394_highlevel' has initializer but incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:152: error: unknown field `name'
+</I>&gt;<i> specified in initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:152: warning: excess elements in
+</I>&gt;<i> struct initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:152: warning: (near initialization
+</I>&gt;<i> for `eth1394_highlevel')
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:153: error: unknown field `add_host'
+</I>&gt;<i> specified in initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:153: warning: excess elements in
+</I>&gt;<i> struct initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:153: warning: (near initialization
+</I>&gt;<i> for `eth1394_highlevel')
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:154: error: unknown field
+</I>&gt;<i> `remove_host' specified in initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:154: warning: excess elements in
+</I>&gt;<i> struct initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:154: warning: (near initialization
+</I>&gt;<i> for `eth1394_highlevel')
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:155: error: unknown field
+</I>&gt;<i> `host_reset' specified in initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:155: warning: excess elements in
+</I>&gt;<i> struct initializer
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:155: warning: (near initialization
+</I>&gt;<i> for `eth1394_highlevel')
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_iso_shutdown':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:164: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_iso_shutdown'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_init_bc':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:176: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:176: error: (Each undeclared
+</I>&gt;<i> identifier is reported only once
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:176: error: for each function it
+</I>&gt;<i> appears in.)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:176: error: parse error before &quot;bc&quot;
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:181: error: `bc' undeclared (first
+</I>&gt;<i> use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:181: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:208: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_iso_recv_init'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:209: error:
+</I>&gt;<i> `HPSB_ISO_DMA_PACKET_PER_BUFFER' undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:210: error:
+</I>&gt;<i> `IEEE1394_PRIORITY_HIGHEST' undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:210: warning: assignment makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:219: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_iso_recv_start'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_reset_priv':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:318: warning: implicit declaration
+</I>&gt;<i> of function `NODEID_TO_NODE'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:318: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:319: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:333: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:337: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:343: error: `LOCAL_BUS' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_add_host':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:422: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_create_hostinfo'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:422: warning: assignment makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:444: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:451: error:
+</I>&gt;<i> `HPSB_ISO_DMA_PACKET_PER_BUFFER' undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:452: error:
+</I>&gt;<i> `IEEE1394_PRIORITY_HIGHEST' undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:452: warning: assignment makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:471: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_register_addrspace'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:479: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_destroy_hostinfo'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_remove_host':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:490: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_get_hostinfo'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:490: warning: initialization makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_host_reset':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:509: warning: initialization makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_header':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:544: error: `nodeid_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: At top level:
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:680: error: parse error before
+</I>&gt;<i> &quot;nodeid_t&quot;
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:682: warning: function declaration
+</I>&gt;<i> isn't a prototype
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_parse_encap':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:683: error: `dev' undeclared (first
+</I>&gt;<i> use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:689: error: `ether_type' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:692: error: `skb' undeclared (first
+</I>&gt;<i> use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:696: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:696: warning: type defaults to `int'
+</I>&gt;<i> in declaration of `_x'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:696: error: dereferencing pointer to
+</I>&gt;<i> incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:696: warning: comparison of distinct
+</I>&gt;<i> pointer types lacks a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:711: error: `srcid' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:742: error: `destid' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_data_handler':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1081: warning: implicit declaration
+</I>&gt;<i> of function `DEBUG_PRINT'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_write':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1115: warning: initialization makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1119: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1121: error: `RCODE_ADDRESS_ERROR'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1125: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1126: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1127: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1128: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1128: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1134: error: `RCODE_COMPLETE'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_iso':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1144: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1144: error: `data' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1145: warning: ISO C90 forbids mixed
+</I>&gt;<i> declarations and code
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1153: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1153: warning: initialization makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1155: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1162: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_iso_n_ready'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1165: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1165: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1165: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1166: error: parse error before ')'
+</I>&gt;<i> token
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1166: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1166: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1170: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1176: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1176: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1181: error: `LOCAL_BUS' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1185: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_iso_recv_release_packets'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_arp_to_1394arp':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1212: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1220: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function
+</I>&gt;<i> `eth1394_alloc_common_packet':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1296: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_alloc_packet'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1296: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1296: warning: assignment makes
+</I>&gt;<i> pointer from integer without a cast
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1298: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1299: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1300: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1300: warning: implicit declaration
+</I>&gt;<i> of function `get_hpsb_generation'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1301: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1301: error: `hpsb_async' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: At top level:
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1309: error: parse error before
+</I>&gt;<i> &quot;nodeid_t&quot;
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1311: warning: function declaration
+</I>&gt;<i> isn't a prototype
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function
+</I>&gt;<i> `eth1394_prep_write_packet':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1312: error: `p' undeclared (first
+</I>&gt;<i> use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1312: error: `node' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1314: error: `TCODE_WRITEB'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1316: error: `host' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1316: error: `addr' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1322: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_get_tlabel'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1323: error: parse error before
+</I>&gt;<i> &quot;NODE_BUS_FMT&quot;
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1330: error: `tx_len' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1332: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1332: error: parse error before ')'
+</I>&gt;<i> token
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_prep_gasp_packet':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1342: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1343: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1343: error: `TCODE_STREAM_DATA'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1345: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1348: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1349: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1349: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1349: error: parse error before ')'
+</I>&gt;<i> token
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1350: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1350: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1350: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1350: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1352: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1358: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1359: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_free_packet':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1365: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1365: error: `TCODE_STREAM_DATA'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1366: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_free_tlabel'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1367: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_free_packet'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_send_packet':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1390: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1393: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1405: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_set_packet_complete_task'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1408: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_send_packet'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_complete_cb':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1451: error: dereferencing pointer
+</I>&gt;<i> to incomplete type
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1451: error: `TCODE_STREAM_DATA'
+</I>&gt;<i> undeclared (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1452: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_packet_success'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_tx':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1485: error: `nodeid_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1485: error: parse error before
+</I>&gt;<i> &quot;dest_node&quot;
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1536: error: `dest_node' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1564: error: `quadlet_t' undeclared
+</I>&gt;<i> (first use in this function)
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_init':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1696: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_register_highlevel'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: In function `eth1394_exit':
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:1703: warning: implicit declaration
+</I>&gt;<i> of function `hpsb_unregister_highlevel'
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c: At top level:
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:151: error: storage size of
+</I>&gt;<i> `eth1394_highlevel' isn't known
+</I>&gt;<i> /usr/src/rtnet/drivers/rt_eth1394.c:142: error: storage size of
+</I>&gt;<i> `eth1394_ops' isn't known
+</I>&gt;<i> make[4]: *** [/usr/src/rtnet/drivers/rt_eth1394.o] Error 1
+</I>&gt;<i> make[3]: *** [_module_/usr/src/rtnet/drivers] Error 2
+</I>&gt;<i> make[3]: Leaving directory `linux-2.6.16-ipipe-xeno2.2'
+</I>&gt;<i> make[2]: *** [all-local.ko] Error 2
+</I>&gt;<i> make[2]: Leaving directory `/usr/src/rtnet/drivers'
+</I>&gt;<i> make[1]: *** [install-recursive] Error 1
+</I>&gt;<i> make[1]: Leaving directory `/usr/src/rtnet/drivers'
+</I>&gt;<i> make: *** [install-recursive] Error 1
+</I>&gt;<i>
+</I>&gt;<i> Then I changed all relevant #includes (hopefully right)and uncommented a typedef and it compiles.
+</I>&gt;<i> The problem the was after insmod and rtroute solicit:
+</I>&gt;<i>
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.debug kernel: ieee1394: Node added:
+</I>&gt;<i> ID:BUS[0-00:1023]  GUID[00e04b66000e3e16]
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.debug kernel: ieee1394: Host added:
+</I>&gt;<i> ID:BUS[0-01:1023]  GUID[00e04b66000e3e17]
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.warn kernel: VFS: Mounted root (nfs
+</I>&gt;<i> filesystem).
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.info kernel: Freeing unused kernel
+</I>&gt;<i> memory: 144k freed
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.warn kernel:
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.warn kernel: *** RTnet 0.9.4 -
+</I>&gt;<i> built on Aug 19 2006 10:34:02 ***
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.warn kernel:
+</I>&gt;<i> Sep 10 02:37:22 kontron_xenomai user.warn kernel: RTnet: initialising
+</I>&gt;<i> real-time networking
+</I>&gt;<i> Sep 10 02:37:25 kontron_xenomai user.warn kernel: initializing loopback...
+</I>&gt;<i> Sep 10 02:37:25 kontron_xenomai user.warn kernel: RTnet: registered rtlo
+</I>&gt;<i> Sep 10 02:37:36 kontron_xenomai user.warn kernel: RTnet: registered rteth0
+</I>&gt;<i> Sep 10 02:37:36 kontron_xenomai user.err kernel: RT-ETH1394: rteth0:
+</I>&gt;<i> IEEE-1394 IPv4 over 1394 Ethernet
+</I>&gt;<i> Sep 10 02:38:23 kontron_xenomai user.err kernel:
+</I>&gt;<i> RT-ETH1394:eth1394_tx[1547]: eth1394_tx: max_payload is 0
+</I>&gt;<i> Sep 10 02:38:23 kontron_xenomai user.warn kernel:
+</I>&gt;<i> Sep 10 02:38:23 kontron_xenomai user.err kernel:
+</I>&gt;<i> RT-ETH1394:eth1394_tx[1553]: max_payload too small: 0   (setting to 512)
+</I>&gt;<i> Sep 10 02:38:23 kontron_xenomai user.warn kernel:
+</I>&gt;<i> Sep 10 02:38:23 kontron_xenomai user.info kernel: Xenomai: suspending
+</I>&gt;<i> kernel thread c8052d60 ('rtnet-rtpc') at 0xc80646c1 after exception #14
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> :(
+</I>&gt;<i> I hope you can help me out,
+</I>&gt;<i>
+</I>&gt;<i> Philipp
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Rtfirewire-devel mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">Rtfirewire-devel at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">https://lists.berlios.de/mailman/listinfo/rtfirewire-devel</A>
+</I>&gt;<i>
+</I>
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000075.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+	<LI>Next message: <A HREF="000080.html">[Rtfirewire-devel] RTnet svn + RT-Firewire svn + Xenomai &gt; 2.0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rtfirewire-devel">More information about the Rtfirewire-devel
+mailing list</a><br>
+</body></html>
